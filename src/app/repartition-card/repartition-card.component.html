@@ -1,0 +1,20 @@
+<div class="container">
+  <div class="row">
+    <h6 class="col">
+      <span [class.isUsOwe]="ourNameInTrip === expense.person">{{expense.person}}</span>
+    </h6>
+  </div>
+  <div class="row">
+    <div class="col">
+      doit a
+    </div>
+    <div class="col col-amount">
+      {{expense?.amount?.toFixed(2)}}€
+    </div>
+  </div>
+  <div class="row">
+    <h6 class="col" [class.isUsOwed]="ourNameInTrip === expense.owesTo">
+      {{expense.owesTo}}
+    </h6>
+  </div>
+</div>

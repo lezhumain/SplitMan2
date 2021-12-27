@@ -1,0 +1,25 @@
+<!--<div class="travel-card">-->
+<!--  <a [routerLink]="['expense', expense.id]">{{expense}}</a>-->
+<!--  &lt;!&ndash;      <i class="fa fa-pencil-square-o" aria-hidden="true"></i>&ndash;&gt;-->
+<!--  <i class="fas fa-edit" (click)="openExpenseEdit(expense.id)"></i>-->
+<!--</div>-->
+
+<div class="container" (click)="openExpense()">
+  <div class="row">
+    <h6 class="col">
+      {{expense.name}}
+    </h6>
+    <div class="col col-amount col-right">
+      {{expense.amount}}€
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      Paid by <strong>{{expense.payer}}</strong>
+<!--      Paid by {{expense.payer}}-->
+    </div>
+    <div class="col col-right">
+      {{expense.displayDate}}
+    </div>
+  </div>
+</div>

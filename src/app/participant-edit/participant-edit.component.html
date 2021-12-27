@@ -1,0 +1,16 @@
+<div>
+  <div class="mb-3">
+    <label for="name" class="form-label">Name:</label>
+    <input type="text" class="form-control" id="name"
+           [(ngModel)]="participantModel.name" >
+  </div>
+  <div class="mb-3">
+    <label for="dayCount" class="form-label">Number of days:</label>
+    <input type="number" class="form-control" id="dayCount"
+           [(ngModel)]="participantModel.dayCount" >
+  </div>
+
+  <div class="col-auto">
+    <button type="button" class="btn btn-primary mb-3" (click)="saveParticipant()">Save</button>
+  </div>
+</div>

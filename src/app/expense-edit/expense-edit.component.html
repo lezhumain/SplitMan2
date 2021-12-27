@@ -1,0 +1,60 @@
+<div>
+  <div class="mb-3">
+    <label for="name" class="form-label">Name:</label>
+    <input type="text" class="form-control" id="name"
+           [(ngModel)]="expenseModel.name" >
+  </div>
+  <div class="mb-3">
+    <label for="amount" class="form-label">Amount:</label>
+    <input type="number" class="form-control" id="amount"
+           [(ngModel)]="expenseModel.amount" >
+  </div>
+  <div class="mb-3">
+    <label for="date" class="form-label">Date:</label>
+    <input type="date" class="form-control" id="date"
+          [value]="expenseModel.dateStr" (change)="dateChanged1($event)">
+  </div>
+  <div class="mb-3">
+    <label for="payer" class="form-label">Payer:</label>
+<!--    <input type="text" class="form-control" id="payer"-->
+<!--           [(ngModel)]="expenseModel.payer" >-->
+    <select id="payer" class="form-select" aria-label="Default select example" [(ngModel)]="expenseModel.payer">
+<!--      <option selected>Payer</option>-->
+      <option *ngFor="let part of travelUsers" value="{{part.name}}" >{{part.name}}</option>
+    </select>
+  </div>
+  <div class="mb-3">
+    <label for="payees" class="form-label">Payees:</label>
+    <input type="text" class="form-control" id="payees"
+           [value]="expenseModel.allPayees" disabled>
+  </div>
+  <div class="mb-3">
+    <div>
+      <label class="form-label">Payees:</label>
+<!--      <input type="text" class="form-control amount-input" aria-label="Amount (to the nearest dollar)" [(ngModel)]="user.e4xpenseRatio" (ngModelChange)="setSelectedUser(user)">-->
+      <input class="form-check-input" type="checkbox" value="" id="isPerDay" name="isPerDay" [(ngModel)]="isPerDay">
+      <label class="form-check-label" for="isPerDay">Per day</label>
+    </div>
+    <div>
+      <div class="form-check" *ngFor="let user of expParts">
+        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked-{{user.name}}" (change)="setUserSelected($event, user.name)" [attr.checked]="isUserSelected(user.name) || null">
+        <label class="form-check-label" for="flexCheckChecked-{{user.name}}">
+          <span>{{user.name}}</span>
+          <div class="input-group mb-3">
+            <input type="text" class="form-control amount-input" aria-label="Amount (to the nearest dollar)"
+                   [(ngModel)]="user.e4xpenseRatio" (ngModelChange)="setSelectedUser(user)"
+                   [attr.disabled]="isPerDay || null">
+            <span class="input-group-text perc-sign">%</span>
+            <input type="text" class="form-control amount-input" aria-label="Amount (to the nearest dollar)"
+                   [value]="getRatioValue(user.e4xpenseRatio || 0)" disabled>
+            <span class="input-group-text">€</span>
+          </div>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-auto">
+    <button type="button" class="btn btn-primary mb-3" (click)="saveExpense()">Save Expense</button>
+  </div>
+</div>

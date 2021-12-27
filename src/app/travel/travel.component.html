@@ -1,0 +1,80 @@
+<div>
+<!--  <div>Trip: {{travel.name}}</div>-->
+  <div>{{travel.description}}</div>
+  <br>
+  <button type="button" class="btn btn-success mb-3" (click)="invite()">Invite</button>
+  <br>
+
+  <div class="chooseWho" *ngIf="!whoAmi && getParticipants() as participants">
+      <div>
+          Who are you ?
+          <select id="payer" class="form-select" aria-label="Default select example" [(ngModel)]="whoAmiSelect">
+            <option *ngFor="let part of participants" value="{{part}}">{{part}}</option>
+          </select>
+          <button id="savePayer" type="button" class="btn btn-primary mb-3" (click)="saveSelfName()">Save</button>
+      </div>
+<!--    HIII {{whoAmi}}-->
+  </div>
+
+  <ul class="nav nav-tabs nav-fill" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button"
+              role="tab" aria-controls="home" aria-selected="true">Expenses</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button"
+              role="tab" aria-controls="profile" aria-selected="false">Repartition</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="profile-tab1" data-bs-toggle="tab" data-bs-target="#profile1" type="button"
+              role="tab" aria-controls="profile1" aria-selected="false">People</button>
+    </li>
+  </ul>
+  <div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+      <h3>Expenses</h3>
+      <div *ngFor="let ex of expenses">
+        <div class="expense-card">
+          <app-expense-card [expense]="ex"></app-expense-card>
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary mb-3" (click)="newExpense()"
+              [attr.disabled]="!travelHasParticipants() || null">Add expense</button>
+      <span class="partic-message" *ngIf="!travelHasParticipants()">Add some people first</span>
+    </div>
+    <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+      <h3>Repartition</h3>
+      <app-repartition [expenses]="expenses" [connectedUser]="(connectedUser$ | async)"></app-repartition>
+    </div>
+    <div class="tab-pane fade" id="profile1" role="tabpanel" aria-labelledby="profile-tab1">
+      <h3>Participants:</h3>
+      <div class="container" *ngIf="travel.participants">
+        <div class="row" *ngFor="let part of travel.participants">
+          <h6 class="col" [class.isUs]="this.isUs(part.name) | async">
+            {{part.name}}
+          </h6>
+          <div class="col">
+            {{part.dayCount}} jours
+          </div>
+          <div class="col">
+            {{part.ratio ? part.ratio.toFixed(2) : ""}} %
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary mb-3" (click)="newPerson()">Add people</button>
+    </div>
+  </div>
+  <div>
+<!--    TODO put in navbar-->
+    <button type="button" class="btn btn-primary mb-3" (click)="downloadAsCSV()"
+      *ngIf="expenses.length > 0">Download CSV</button>
+    <div class="mb-3">
+      <label for="formFile" class="form-label">Load CSV</label>
+      <input class="form-control" type="file" id="formFile" (change)="csvFileChanged($event)">
+      <button type="button" class="btn btn-primary mb-3"
+              *ngIf="!!file"
+              (click)="uploadCSV()">Upload CSV</button>
+    </div>
+  </div>
+</div>
+

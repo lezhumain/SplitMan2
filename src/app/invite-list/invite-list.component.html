@@ -1,0 +1,23 @@
+<p>invite-list works!</p>
+<!--<ng-container *ngIf="connectedUser$ && (connectedUser$ | async) as connectedUser">-->
+  <h3>Invites</h3>
+<!--  <div *ngIf="connectedUser.invites && connectedUser.invites.length > 0">-->
+<!--    <div *ngFor="let invite of connectedUser.invites">-->
+  <ng-container *ngIf="invites$ && (invites$ | async) as invites">
+    <div class="container" *ngIf="invites.length > 0">
+      <div class="row" *ngFor="let invite of invites">
+        <div class="col">
+          {{invite.tripName}}
+        </div>
+        <div class="col">
+          <i class="fas fa-check accept" (click)="acceptInvite(invite)"></i>
+        </div>
+        <div class="col">
+          <i class="fas fa-times discard" (click)="discardInvite(invite)"></i>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+<!--    </div>-->
+<!--  </div>-->
+<!--</ng-container>-->

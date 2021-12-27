@@ -1,0 +1,18 @@
+<div class="travel-card" (click)="openTravel()">
+<!--  <a [routerLink]="['/travels', travel.id]">{{travel}}</a>-->
+<!--      <i class="fa fa-pencil-square-o" aria-hidden="true"></i>-->
+<!--<i class="fas fa-edit" (click)="openTravelEdit()"></i>-->
+
+<div class="container">
+  <div class="row">
+    <h6 class="col">
+      {{travel?.name}}
+    </h6>
+  </div>
+  <div class="row">
+    <div class="col">
+      {{getParticipantList()}}
+    </div>
+  </div>
+</div>
+</div>

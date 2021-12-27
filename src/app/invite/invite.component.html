@@ -1,0 +1,13 @@
+<h3>Invite someone to the trip</h3>
+<div>
+  <div class="mb-3">
+    <label for="email" class="form-label">Email address</label>
+    <input type="email" class="form-control" id="email"
+           [(ngModel)]="email" placeholder="name@example.com">
+  </div>
+  <div>This will not send any email but search for the user in db.</div>
+
+  <div class="col-auto">
+    <button type="button" class="btn btn-primary mb-3" (click)="sendInvite()">Save</button>
+  </div>
+</div>

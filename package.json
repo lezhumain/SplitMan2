@@ -6,13 +6,13 @@
     "start": "ng serve",
     "build": "ng build",
     "build:safe": "npm run test && npm run e2e && npm run build",
-    "build:prod": "npm run e2e && ng build --configuration production",
+    "build:prod": "npm run cp-libs && ng build --configuration production",
     "build:safe:prod": "npx rimraf dist && npm run test:headless && npm run e2e && npm run build:prod",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:headless": "ng test --browsers ChromeHeadless --watch=false",
     "e2e": "npx ts-node e2e/main_e2e.ts",
-    "cp-bootstrap": "npx cp-cli node_modules/bootstrap/dist/css/bootstrap.min.css src/assets/css/bootstrap/bootstrap.min.css"
+    "cp-libs": "npx cp-cli node_modules/bootstrap/dist src/assets/bootstrap && npx make-dir-cli src/assets/font-awesome && npx cp-cli node_modules/font-awesome/css/ src/assets/font-awesome/css && npx cp-cli node_modules/font-awesome/fonts src/assets/font-awesome/fonts"
   },
   "private": true,
   "dependencies": {
@@ -49,5 +49,7 @@
     "puppeteer": "^11.0.0",
     "ts-node": "^10.4.0",
     "typescript": "~4.3.5"
-  }
+  },
+  "engineStrict": true,
+  "engines" : { "node" : ">=12.14" }
 }

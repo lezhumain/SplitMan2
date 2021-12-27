@@ -1,0 +1,11 @@
+<div>
+  <h3>Travels</h3>
+  <br>
+<!--  LIST-->
+<!--  <div *ngFor="let t of allTravels"><a routerLink="/travels/{{t.id}}" routerLinkActive="active">{{t}}</a></div>-->
+  <div *ngFor="let t of allTravels">
+    <app-travel-card [travel]="t"></app-travel-card>
+  </div>
+</div>
+<br>
+<button id="addTravel" type="button" class="btn btn-primary mb-3" (click)="newTravel()">Add travel</button>

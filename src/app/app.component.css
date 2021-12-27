@@ -1,0 +1,11 @@
+.main-container {
+  width: 90%;
+}
+
+.main-container > * {
+  width: 100%;
+}
+
+::ng-deep #regBtn {
+  margin-left: 15px;
+}

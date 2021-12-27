@@ -1,0 +1,92 @@
+[
+  {
+    "id": 1,
+    "type": "travel",
+    "name": "Test Sat, 04 Dec 2021 02:41:30 GMT",
+    "description": "E2E test travel",
+    "fromDate": null,
+    "toDate": null,
+    "participants": [
+      {
+        "dayCount": 2,
+        "name": "Dju",
+        "ratio": 0.25
+      },
+      {
+        "dayCount": 2,
+        "name": "Max",
+        "ratio": 0.25
+      },
+      {
+        "dayCount": 2,
+        "name": "Suzie",
+        "ratio": 0.25
+      },
+      {
+        "dayCount": 2,
+        "name": "Elyan",
+        "ratio": 0.25
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "type": "travel",
+    "name": "Test Sat, 04 Dec 2021 02:48:46 GMT",
+    "description": "E2E test travel",
+    "fromDate": null,
+    "toDate": null,
+    "participants": [
+      {
+        "dayCount": 2,
+        "name": "Dju",
+        "ratio": 0.25
+      },
+      {
+        "dayCount": 2,
+        "name": "Max",
+        "ratio": 0.25
+      },
+      {
+        "dayCount": 2,
+        "name": "Suzie",
+        "ratio": 0.25
+      },
+      {
+        "dayCount": 2,
+        "name": "Elyan",
+        "ratio": 0.25
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "type": "travel",
+    "name": "Test Sat, 04 Dec 2021 02:49:47 GMT",
+    "description": "E2E test travel",
+    "fromDate": null,
+    "toDate": null,
+    "participants": [
+      {
+        "dayCount": 2,
+        "name": "Dju",
+        "ratio": 0.25
+      },
+      {
+        "dayCount": 2,
+        "name": "Max",
+        "ratio": 0.25
+      },
+      {
+        "dayCount": 2,
+        "name": "Suzie",
+        "ratio": 0.25
+      },
+      {
+        "dayCount": 2,
+        "name": "Elyan",
+        "ratio": 0.25
+      }
+    ]
+  }
+]

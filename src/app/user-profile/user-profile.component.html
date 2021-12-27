@@ -1,0 +1,40 @@
+<h3>User info</h3>
+<ng-container *ngIf="user">
+  <div *ngIf="!isEditing; else editMode">
+    <div class="mb-3">{{user.email}}</div>
+    <div class="mb-3">{{user.username}}></div>
+
+    <!--  <div class="mb-3">-->
+    <!--    <label for="email" class="form-label">Email address</label>-->
+    <!--    <input type="email" class="form-control" id="email"-->
+    <!--           [(ngModel)]="user.email" placeholder="name@example.com">-->
+    <!--  </div>-->
+    <!--  <div class="mb-3">-->
+    <!--    <label for="username" class="form-label">Username</label>-->
+    <!--    <input type="text" class="form-control" id="username"-->
+    <!--           [(ngModel)]="user.username" >-->
+    <!--  </div>-->
+
+    <div class="col-auto">
+      <button type="button" class="btn btn-primary mb-3" (click)="edit()">Edit</button>
+    </div>
+  </div>
+  <ng-template #editMode>
+    <div>
+      <div class="mb-3">
+        <label for="email" class="form-label">Email address</label>
+        <input type="email" class="form-control" id="email"
+               [(ngModel)]="user.email" placeholder="name@example.com">
+      </div>
+      <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        <input type="text" class="form-control" id="username"
+               [(ngModel)]="user.username" >
+      </div>
+
+      <div class="col-auto">
+        <button type="button" class="btn btn-primary mb-3" (click)="save()">Save</button>
+      </div>
+    </div>
+  </ng-template>
+</ng-container>

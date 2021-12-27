@@ -1,0 +1,27 @@
+{
+  "id": 1,
+  "email": "hatsune.miku.asb@wspt.co.uk",
+  "username": "s",
+  "password": "s",
+  "password1": "",
+  "invites": [
+    {
+      "isAccepted": true,
+      "tripID": 1,
+      "tripName": "Test Sat, 04 Dec 2021 02:41:30 GMT",
+      "nameInTrip": "Max"
+    },
+    {
+      "isAccepted": true,
+      "tripID": 2,
+      "tripName": "Test Sat, 04 Dec 2021 02:48:46 GMT",
+      "nameInTrip": "Max"
+    },
+    {
+      "isAccepted": true,
+      "tripID": 3,
+      "tripName": "Test Sat, 04 Dec 2021 02:49:47 GMT",
+      "nameInTrip": "Max"
+    }
+  ]
+}
