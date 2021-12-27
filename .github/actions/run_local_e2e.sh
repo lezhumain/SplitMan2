@@ -25,9 +25,10 @@ SERVER_PID="$(ps -fu $USER| grep "[d]emo" | awk '{print $2}')"
 
 
 ## SETUP app
+npm i -g
 npm ci
 npm run build:prod
-ng serve &
+npx ng serve &
 APP_PID="$(ps -fu $USER| grep "[n]g serve" | awk '{print $2}')"
 
 sleep 20
