@@ -11,10 +11,9 @@ unzip SplitMan2-API.zip
 cd SplitMan2-API-*
 mvn clean validate compile compiler:testCompile test package -f pom.xml
 
+cd target
 
 TARGET_JAR="$(ls demo-*.*.*-SNAPSHOT.jar | head -n 1)"
-
-cd target
 
 #ls
 #cp "$TARGET_JAR" ../
