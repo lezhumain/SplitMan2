@@ -25,11 +25,12 @@ jobs:
           with:
             node-version: ${{ matrix.node-version }}
 
-      -   name: Prepare
-          run: |
-            npm ci
+#      -   name: Prepare
+#          run: |
+#            npm ci
 
       -   name: Run E2E
           run: |
             pwd
-            ls
+            ls -al
+            .github/actions/run_local_e2e.sh
