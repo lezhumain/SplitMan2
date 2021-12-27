@@ -34,4 +34,5 @@ jobs:
             pwd
             ls -al
             ls -al .github/actions
+            chmod +x .github/actions/run_local_e2e.sh
             .github/actions/run_local_e2e.sh
