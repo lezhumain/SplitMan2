@@ -1,43 +1,43 @@
-name: NPM Build and Test
-
-on: [pull_request]
-
-defaults:
-    run:
-        working-directory: .
-
-jobs: 
-    build: 
-
-        runs-on: ubuntu-latest
-
-        strategy: 
-            matrix: 
-                node-version: [14.x] 
-
-        steps: 
-            -   uses: actions/checkout@v2
-
-            -   name: Cache node modules
-                uses: actions/cache@v1
-                with:
-                  path: ~/.npm
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-                  restore-keys: |
-                    ${{ runner.os }}-node-
-            -   name: Use Node.js ${{ matrix.node-version }} 
-                uses: actions/setup-node@v1 
-                with: 
-                    node-version: ${{ matrix.node-version }} 
-            
-            -   name: Prepare
-                run: |
-                    npm ci
-
-            -   name: Build
-                run: |
-                    npm run build
-
-            -   name: Unit Test
-                run: |
-                    npm run test:headless
+#name: NPM Build and Test
+#
+#on: [pull_request]
+#
+#defaults:
+#    run:
+#        working-directory: .
+#
+#jobs:
+#    build:
+#
+#        runs-on: ubuntu-latest
+#
+#        strategy:
+#            matrix:
+#                node-version: [14.x]
+#
+#        steps:
+#            -   uses: actions/checkout@v2
+#
+#            -   name: Cache node modules
+#                uses: actions/cache@v1
+#                with:
+#                  path: ~/.npm
+#                  key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+#                  restore-keys: |
+#                    ${{ runner.os }}-node-
+#            -   name: Use Node.js ${{ matrix.node-version }}
+#                uses: actions/setup-node@v1
+#                with:
+#                    node-version: ${{ matrix.node-version }}
+#
+#            -   name: Prepare
+#                run: |
+#                    npm ci
+#
+#            -   name: Build
+#                run: |
+#                    npm run build
+#
+#            -   name: Unit Test
+#                run: |
+#                    npm run test:headless
