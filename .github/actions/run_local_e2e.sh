@@ -1,5 +1,7 @@
 #! /bin/bash
 
+set -e
+
 ## SETUP API
 # get api
 curl -o SplitMan2-API.zip https://codeload.github.com/lezhumain/SplitMan2-API/zip/refs/heads/master
@@ -17,7 +19,7 @@ cd target
 #ls
 #cp "$TARGET_JAR" ../
 
-/usr/lib/jvm/default-java/bin/java  -jar "$TARGET_JAR" --server.port=8888 &
+java  -jar "$TARGET_JAR" --server.port=8888 &
 
 sleep 20
 
