@@ -11,7 +11,8 @@ curl -o SplitMan2-API.zip https://codeload.github.com/lezhumain/SplitMan2-API/zi
 unzip SplitMan2-API.zip
 
 cd SplitMan2-API-*
-mvn clean validate compile compiler:testCompile test package -f pom.xml
+#mvn clean validate compile compiler:testCompile test package -f pom.xml
+mvn package -f pom.xml
 
 cd target
 
@@ -30,7 +31,7 @@ SERVER_PID="$(ps -fu $USER| grep "[d]emo" | awk '{print $2}')"
 ## SETUP app
 cd "$WORKING_DIR"
 npm ci
-npm run build:prod
+#npm run build:prod
 npx ng serve &
 APP_PID="$(ps -fu $USER| grep "[n]g serve" | awk '{print $2}')"
 
