@@ -33,4 +33,5 @@ jobs:
           run: |
             pwd
             ls -al
+            ls -al .github/actions
             .github/actions/run_local_e2e.sh
