@@ -1,0 +1,24 @@
+h6 {
+  color: #0a58ca;
+}
+
+.container {
+  border-bottom: thin solid black;
+  margin: 10px 0;
+  padding-bottom: 10px;
+}
+
+.col-amount {
+  text-align: end;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.isUsOwe {
+  color: red;
+}
+
+.isUsOwed {
+  color: green;
+  font-weight: bold;
+}

@@ -1,0 +1,22 @@
+h6 {
+  color: #0a58ca;
+}
+
+.container {
+  border-bottom: thin solid black;
+  margin: 10px 0;
+  padding-bottom: 10px;
+}
+
+.container:hover {
+  background-color: aliceblue;
+}
+
+.col-right {
+  text-align: end;
+}
+
+.col-amount {
+  font-size: 1rem;
+  font-weight: bold;
+}

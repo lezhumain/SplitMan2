@@ -1,0 +1,15 @@
+<div>
+  <div>Expense: {{expense.name}}</div>
+  <div>Total: {{expense.amount}}</div>
+  <div>Date: {{expense.displayDate}}</div>
+<!--  <div>Date: {{getTypeof(expense.date)}}</div>-->
+  <div>Paid by: {{expense.payer}}</div>
+  <div>
+    Paid for
+    <ul>
+      <li *ngFor="let payee of expense.payees">{{payee}}</li>
+    </ul>
+  </div>
+</div>
+<!--<button type="button" (click)="editExpense()">Edit expense</button>-->
+<button type="button" class="btn btn-primary mb-3" (click)="editExpense()">Edit expense</button>

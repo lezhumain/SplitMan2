@@ -1,0 +1,19 @@
+.partic-message {
+  color: red;
+  margin-left: 10px;
+}
+
+#payer {
+  display: inline-block;
+  width: 100px;
+}
+
+.isUs {
+  color: #0a58ca;
+  font-weight: bold;
+}
+
+.chooseWho {
+  background-color: var(--bs-warning);
+  padding: 5px 10px;
+}
