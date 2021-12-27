@@ -37,8 +37,8 @@ APP_PID="$(ps -fu $USER| grep "[n]g serve" | awk '{print $2}')"
 
 sleep 20
 
-#npm run e2e
-#RES="$?"
+npm run e2e
+RES="$?"
 
 echo "Stopping API server"
 kill "$SERVER_PID"
@@ -46,4 +46,4 @@ kill "$SERVER_PID"
 echo "Stopping app"
 kill "$APP_PID"
 
-#exit $RES
+exit $RES
