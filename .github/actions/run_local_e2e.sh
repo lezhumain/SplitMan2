@@ -2,6 +2,8 @@
 
 set -e
 
+WORKING_DIR="$(pwd)"
+
 ## SETUP API
 # get api
 curl -o SplitMan2-API.zip https://codeload.github.com/lezhumain/SplitMan2-API/zip/refs/heads/master
@@ -26,7 +28,7 @@ SERVER_PID="$(ps -fu $USER| grep "[d]emo" | awk '{print $2}')"
 
 
 ## SETUP app
-npm i -g
+cd "$WORKING_DIR"
 npm ci
 npm run build:prod
 npx ng serve &
