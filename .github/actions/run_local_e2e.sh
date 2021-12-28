@@ -3,6 +3,7 @@
 set -e
 
 WORKING_DIR="$(pwd)"
+API_PORT=8888
 
 ## SETUP API
 # get api
@@ -13,7 +14,11 @@ unzip SplitMan2-API.zip > /dev/null
 
 echo "Build APP"
 npm ci
-#npm run build:prod
+
+echo "Changing API port to $API_PORT"
+sed "s/:8080/:$API_PORT/g" src/environments/environment.ts > src/environments/environment.test.ts
+mv src/environments/environment.ts src/environments/environment.dev.ts
+cp src/environments/environment.test.ts src/environments/environment.ts
 
 echo "Run APP server"
 npx ng serve &
@@ -27,10 +32,10 @@ cd target
 TARGET_JAR="$(ls demo-*.*.*-SNAPSHOT.jar | head -n 1)"
 
 echo "Run API server"
-java -jar "$TARGET_JAR" --server.port=8888 &
+java -jar "$TARGET_JAR" --server.port="$API_PORT" &
 
 echo "Waiting for API server..."
-"$WORKING_DIR"/.github/actions/waitForServer.sh 127.0.0.1:8888
+"$WORKING_DIR"/.github/actions/waitForServer.sh "127.0.0.1:$API_PORT"
 echo "API server running."
 
 echo "Waiting for Angular server..."
