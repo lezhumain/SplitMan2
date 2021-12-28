@@ -23,7 +23,7 @@ TARGET_JAR="$(ls demo-*.*.*-SNAPSHOT.jar | head -n 1)"
 
 java  -jar "$TARGET_JAR" --server.port=8888 &
 
-sleep 20
+"$WORKING_DIR"/waitForServer.sh 127.0.0.1:8888
 
 SERVER_PID="$(ps -fu $USER| grep "[d]emo" | awk '{print $2}')"
 
@@ -33,9 +33,11 @@ cd "$WORKING_DIR"
 npm ci
 #npm run build:prod
 npx ng serve &
+
+"$WORKING_DIR"/waitForServer.sh 127.0.0.1:4200
+
 APP_PID="$(ps -fu $USER| grep "[n]g serve" | awk '{print $2}')"
 
-sleep 20
 
 npm run e2e
 RES="$?"
