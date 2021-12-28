@@ -11,13 +11,14 @@ curl -o SplitMan2-API.zip https://codeload.github.com/lezhumain/SplitMan2-API/zi
 #curl -o SplitMan2.zip https://codeload.github.com/lezhumain/SplitMan2/zip/refs/heads/version_1
 unzip SplitMan2-API.zip > /dev/null
 
-echo "Build APP and run Angular server"
+echo "Build APP"
 npm ci
 #npm run build:prod
+
 echo "Run APP server"
 npx ng serve &
 
-echo "Build API and run"
+echo "Build API"
 cd SplitMan2-API-*
 #mvn clean validate compile compiler:testCompile test package -f pom.xml
 mvn package -f pom.xml > /dev/null
@@ -29,11 +30,11 @@ echo "Run API server"
 java -jar "$TARGET_JAR" --server.port=8888 &
 
 echo "Waiting for API server..."
-"$WORKING_DIR"/waitForServer.sh 127.0.0.1:8888
+"$WORKING_DIR"/.github/actions/waitForServer.sh 127.0.0.1:8888
 echo "API server running."
 
 echo "Waiting for Angular server..."
-"$WORKING_DIR"/waitForServer.sh 127.0.0.1:4200
+"$WORKING_DIR"/.github/actions/waitForServer.sh 127.0.0.1:4200
 echo "Angular server running."
 
 SERVER_PID="$(ps -fu $USER| grep "[d]emo" | awk '{print $2}')"
