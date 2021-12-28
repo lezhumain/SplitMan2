@@ -6,7 +6,7 @@ WORKING_DIR="$(pwd)"
 
 ## SETUP API
 # get api
-curl -o SplitMan2-API.zip https://codeload.github.com/lezhumain/SplitMan2-API/zip/refs/heads/master
+curl -o SplitMan2-API.zip https://codeload.github.com/lezhumain/SplitMan2-API/zip/refs/heads/master_1
 #curl -o SplitMan2.zip https://codeload.github.com/lezhumain/SplitMan2/zip/refs/heads/version_1
 unzip SplitMan2-API.zip
 
