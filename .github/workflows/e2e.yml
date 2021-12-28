@@ -1,59 +1,59 @@
-#name: E2E Tests
-#
-##on:
-##  push:
-##    branches: [ master ]
-#
-#on: [pull_request]
-#
-#jobs:
-#  build:
-#    runs-on: ubuntu-latest
-#
-#    strategy:
-#      matrix:
-#        # see available versions here: https://github.com/actions/setup-java
-#        java-version: [17]
-#        node-version: [14.x]
-#
-#    steps:
-#      - uses: actions/checkout@v2
-#
-#      - name: Cache node modules
-#        uses: actions/cache@v1
-#        with:
-#          path: ~/.npm
-#          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-#          restore-keys: |
-#            ${{ runner.os }}-node-
-#
-#      - name: Use Node.js ${{ matrix.node-version }}
-#        uses: actions/setup-node@v1
-#        with:
-#          node-version: ${{ matrix.node-version }}
-#
-#      # Step that does that actual cache save and restore
-#      - name: Cache maven modules
-#        uses: actions/cache@v1
-#        with:
-#          path: ~/.m2/repository
-#          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-#          restore-keys: |
-#            ${{ runner.os }}-maven-
-#
-#      - name: Set up JDK
-#        uses: actions/setup-java@v1
-#        with:
-#          java-version: ${{ matrix.java-version }}
-#
-##      - name: Prepare
-##          run: |
-##          npm ci
-#
-#      - name: Run E2E
-#        run: |
-#          pwd
-#          ls -al
-#          ls -al .github/actions
-#          chmod +x .github/actions/run_local_e2e.sh
-#          .github/actions/run_local_e2e.sh
+name: E2E Tests
+
+#on:
+#  push:
+#    branches: [ master ]
+
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        # see available versions here: https://github.com/actions/setup-java
+        java-version: [17]
+        node-version: [14.x]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache node modules
+        uses: actions/cache@v1
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # Step that does that actual cache save and restore
+      - name: Cache maven modules
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java-version }}
+
+#      - name: Prepare
+#          run: |
+#          npm ci
+
+      - name: Run E2E
+        run: |
+          pwd
+          ls -al
+          ls -al .github/actions
+          chmod +x .github/actions/run_local_e2e.sh
+          .github/actions/run_local_e2e.sh
