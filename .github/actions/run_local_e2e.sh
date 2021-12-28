@@ -13,6 +13,7 @@ unzip SplitMan2-API.zip
 echo "Build APP and run Angular server"
 npm ci
 #npm run build:prod
+echo "Run APP server"
 npx ng serve &
 
 echo "Build API and run"
@@ -23,6 +24,7 @@ mvn package -f pom.xml
 cd target
 TARGET_JAR="$(ls demo-*.*.*-SNAPSHOT.jar | head -n 1)"
 
+echo "Run API server"
 java -jar "$TARGET_JAR" --server.port=8888 &
 
 echo "Waiting for API server..."
@@ -38,6 +40,7 @@ APP_PID="$(ps -fu $USER| grep "[n]g serve" | awk '{print $2}')"
 
 cd "$WORKING_DIR"
 
+echo "Running E2E tests"
 npm run e2e
 RES="$?"
 
