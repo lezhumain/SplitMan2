@@ -6,9 +6,10 @@ WORKING_DIR="$(pwd)"
 
 ## SETUP API
 # get api
+echo "Downloading API code"
 curl -o SplitMan2-API.zip https://codeload.github.com/lezhumain/SplitMan2-API/zip/refs/heads/master_1
 #curl -o SplitMan2.zip https://codeload.github.com/lezhumain/SplitMan2/zip/refs/heads/version_1
-unzip SplitMan2-API.zip
+unzip SplitMan2-API.zip > /dev/null
 
 echo "Build APP and run Angular server"
 npm ci
@@ -19,7 +20,7 @@ npx ng serve &
 echo "Build API and run"
 cd SplitMan2-API-*
 #mvn clean validate compile compiler:testCompile test package -f pom.xml
-mvn package -f pom.xml
+mvn package -f pom.xml > /dev/null
 
 cd target
 TARGET_JAR="$(ls demo-*.*.*-SNAPSHOT.jar | head -n 1)"
