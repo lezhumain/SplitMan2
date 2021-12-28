@@ -778,22 +778,22 @@ async function runAll() {
       msg: "Test back bug",
       params: []
     },
-    {
-      fn: MainTest,
-      msg: "E2E with 1 expense",
-      params: [
-        allExpenses.slice(0, 1),
-        "Dju\ndoit a\n8.56€\nSuzie\nMax\ndoit a\n8.56€\nSuzie\nElyan\ndoit a\n8.56€\nSuzie"
-      ]
-    },
-    {
-      fn: MainTest,
-      msg: "E2E with all expenses",
-      params: [
-        allExpenses.slice(),
-        "Elyan\ndoit a\n17.30€\nDju"
-      ]
-    }
+    // {
+    //   fn: MainTest,
+    //   msg: "E2E with 1 expense",
+    //   params: [
+    //     allExpenses.slice(0, 1),
+    //     "Dju\ndoit a\n8.56€\nSuzie\nMax\ndoit a\n8.56€\nSuzie\nElyan\ndoit a\n8.56€\nSuzie"
+    //   ]
+    // },
+    // {
+    //   fn: MainTest,
+    //   msg: "E2E with all expenses",
+    //   params: [
+    //     allExpenses.slice(),
+    //     "Elyan\ndoit a\n17.30€\nDju"
+    //   ]
+    // }
   ];
 
   const allRes: string[] = [];
@@ -832,7 +832,7 @@ async function runMiny() {
   };
 
   const br = await puppeteer.launch(pupArgs);
-  const pa = await br.pages().then(e => e[0])
+  const pa = await br.pages().then(e => e[0]);
 
   await pa.goto("https://puppeteer.github.io/puppeteer/");
 
@@ -841,4 +841,5 @@ async function runMiny() {
   await br.close();
 }
 
-runMiny().then(e => console.log("Done."));
+// runMiny().then(e => console.log("Done."));
+runAll().then(e => console.log("Done."));
