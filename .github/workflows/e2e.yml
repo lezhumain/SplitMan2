@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         # see available versions here: https://github.com/actions/setup-java
-        java-version: [17]
+        java-version: [12]
         node-version: [14.x]
 
     steps:
