@@ -45,6 +45,7 @@ cd "$WORKING_DIR"
 echo "Running E2E tests"
 npm run e2e
 RES="$?"
+echo "E2E tests results: $RES"
 
 echo "Stopping API server"
 kill "$SERVER_PID"
@@ -52,4 +53,8 @@ kill "$SERVER_PID"
 echo "Stopping app"
 kill "$APP_PID"
 
-exit $RES
+if [ $RES != 0 ]; then
+  RES=1
+fi
+
+return $RES
