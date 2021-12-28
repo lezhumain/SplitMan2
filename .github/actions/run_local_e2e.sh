@@ -34,7 +34,9 @@ npm ci
 #npm run build:prod
 npx ng serve &
 
+echo "waitForServer.sh..."
 "$WORKING_DIR"/waitForServer.sh 127.0.0.1:4200
+echo "ok"
 
 APP_PID="$(ps -fu $USER| grep "[n]g serve" | awk '{print $2}')"
 
