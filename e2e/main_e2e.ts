@@ -818,6 +818,7 @@ async function runAll() {
 
 async function runMiny() {
   const isHeadless: boolean = getHeadlessParam();
+  console.log(`isHeadless: ${isHeadless}`);
   const pupArgs = {
     headless: isHeadless,
     defaultViewport: null,
