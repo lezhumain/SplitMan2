@@ -52,11 +52,11 @@ npm run e2e
 RES="$?"
 echo "E2E tests results: $RES"
 
-echo "Stopping API server"
-kill "$SERVER_PID"
+#echo "Stopping API server"
+#kill "$SERVER_PID"
 
-echo "Stopping app"
-kill "$APP_PID"
+#echo "Stopping app"
+#kill "$APP_PID"
 
 if [ $RES != 0 ]; then
   RES=1

@@ -52,8 +52,9 @@ jobs:
 
       - name: Run E2E
         run: |
-          pwd
-          ls -al
-          ls -al .github/actions
-          chmod +x .github/actions/run_local_e2e.sh
+          #pwd
+          #ls -al
+          #ls -al .github/actions
+          #chmod +x .github/actions/run_local_e2e.sh
           .github/actions/run_local_e2e.sh
+          .github/actions/stopServers.sh
