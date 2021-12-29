@@ -846,7 +846,10 @@ async function runAll() {
   for(const resPart of allRes) {
     console.log("Test:" + resPart.msg);
     console.log("Status:" + (resPart.hasError ? "failed" : "passed"));
-    console.log("Error:" + resPart.errorMsg + "\n");
+    if (resPart.errorMsg) {
+      console.log("Error:" + resPart.errorMsg);
+    }
+    console.log("");
   }
   console.log("=====================");
 
