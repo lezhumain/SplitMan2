@@ -768,7 +768,7 @@ async function MainTest(params: any[]) {
   }
 }
 
-async function runMiny() {
+async function runMiny(_: string[]) {
   const isHeadless: boolean = getHeadlessParam();
   console.log(`isHeadless: ${isHeadless}`);
   const pupArgs = {
@@ -802,7 +802,7 @@ async function runAll() {
     {
       fn: runMiny,
       msg: "Mini test",
-      params: []
+      params: undefined
     },
     {
       fn: MainTestBackBug,
