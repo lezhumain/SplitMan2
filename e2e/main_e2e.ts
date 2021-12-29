@@ -153,14 +153,19 @@ async function testCommonTravels(pages: puppeteer.Page[]) {
 }
 
 async function handleLogout(page: Page) {
-  await page.waitForSelector(".fa-user", {visible: true})
-    .then(e => e ? e.click() : null);
+  try {
+    await page.waitForSelector(".fa-user", {visible: true})
+      .then(e => e ? e.click() : null);
 
-  await page.waitForXPath("//a[contains(text(), 'Log out')]", {visible: true})
-    .then(e => e ? Promise.all([scrollAndClick(e, page), page.waitForNavigation()]) : null);
+    await page.waitForXPath("//a[contains(text(), 'Log out')]", {visible: true})
+      .then(e => e ? Promise.all([scrollAndClick(e, page), page.waitForNavigation()]) : null);
 
-  expect(page.url()).to.contain("/login");
-  await page.waitForTimeout(500);
+    expect(page.url()).to.contain("/login");
+    await page.waitForTimeout(500);
+  } catch (e) {
+    console.log("Logout errorm should be ok");
+    console.log(e);
+  }
 }
 
 async function handleLogin(page: Page, userData: { pass: string; email: string; username: string }) {
@@ -409,6 +414,11 @@ async function MainTestBackBug(params: any[]) {
   // try {
     const pages = [page, page1];
 
+    // logout
+    await Promise.all(
+      pages.map((pagee: Page) => handleLogout(pagee))
+    );
+
     await goToAndSecurity(pages);
 
     await testBackBug(pages);
@@ -417,10 +427,11 @@ async function MainTestBackBug(params: any[]) {
 
     await removeHandlers(pages);
 
-    // logout
-    await Promise.all(
-      pages.map((pagee: Page) => handleLogout(pagee))
-    );
+    // // logout
+    // await Promise.all(
+    //   pages.map((pagee: Page) => handleLogout(pagee))
+    // );
+
   // } catch (e) {
   //   await Promise.all(
   //     [page, page1].map(thePage => takeScreenshot(thePage).then(link => console.log("Screenshot link : " + link)))
@@ -505,7 +516,12 @@ async function MainTest(params: any[]) {
     const page = await browser.pages().then(e => e[0]),
       page1 = await browser1.pages().then(e => e[0]);
 
-      pages = [page, page1];
+    pages = [page, page1];
+
+    // logout
+    await Promise.all(
+      pages.map((pagee: Page) => handleLogout(pagee))
+    );
 
     // await page.goto(url).then(() => {}, () => {});
     await goToAndSecurity(pages);
@@ -765,10 +781,10 @@ async function MainTest(params: any[]) {
     console.error(e);
     isError = e;
   } finally {
-    // logout
-    await Promise.all(
-      pages.map((pagee: Page) => handleLogout(pagee))
-    );
+    // // logout
+    // await Promise.all(
+    //   pages.map((pagee: Page) => handleLogout(pagee))
+    // );
 
     if(isError) {
       throw isError;
@@ -903,8 +919,7 @@ async function runAll() {
     let msg = `${testFn.msg}: `;
     const res: string = await testFn.fn(testFn.params)
       .then(e => "", (e) => {
-
-        return e.toString()
+        return e.toString();
       });
 
     // allRes.push(msg + (res ? "passed" : "failed") + ".");
