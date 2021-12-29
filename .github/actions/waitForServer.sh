@@ -4,6 +4,7 @@ WAIT_FOR_SERVER=1
 
 while [ $WAIT_FOR_SERVER == 1 ]
 do
+  echo "Waiting for $1"
   DATA="$(curl "$1" 2> /dev/null)"
   if [ $? != 0 ]; then
     sleep 5
@@ -11,4 +12,4 @@ do
     WAIT_FOR_SERVER=0
   fi
 done
-echo "Done"
+echo "$1 ready"

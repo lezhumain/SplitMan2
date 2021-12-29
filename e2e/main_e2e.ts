@@ -120,7 +120,7 @@ async function testCommonTravels(pages: puppeteer.Page[]) {
     // open travel
     await Promise.all(
       pages.map(page => page.waitForXPath(`//app-travel-card//h6[contains(text(), '${travel}')]`, {visible: true})
-        .then(e => e ? Promise.all([e.click(), page.waitForNavigation()]) : null))
+        .then(e => e ? Promise.all([e.click(), page.waitForNavigation({timeout: 10000})]) : null))
     );
 
     await Promise.all(
@@ -146,21 +146,26 @@ async function testCommonTravels(pages: puppeteer.Page[]) {
     // back
     await Promise.all(
       pages.map(page => page.waitForSelector("div.iconWrapper > i.fa-arrow-left")
-        .then(e => e ? Promise.all([e.click(), page.waitForNavigation()]) : null))
+        .then(e => e ? Promise.all([e.click(), page.waitForNavigation({timeout: 10000})]) : null))
     );
   }
   console.log("okff");
 }
 
 async function handleLogout(page: Page) {
-  await page.waitForSelector(".fa-user", {visible: true})
-    .then(e => e ? e.click() : null);
+  try {
+    await page.waitForSelector(".fa-user", {visible: true})
+      .then(e => e ? e.click() : null);
 
-  await page.waitForXPath("//a[contains(text(), 'Log out')]", {visible: true})
-    .then(e => e ? Promise.all([scrollAndClick(e, page), page.waitForNavigation()]) : null);
+    await page.waitForXPath("//a[contains(text(), 'Log out')]", {visible: true})
+      .then(e => e ? Promise.all([scrollAndClick(e, page), page.waitForNavigation({timeout: 10000})]) : null);
 
-  expect(page.url()).to.contain("/login");
-  await page.waitForTimeout(500);
+    expect(page.url()).to.contain("/login");
+    await page.waitForTimeout(500);
+  } catch (e) {
+    console.log("Logout errorm should be ok");
+    console.log(e);
+  }
 }
 
 async function handleLogin(page: Page, userData: { pass: string; email: string; username: string }) {
@@ -177,7 +182,7 @@ async function handleLogin(page: Page, userData: { pass: string; email: string; 
   await page.waitForTimeout(500);
 
   await page.waitForXPath("//button[contains(text(), 'Login')]", {visible: true})
-    .then(e => e ? Promise.all([e.click(), page.waitForNavigation()]) : null);
+    .then(e => e ? Promise.all([e.click(), page.waitForNavigation({timeout: 10000})]) : null);
 
   // await page.waitForNavigation();
 
@@ -335,7 +340,7 @@ async function checkTravelCount(number: number, page: Page) {
   await page.waitForXPath("//h3[contains(text(), 'Expenses')]");
 
   await page.waitForSelector("div.iconWrapper > i.fa-arrow-left")
-    .then(e => e ? Promise.all([e.click(), page.waitForNavigation()]) : null);
+    .then(e => e ? Promise.all([e.click(), page.waitForNavigation({timeout: 10000})]) : null);
 
   await page.waitForTimeout(1000);
 
@@ -406,20 +411,34 @@ async function MainTestBackBug(params: any[]) {
   const page = await browser.pages().then(e => e[0]),
     page1 = await browser1.pages().then(e => e[0]);
 
-  const pages = [page, page1];
+  // try {
+    const pages = [page, page1];
 
-  await goToAndSecurity(pages);
+    // logout
+    await Promise.all(
+      pages.map((pagee: Page) => handleLogout(pagee))
+    );
 
-  await testBackBug(pages);
+    await goToAndSecurity(pages);
 
-  await testCommonTravels(pages);
+    await testBackBug(pages);
 
-  await removeHandlers(pages);
+    await testCommonTravels(pages);
 
-  // logout
-  await Promise.all(
-    pages.map((pagee: Page) => handleLogout(pagee))
-  );
+    await removeHandlers(pages);
+
+    // // logout
+    // await Promise.all(
+    //   pages.map((pagee: Page) => handleLogout(pagee))
+    // );
+
+  // } catch (e) {
+  //   await Promise.all(
+  //     [page, page1].map(thePage => takeScreenshot(thePage).then(link => console.log("Screenshot link : " + link)))
+  //   );
+  //
+  //   throw e;
+  // }
 }
 
 async function MainTestSQLLogin(params: any[]) {
@@ -497,7 +516,12 @@ async function MainTest(params: any[]) {
     const page = await browser.pages().then(e => e[0]),
       page1 = await browser1.pages().then(e => e[0]);
 
-      pages = [page, page1];
+    pages = [page, page1];
+
+    // logout
+    await Promise.all(
+      pages.map((pagee: Page) => handleLogout(pagee))
+    );
 
     // await page.goto(url).then(() => {}, () => {});
     await goToAndSecurity(pages);
@@ -528,7 +552,7 @@ async function MainTest(params: any[]) {
     // await elm.click();
     await Promise.all([
       scrollAndClick(elm, page),
-      page.waitForNavigation()
+      page.waitForNavigation({timeout: 10000})
     ]);
 
     const travelNAme = `Test ${new Date().toUTCString()}`;
@@ -539,7 +563,7 @@ async function MainTest(params: any[]) {
       .then(e => e ? e.type("E2E test travel", {delay: 30}) : null);
 
     await page.waitForXPath("//button[contains(text(), 'Save Travel')]", {visible: true})
-      .then(e => e ? Promise.all([e.click(), page.waitForNavigation()]) : null);
+      .then(e => e ? Promise.all([e.click(), page.waitForNavigation({timeout: 10000})]) : null);
 
     // await page.waitForNavigation();
 
@@ -638,7 +662,7 @@ async function MainTest(params: any[]) {
       }
 
       await page.waitForXPath("//button[contains(text(), 'Save Expense')]", {visible: true})
-        .then(e => e ? Promise.all([scrollAndClick(e, page), page.waitForNavigation()]) : null);
+        .then(e => e ? Promise.all([scrollAndClick(e, page), page.waitForNavigation({timeout: 10000})]) : null);
 
       // await page.waitForNavigation();
       await page.waitForTimeout(500);
@@ -735,7 +759,7 @@ async function MainTest(params: any[]) {
     }
 
     await page1.waitForXPath(`//h6[contains(text(), '${travelNAme}')]`, {visible: true})
-      // .then(e => e ? Promise.all([e.click(), page.waitForNavigation({timeout: 20000})]) : null);
+      // .then(e => e ? Promise.all([e.click(), page.waitForNavigation({timeout: 10000})]) : null);
         .then(e => e?.click());
 
     await page1.waitForTimeout(1000);
@@ -757,10 +781,10 @@ async function MainTest(params: any[]) {
     console.error(e);
     isError = e;
   } finally {
-    // logout
-    await Promise.all(
-      pages.map((pagee: Page) => handleLogout(pagee))
-    );
+    // // logout
+    // await Promise.all(
+    //   pages.map((pagee: Page) => handleLogout(pagee))
+    // );
 
     if(isError) {
       throw isError;
@@ -768,11 +792,105 @@ async function MainTest(params: any[]) {
   }
 }
 
+async function runMiny(_: string[]) {
+  const [pa] = await getPagse();
+
+  await pa.goto("https://puppeteer.github.io/puppeteer/");
+
+  await pa.waitForXPath("//h1[contains(text(), 'Puppeteer')]", {visible: true, timeout: 10000});
+}
+
+
+async function takeScreenshot(page: Page) {
+  const brow = page.browser();
+  const pa = await brow.newPage();
+
+  await pa.goto("https://privnote.com/#");
+
+  const el = await pa.waitForSelector("#note_raw", {visible: true, timeout: 10000});
+  const data: string = await page.screenshot({path: "./screen.jpg", type: "jpeg", encoding: "base64", quality: 33})
+    .then(e => e.toString());
+
+  const result = data;
+
+  // faster than .type(data)
+  await pa.evaluate((pData, pEl) => {
+    pEl.value = pData;
+  }, data, el);
+  // await el.type(result);
+
+  await pa.waitForSelector("#encrypt_note").then(e => e.click());
+
+  await pa.waitForResponse("https://privnote.com/legacy/");
+
+  // let v = null;
+  // while(!v) {
+  //   v = await pa.waitForSelector("#note_link_input")
+  //     .then(e => e.getProperty("value"))
+  //     .then(e => {
+  //       return e._remoteObject.value;
+  //     });
+  //
+  //   if(!v) {
+  //     await pa.waitForTimeout(500);
+  //   }
+  // }
+
+  await pa.waitForTimeout(500);
+  const v = await pa.waitForSelector("#note_link_input")
+      .then(e => e.getProperty("value"))
+      .then(e => {
+        return e._remoteObject.value;
+      });
+
+  return pa.close().then(() => v);
+}
+
+async function runPrivNote(_: string[]) { //: Promise<string> {
+  // const isHeadless: boolean = getHeadlessParam();
+  // console.log(`isHeadless: ${isHeadless}`);
+  // const pupArgs = {
+  //   headless: isHeadless,
+  //   defaultViewport: null,
+  //   args: [
+  //     '--disable-web-security',
+  //     '--start-maximized',
+  //     '--no-sandbox' // discouraged, see https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#setting-up-chrome-linux-sandbox
+  //   ],
+  //   // executablePath: "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
+  //   // executablePath: "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
+  // };
+  //
+  // const br = await puppeteer.launch(pupArgs);
+  // const pa = await br.pages().then(e => e[0]);
+
+  const pa = await browser.pages().then(e => e[0]);
+
+  const link = await takeScreenshot(pa);
+  console.log("Screenshot link: " + link);
+
+  // await br.close();
+}
+
+async function getPagse(): Promise<Page[]> {
+  return Promise.all([browser, browser1].map(b => b? b.pages().then(e => e[0]) : null));
+}
+
 async function runAll() {
 // const testList = [MainTest0/*, MainTest*/];
   await CreateBrowsers();
 
   const testList = [
+    // {
+    //   fn: runPrivNote,
+    //   msg: "PrivNote test",
+    //   params: undefined
+    // },
+    // {
+    //   fn: runMiny,
+    //   msg: "Mini test",
+    //   params: undefined
+    // },
     {
       fn: MainTestBackBug,
       msg: "Test back bug",
@@ -796,25 +914,69 @@ async function runAll() {
     }
   ];
 
-  const allRes: string[] = [];
+  const allRes: {msg: string, errorMsg?: string, hasError: boolean, links?: string[]}[] = [];
   for(const testFn of testList) {
     let msg = `${testFn.msg}: `;
-    const res = await testFn.fn(testFn.params)
-      .then(e => true, () => false);
-    allRes.push(msg + (res ? "passed" : "failed") + ".");
+    const res: string = await testFn.fn(testFn.params)
+      .then(e => "", (e) => {
+        return e.toString();
+      });
+
+    // allRes.push(msg + (res ? "passed" : "failed") + ".");
+    // allRes.push(msg + (!!res ? "passed" : "failed") + `:\n${res || ""}`);
+
+    const resOO: {msg: string, errorMsg?: string, hasError: boolean, links?: string[]} = {
+      msg: msg,
+      errorMsg: res,
+      hasError: !!res
+    };
+
+    if(resOO.hasError) {
+      // take screenshot
+      const pages = await getPagse();
+
+      resOO.links = await Promise.all(
+        pages.map((thePage: Page, index: number) => takeScreenshot(thePage)
+          // .then((link: string) => console.log(`Screenshot link ${index} : ${link}`))
+        )
+      );
+
+      // upload file somewhere
+    }
+
+    allRes.push(resOO);
   }
 
-  console.log(allRes.join("\n"));
+  console.log("====================");
+  for(const resPart of allRes) {
+    // console.log("Test:" + resPart.msg);
+    // console.log("Status:" + (resPart.hasError ? "failed" : "passed"));
+    // if (resPart.errorMsg) {
+    //   console.log("Error:" + resPart.errorMsg);
+    // }
+    console.log(JSON.stringify(resPart, null, 2));
+    console.log("");
+  }
+  console.log("=====================");
 
   await Promise.all(
     [browser, browser1].map(b => b.close())
   );
 
-  if(allRes.some(a => a.endsWith("failed."))) {
+  // const allRes = ["ok"];
+
+  if(allRes.some(a => a.hasError)) {
     // process.exit(1);
     throw "Some errors";
   }
 }
 
 
-runAll().then(e => console.log("Done."));
+// runMiny().then(e => console.log("Done."));
+runAll().then(e => {
+  console.log("Done.");
+  process.exit(0);
+}, (e) => {
+  console.error(e);
+  process.exit(1);
+});
