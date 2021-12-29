@@ -23,9 +23,8 @@ cp src/environments/environment.test.ts src/environments/environment.ts
 echo "Run APP server"
 npx ng serve &
 
-echo "Build API"
 cd SplitMan2-API-*
-#mvn clean validate compile compiler:testCompile test package -f pom.xml
+echo "Build API"
 mvn package -f pom.xml > /dev/null
 
 cd target
@@ -42,8 +41,8 @@ echo "Waiting for Angular server..."
 "$WORKING_DIR"/.github/actions/waitForServer.sh 127.0.0.1:4200
 echo "Angular server running."
 
-SERVER_PID="$(ps -fu $USER| grep "[d]emo" | awk '{print $2}')"
-APP_PID="$(ps -fu $USER| grep "[n]g serve" | awk '{print $2}')"
+#SERVER_PID="$(ps -fu $USER| grep "[d]emo" | awk '{print $2}')"
+#APP_PID="$(ps -fu $USER| grep "[n]g serve" | awk '{print $2}')"
 
 cd "$WORKING_DIR"
 
