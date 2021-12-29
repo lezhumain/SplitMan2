@@ -880,14 +880,14 @@ async function runAll() {
       msg: "Test back bug",
       params: []
     },
-    // {
-    //   fn: MainTest,
-    //   msg: "E2E with 1 expense",
-    //   params: [
-    //     allExpenses.slice(0, 1),
-    //     "Dju\ndoit a\n8.56€\nSuzie\nMax\ndoit a\n8.56€\nSuzie\nElyan\ndoit a\n8.56€\nSuzie"
-    //   ]
-    // },
+    {
+      fn: MainTest,
+      msg: "E2E with 1 expense",
+      params: [
+        allExpenses.slice(0, 1),
+        "Dju\ndoit a\n8.56€\nSuzie\nMax\ndoit a\n8.56€\nSuzie\nElyan\ndoit a\n8.56€\nSuzie"
+      ]
+    },
     // {
     //   fn: MainTest,
     //   msg: "E2E with all expenses",
