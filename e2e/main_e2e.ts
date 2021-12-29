@@ -406,20 +406,28 @@ async function MainTestBackBug(params: any[]) {
   const page = await browser.pages().then(e => e[0]),
     page1 = await browser1.pages().then(e => e[0]);
 
-  const pages = [page, page1];
+  // try {
+    const pages = [page, page1];
 
-  await goToAndSecurity(pages);
+    await goToAndSecurity(pages);
 
-  await testBackBug(pages);
+    await testBackBug(pages);
 
-  await testCommonTravels(pages);
+    await testCommonTravels(pages);
 
-  await removeHandlers(pages);
+    await removeHandlers(pages);
 
-  // logout
-  await Promise.all(
-    pages.map((pagee: Page) => handleLogout(pagee))
-  );
+    // logout
+    await Promise.all(
+      pages.map((pagee: Page) => handleLogout(pagee))
+    );
+  // } catch (e) {
+  //   await Promise.all(
+  //     [page, page1].map(thePage => takeScreenshot(thePage).then(link => console.log("Screenshot link : " + link)))
+  //   );
+  //
+  //   throw e;
+  // }
 }
 
 async function MainTestSQLLogin(params: any[]) {
@@ -794,21 +802,101 @@ async function runMiny(_: string[]) {
 }
 
 
+async function takeScreenshot(page: Page) {
+  const brow = page.browser();
+  const pa = await brow.newPage();
+
+  await pa.goto("https://privnote.com/#");
+
+  const el = await pa.waitForSelector("#note_raw", {visible: true, timeout: 10000});
+  const data: string = await page.screenshot({path: "./screen.jpg", type: "jpeg", encoding: "base64", quality: 33})
+    .then(e => e.toString());
+
+  const result = data;
+
+  // faster than .type(data)
+  await pa.evaluate((pData, pEl) => {
+    pEl.value = pData;
+  }, data, el);
+  // await el.type(result);
+
+  await pa.waitForSelector("#encrypt_note").then(e => e.click());
+
+  await pa.waitForResponse("https://privnote.com/legacy/");
+
+  // let v = null;
+  // while(!v) {
+  //   v = await pa.waitForSelector("#note_link_input")
+  //     .then(e => e.getProperty("value"))
+  //     .then(e => {
+  //       return e._remoteObject.value;
+  //     });
+  //
+  //   if(!v) {
+  //     await pa.waitForTimeout(500);
+  //   }
+  // }
+
+  await pa.waitForTimeout(500);
+  const v = await pa.waitForSelector("#note_link_input")
+      .then(e => e.getProperty("value"))
+      .then(e => {
+        return e._remoteObject.value;
+      });
+
+  return pa.close().then(() => v);
+}
+
+async function runPrivNote(_: string[]) { //: Promise<string> {
+  // const isHeadless: boolean = getHeadlessParam();
+  // console.log(`isHeadless: ${isHeadless}`);
+  // const pupArgs = {
+  //   headless: isHeadless,
+  //   defaultViewport: null,
+  //   args: [
+  //     '--disable-web-security',
+  //     '--start-maximized',
+  //     '--no-sandbox' // discouraged, see https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#setting-up-chrome-linux-sandbox
+  //   ],
+  //   // executablePath: "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
+  //   // executablePath: "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
+  // };
+  //
+  // const br = await puppeteer.launch(pupArgs);
+  // const pa = await br.pages().then(e => e[0]);
+
+  const pa = await browser.pages().then(e => e[0]);
+
+  const link = await takeScreenshot(pa);
+  console.log("Screenshot link: " + link);
+
+  // await br.close();
+}
+
+async function getPagse(): Promise<Page[]> {
+  return Promise.all([browser, browser1].map(b => b? b.pages().then(e => e[0]) : null));
+}
+
 async function runAll() {
 // const testList = [MainTest0/*, MainTest*/];
   await CreateBrowsers();
 
   const testList = [
+    // {
+    //   fn: runMiny,
+    //   msg: "Mini test",
+    //   params: undefined
+    // },
     {
-      fn: runMiny,
-      msg: "Mini test",
+      fn: runPrivNote,
+      msg: "PrivNote test",
       params: undefined
     },
-    {
-      fn: MainTestBackBug,
-      msg: "Test back bug",
-      params: []
-    },
+    // {
+    //   fn: MainTestBackBug,
+    //   msg: "Test back bug",
+    //   params: []
+    // },
     // {
     //   fn: MainTest,
     //   msg: "E2E with 1 expense",
@@ -831,15 +919,33 @@ async function runAll() {
   for(const testFn of testList) {
     let msg = `${testFn.msg}: `;
     const res: string = await testFn.fn(testFn.params)
-      .then(e => "", (e) => e.toString());
+      .then(e => "", (e) => {
+
+        return e.toString()
+      });
 
     // allRes.push(msg + (res ? "passed" : "failed") + ".");
     // allRes.push(msg + (!!res ? "passed" : "failed") + `:\n${res || ""}`);
-    allRes.push({
+
+    const resOO = {
       msg: msg,
       errorMsg: res,
       hasError: !!res
-    });
+    };
+
+    if(resOO.hasError) {
+      // take screenshot
+      const pages = await getPagse();
+
+      await Promise.all(
+        pages.map((thePage: Page, index: number) => takeScreenshot(thePage)
+          .then((link: string) => console.log(`Screenshot link ${index} : ${link}`)))
+      );
+
+      // upload file somewhere
+    }
+
+    allRes.push(resOO);
   }
 
   console.log("====================");
