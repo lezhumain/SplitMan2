@@ -827,18 +827,27 @@ async function runAll() {
     // }
   ];
 
-  const allRes: string[] = [];
+  const allRes: {msg: string, errorMsg: string, hasError: boolean}[] = [];
   for(const testFn of testList) {
     let msg = `${testFn.msg}: `;
     const res: string = await testFn.fn(testFn.params)
       .then(e => "", (e) => e.toString());
 
     // allRes.push(msg + (res ? "passed" : "failed") + ".");
-    allRes.push(msg + (!!res ? "passed" : "failed") + `:\n${res || ""}`);
+    // allRes.push(msg + (!!res ? "passed" : "failed") + `:\n${res || ""}`);
+    allRes.push({
+      msg: msg,
+      errorMsg: res,
+      hasError: !!res
+    });
   }
 
   console.log("====================");
-  console.log(allRes.join("\n"));
+  for(const resPart of allRes) {
+    console.log("Test:" + resPart.msg);
+    console.log("Status:" + (resPart.hasError ? "failed" : "passed"));
+    console.log("Error:" + resPart.errorMsg + "\n");
+  }
   console.log("=====================");
 
   await Promise.all(
@@ -847,7 +856,7 @@ async function runAll() {
 
   // const allRes = ["ok"];
 
-  if(allRes.some(a => /failed/.test(a))) {
+  if(allRes.some(a => a.hasError)) {
     // process.exit(1);
     throw "Some errors";
   }
