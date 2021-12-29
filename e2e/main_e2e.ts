@@ -777,28 +777,11 @@ async function MainTest(params: any[]) {
 }
 
 async function runMiny(_: string[]) {
-  const isHeadless: boolean = getHeadlessParam();
-  console.log(`isHeadless: ${isHeadless}`);
-  const pupArgs = {
-    headless: isHeadless,
-    defaultViewport: null,
-    args: [
-      '--disable-web-security',
-      '--start-maximized',
-      '--no-sandbox' // discouraged, see https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#setting-up-chrome-linux-sandbox
-    ],
-    // executablePath: "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
-    // executablePath: "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
-  };
-
-  const br = await puppeteer.launch(pupArgs);
-  const pa = await br.pages().then(e => e[0]);
+  const [pa] = await getPagse();
 
   await pa.goto("https://puppeteer.github.io/puppeteer/");
 
   await pa.waitForXPath("//h1[contains(text(), 'Puppeteer')]", {visible: true, timeout: 10000});
-
-  await br.close();
 }
 
 
@@ -882,14 +865,14 @@ async function runAll() {
   await CreateBrowsers();
 
   const testList = [
-    // {
-    //   fn: runMiny,
-    //   msg: "Mini test",
-    //   params: undefined
-    // },
     {
       fn: runPrivNote,
       msg: "PrivNote test",
+      params: undefined
+    },
+    {
+      fn: runMiny,
+      msg: "Mini test",
       params: undefined
     },
     // {
