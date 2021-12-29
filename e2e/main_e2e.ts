@@ -875,11 +875,11 @@ async function runAll() {
       msg: "Mini test",
       params: undefined
     },
-    // {
-    //   fn: MainTestBackBug,
-    //   msg: "Test back bug",
-    //   params: []
-    // },
+    {
+      fn: MainTestBackBug,
+      msg: "Test back bug",
+      params: []
+    },
     // {
     //   fn: MainTest,
     //   msg: "E2E with 1 expense",
