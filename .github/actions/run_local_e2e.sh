@@ -5,15 +5,15 @@ set -e
 WORKING_DIR="$(pwd)"
 API_PORT=8888
 
-## SETUP API
-# get api
-echo "Downloading API code"
-curl -o SplitMan2-API.zip https://codeload.github.com/lezhumain/SplitMan2-API/zip/refs/heads/master_1
-#curl -o SplitMan2.zip https://codeload.github.com/lezhumain/SplitMan2/zip/refs/heads/version_1
-unzip SplitMan2-API.zip > /dev/null
-
-echo "Build APP"
-npm ci
+### SETUP API
+## get api
+#echo "Downloading API code"
+#curl -o SplitMan2-API.zip https://codeload.github.com/lezhumain/SplitMan2-API/zip/refs/heads/master_1
+##curl -o SplitMan2.zip https://codeload.github.com/lezhumain/SplitMan2/zip/refs/heads/version_1
+#unzip SplitMan2-API.zip > /dev/null
+#
+#echo "Build APP"
+#npm ci
 
 echo "Changing API port to $API_PORT"
 sed "s/:8080/:$API_PORT/g" src/environments/environment.ts > src/environments/environment.test.ts
@@ -24,8 +24,8 @@ echo "Run APP server"
 npx ng serve &
 
 cd SplitMan2-API-*
-echo "Build API"
-mvn package -f pom.xml > /dev/null
+#echo "Build API"
+#mvn package -f pom.xml > /dev/null
 
 cd target
 TARGET_JAR="$(ls demo-*.*.*-SNAPSHOT.jar | head -n 1)"
