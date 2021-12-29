@@ -881,16 +881,16 @@ async function runAll() {
   await CreateBrowsers();
 
   const testList = [
-    {
-      fn: runPrivNote,
-      msg: "PrivNote test",
-      params: undefined
-    },
-    {
-      fn: runMiny,
-      msg: "Mini test",
-      params: undefined
-    },
+    // {
+    //   fn: runPrivNote,
+    //   msg: "PrivNote test",
+    //   params: undefined
+    // },
+    // {
+    //   fn: runMiny,
+    //   msg: "Mini test",
+    //   params: undefined
+    // },
     {
       fn: MainTestBackBug,
       msg: "Test back bug",
@@ -904,14 +904,14 @@ async function runAll() {
         "Dju\ndoit a\n8.56€\nSuzie\nMax\ndoit a\n8.56€\nSuzie\nElyan\ndoit a\n8.56€\nSuzie"
       ]
     },
-    // {
-    //   fn: MainTest,
-    //   msg: "E2E with all expenses",
-    //   params: [
-    //     allExpenses.slice(),
-    //     "Elyan\ndoit a\n17.30€\nDju"
-    //   ]
-    // }
+    {
+      fn: MainTest,
+      msg: "E2E with all expenses",
+      params: [
+        allExpenses.slice(),
+        "Elyan\ndoit a\n17.30€\nDju"
+      ]
+    }
   ];
 
   const allRes: {msg: string, errorMsg?: string, hasError: boolean, links?: string[]}[] = [];
