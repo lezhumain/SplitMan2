@@ -810,7 +810,9 @@ async function runAll() {
     [browser, browser1].map(b => b.close())
   );
 
-  if(allRes.some(a => a.endsWith("failed."))) {
+  // const allRes = ["ok"];
+
+  if(allRes.some(a => /failed/.test(a))) {
     // process.exit(1);
     throw "Some errors";
   }
@@ -842,4 +844,10 @@ async function runMiny() {
 }
 
 // runMiny().then(e => console.log("Done."));
-runAll().then(e => console.log("Done."));
+runAll().then(e => {
+  console.log("Done.");
+  process.exit(0);
+}, (e) => {
+  console.error(e);
+  process.exit(1);
+});

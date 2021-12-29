@@ -62,4 +62,4 @@ if [ $RES != 0 ]; then
   RES=1
 fi
 
-return $RES
+exit $RES
