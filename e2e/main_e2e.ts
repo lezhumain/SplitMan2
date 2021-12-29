@@ -898,7 +898,7 @@ async function runAll() {
     // }
   ];
 
-  const allRes: {msg: string, errorMsg: string, hasError: boolean}[] = [];
+  const allRes: {msg: string, errorMsg?: string, hasError: boolean, links?: string[]}[] = [];
   for(const testFn of testList) {
     let msg = `${testFn.msg}: `;
     const res: string = await testFn.fn(testFn.params)
@@ -910,7 +910,7 @@ async function runAll() {
     // allRes.push(msg + (res ? "passed" : "failed") + ".");
     // allRes.push(msg + (!!res ? "passed" : "failed") + `:\n${res || ""}`);
 
-    const resOO = {
+    const resOO: {msg: string, errorMsg?: string, hasError: boolean, links?: string[]} = {
       msg: msg,
       errorMsg: res,
       hasError: !!res
@@ -920,9 +920,10 @@ async function runAll() {
       // take screenshot
       const pages = await getPagse();
 
-      await Promise.all(
+      resOO.links = await Promise.all(
         pages.map((thePage: Page, index: number) => takeScreenshot(thePage)
-          .then((link: string) => console.log(`Screenshot link ${index} : ${link}`)))
+          // .then((link: string) => console.log(`Screenshot link ${index} : ${link}`))
+        )
       );
 
       // upload file somewhere
@@ -933,11 +934,12 @@ async function runAll() {
 
   console.log("====================");
   for(const resPart of allRes) {
-    console.log("Test:" + resPart.msg);
-    console.log("Status:" + (resPart.hasError ? "failed" : "passed"));
-    if (resPart.errorMsg) {
-      console.log("Error:" + resPart.errorMsg);
-    }
+    // console.log("Test:" + resPart.msg);
+    // console.log("Status:" + (resPart.hasError ? "failed" : "passed"));
+    // if (resPart.errorMsg) {
+    //   console.log("Error:" + resPart.errorMsg);
+    // }
+    console.log(JSON.stringify(resPart, null, 2));
     console.log("");
   }
   console.log("=====================");
