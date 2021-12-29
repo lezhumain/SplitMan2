@@ -120,7 +120,7 @@ async function testCommonTravels(pages: puppeteer.Page[]) {
     // open travel
     await Promise.all(
       pages.map(page => page.waitForXPath(`//app-travel-card//h6[contains(text(), '${travel}')]`, {visible: true})
-        .then(e => e ? Promise.all([e.click(), page.waitForNavigation()]) : null))
+        .then(e => e ? Promise.all([e.click(), page.waitForNavigation({timeout: 10000})]) : null))
     );
 
     await Promise.all(
@@ -146,7 +146,7 @@ async function testCommonTravels(pages: puppeteer.Page[]) {
     // back
     await Promise.all(
       pages.map(page => page.waitForSelector("div.iconWrapper > i.fa-arrow-left")
-        .then(e => e ? Promise.all([e.click(), page.waitForNavigation()]) : null))
+        .then(e => e ? Promise.all([e.click(), page.waitForNavigation({timeout: 10000})]) : null))
     );
   }
   console.log("okff");
@@ -158,7 +158,7 @@ async function handleLogout(page: Page) {
       .then(e => e ? e.click() : null);
 
     await page.waitForXPath("//a[contains(text(), 'Log out')]", {visible: true})
-      .then(e => e ? Promise.all([scrollAndClick(e, page), page.waitForNavigation()]) : null);
+      .then(e => e ? Promise.all([scrollAndClick(e, page), page.waitForNavigation({timeout: 10000})]) : null);
 
     expect(page.url()).to.contain("/login");
     await page.waitForTimeout(500);
@@ -182,7 +182,7 @@ async function handleLogin(page: Page, userData: { pass: string; email: string; 
   await page.waitForTimeout(500);
 
   await page.waitForXPath("//button[contains(text(), 'Login')]", {visible: true})
-    .then(e => e ? Promise.all([e.click(), page.waitForNavigation()]) : null);
+    .then(e => e ? Promise.all([e.click(), page.waitForNavigation({timeout: 10000})]) : null);
 
   // await page.waitForNavigation();
 
@@ -340,7 +340,7 @@ async function checkTravelCount(number: number, page: Page) {
   await page.waitForXPath("//h3[contains(text(), 'Expenses')]");
 
   await page.waitForSelector("div.iconWrapper > i.fa-arrow-left")
-    .then(e => e ? Promise.all([e.click(), page.waitForNavigation()]) : null);
+    .then(e => e ? Promise.all([e.click(), page.waitForNavigation({timeout: 10000})]) : null);
 
   await page.waitForTimeout(1000);
 
@@ -552,7 +552,7 @@ async function MainTest(params: any[]) {
     // await elm.click();
     await Promise.all([
       scrollAndClick(elm, page),
-      page.waitForNavigation()
+      page.waitForNavigation({timeout: 10000})
     ]);
 
     const travelNAme = `Test ${new Date().toUTCString()}`;
@@ -563,7 +563,7 @@ async function MainTest(params: any[]) {
       .then(e => e ? e.type("E2E test travel", {delay: 30}) : null);
 
     await page.waitForXPath("//button[contains(text(), 'Save Travel')]", {visible: true})
-      .then(e => e ? Promise.all([e.click(), page.waitForNavigation()]) : null);
+      .then(e => e ? Promise.all([e.click(), page.waitForNavigation({timeout: 10000})]) : null);
 
     // await page.waitForNavigation();
 
@@ -662,7 +662,7 @@ async function MainTest(params: any[]) {
       }
 
       await page.waitForXPath("//button[contains(text(), 'Save Expense')]", {visible: true})
-        .then(e => e ? Promise.all([scrollAndClick(e, page), page.waitForNavigation()]) : null);
+        .then(e => e ? Promise.all([scrollAndClick(e, page), page.waitForNavigation({timeout: 10000})]) : null);
 
       // await page.waitForNavigation();
       await page.waitForTimeout(500);
@@ -759,7 +759,7 @@ async function MainTest(params: any[]) {
     }
 
     await page1.waitForXPath(`//h6[contains(text(), '${travelNAme}')]`, {visible: true})
-      // .then(e => e ? Promise.all([e.click(), page.waitForNavigation({timeout: 20000})]) : null);
+      // .then(e => e ? Promise.all([e.click(), page.waitForNavigation({timeout: 10000})]) : null);
         .then(e => e?.click());
 
     await page1.waitForTimeout(1000);
