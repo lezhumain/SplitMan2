@@ -1,5 +1,8 @@
 # SplitMan21
 
+![example workflow](https://github.com/lezhumain/SplitMan2/actions/workflows/node.js.yml/badge.svg)
+![example workflow](https://github.com/lezhumain/SplitMan2/actions/workflows/e2e.yml/badge.svg)
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.12.
 
 ## Development server
