@@ -49,7 +49,8 @@ export class BaseService {
     );
   }
 
-  protected httpPost(url: string, data: any): Observable<any> {
+  protected httpPost(url: string, data: any, respType: "json" | "text" | "blob" | "arraybuffer" = "json",
+                     accept = 'application/json', withCred = true): Observable<any> {
     const headers: any = this._headers;
     headers["User-ID"] = BaseService.USER_ID;
 
@@ -58,8 +59,8 @@ export class BaseService {
     }
 
     // return this.http.post(url, data, {withCredentials: true, headers: {"Accept": "application/json", "Content-Type": "application/json"}})
-    return this.http.post(url, data, {withCredentials: true, responseType: "json",
-      headers : new HttpHeaders({ /*'Content-Type': 'application/json', */'Accept': 'application/json' })})
+    return this.http.post(url, data, {withCredentials: withCred, responseType: respType as "json" | undefined,
+      headers : new HttpHeaders({ /*'Content-Type': 'application/json', */'Accept': accept })})
     // return this.http.post(url, data, {withCredentials: true})
     // return ajax({
     //   url: url,

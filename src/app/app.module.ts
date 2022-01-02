@@ -23,6 +23,7 @@ import { TravelCardComponent } from './travel-card/travel-card.component';
 import { UserProfileComponent } from './user-profile/user-profile.component';
 import { UserEditComponent } from './user-edit/user-edit.component';
 import {HttpClientModule} from "@angular/common/http";
+import { TestEndpointComponent } from './test-endpoint/test-endpoint.component';
 
 @NgModule({
   declarations: [
@@ -43,7 +44,8 @@ import {HttpClientModule} from "@angular/common/http";
     InviteListComponent,
     TravelCardComponent,
     UserProfileComponent,
-    UserEditComponent
+    UserEditComponent,
+    TestEndpointComponent
   ],
   imports: [
     BrowserModule,

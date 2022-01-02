@@ -14,11 +14,13 @@ import {InviteListComponent} from "../invite-list/invite-list.component";
 import {AuthGuard} from "./auth-guard";
 import {UserProfileComponent} from "../user-profile/user-profile.component";
 import {UserEditComponent} from "../user-edit/user-edit.component";
+import {TestEndpointComponent} from "../test-endpoint/test-endpoint.component";
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' }, // redirect to `first-component`
+  { path: 'genimg', component: TestEndpointComponent}
 ];
 
 const protectedRoutes: Routes = [

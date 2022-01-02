@@ -5,6 +5,9 @@ import {Browser, ClickOptions, ElementHandle, JSHandle, Page} from "puppeteer";
 import {expect} from "chai";
 import {badData} from "./data/bugData";
 import {allExpenses} from "./data/allExpenses";
+import {from, Observable, Subject} from "rxjs";
+import {filter, first} from "rxjs/operators";
+import {flatMap} from "rxjs/internal/operators";
 // import {badData} from "./data/bugData";
 
 const userData = {
@@ -502,6 +505,48 @@ async function goToAndSecurity(pages: Page[]) {
 
 let pageDialogHandled = false;
 
+const checkInvite$: Subject<any> = new Subject<any>();
+// checkInvite$.pipe(
+//   tak
+// )
+
+async function startCheckInviteCall(pag: Page) {
+  await pag.setRequestInterception(true);
+
+  const handler = async (resp: puppeteer.HTTPResponse) => {
+    // console.log(request);
+    try {
+      if (/\/invite$/.test(resp.url())) {
+        debugger;
+      }
+    } catch (e) {
+      debugger;
+    }
+  };
+
+  pag.on('response', handler);
+
+  checkInvite$.next(handler);
+
+  checkInvite$.pipe(
+    filter(e => e === null),
+    first(),
+    flatMap(() => {
+      return from(pag.setRequestInterception(true));
+    })
+  ).subscribe(() => {
+    pag.off('response', handler);
+  });
+}
+
+function stopCheckInviteCall(page: Page) {
+  if(checkInvite$) {
+    return;
+  }
+
+  checkInvite$.next(null);
+}
+
 async function MainTest(params: any[]) {
   let isError = null;
 
@@ -686,6 +731,8 @@ async function MainTest(params: any[]) {
 
     await checkRepartition(page, targetReparttion);
 
+    startCheckInviteCall(page);
+
     // debugger;
     await page.waitForTimeout(200);
 
@@ -786,6 +833,9 @@ async function MainTest(params: any[]) {
     //   pages.map((pagee: Page) => handleLogout(pagee))
     // );
 
+    const [page] = await getPagse();
+    stopCheckInviteCall(page);
+
     if(isError) {
       throw isError;
     }
@@ -801,49 +851,54 @@ async function runMiny(_: string[]) {
 }
 
 
-async function takeScreenshot(page: Page) {
+async function takeScreenshot(page: Page, doPrivNote = true) {
   const brow = page.browser();
   const pa = await brow.newPage();
 
-  await pa.goto("https://privnote.com/#");
-
-  const el = await pa.waitForSelector("#note_raw", {visible: true, timeout: 10000});
   const data: string = await page.screenshot({path: "./screen.jpg", type: "jpeg", encoding: "base64", quality: 33})
     .then(e => e.toString());
 
-  const result = data;
+  if (doPrivNote) {
+    await pa.goto("https://privnote.com/#");
 
-  // faster than .type(data)
-  await pa.evaluate((pData, pEl) => {
-    pEl.value = pData;
-  }, data, el);
-  // await el.type(result);
+    const el = await pa.waitForSelector("#note_raw", {visible: true, timeout: 10000});
 
-  await pa.waitForSelector("#encrypt_note").then(e => e.click());
+    const result = data;
 
-  await pa.waitForResponse("https://privnote.com/legacy/");
+    // faster than .type(data)
+    await pa.evaluate((pData, pEl) => {
+      pEl.value = pData;
+    }, data, el);
+    // await el.type(result);
 
-  // let v = null;
-  // while(!v) {
-  //   v = await pa.waitForSelector("#note_link_input")
-  //     .then(e => e.getProperty("value"))
-  //     .then(e => {
-  //       return e._remoteObject.value;
-  //     });
-  //
-  //   if(!v) {
-  //     await pa.waitForTimeout(500);
-  //   }
-  // }
+    await pa.waitForSelector("#encrypt_note").then(e => e.click());
 
-  await pa.waitForTimeout(500);
-  const v = await pa.waitForSelector("#note_link_input")
+    await pa.waitForResponse("https://privnote.com/legacy/");
+
+    // let v = null;
+    // while(!v) {
+    //   v = await pa.waitForSelector("#note_link_input")
+    //     .then(e => e.getProperty("value"))
+    //     .then(e => {
+    //       return e._remoteObject.value;
+    //     });
+    //
+    //   if(!v) {
+    //     await pa.waitForTimeout(500);
+    //   }
+    // }
+
+    await pa.waitForTimeout(500);
+    const v = await pa.waitForSelector("#note_link_input")
       .then(e => e.getProperty("value"))
       .then(e => {
         return e._remoteObject.value;
       });
 
-  return pa.close().then(() => v);
+    return pa.close().then(() => v);
+  } else {
+    return Promise.resolve("");
+  }
 }
 
 async function runPrivNote(_: string[]) { //: Promise<string> {
@@ -936,7 +991,7 @@ async function runAll() {
       const pages = await getPagse();
 
       resOO.links = await Promise.all(
-        pages.map((thePage: Page, index: number) => takeScreenshot(thePage)
+        pages.map((thePage: Page, index: number) => takeScreenshot(thePage, false)
           // .then((link: string) => console.log(`Screenshot link ${index} : ${link}`))
         )
       );

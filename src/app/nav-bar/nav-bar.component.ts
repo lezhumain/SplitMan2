@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {NavigationEnd, Router} from "@angular/router";
+import {NavigationEnd, NavigationStart, Router} from "@angular/router";
 import {filter, first, takeWhile, tap} from "rxjs/operators";
 import { Location } from '@angular/common';
 import {NavBarService} from "../nav-bar.service";
@@ -30,12 +30,12 @@ export class NavBarComponent implements OnInit {
 
   ngOnInit(): void {
     this.router.events.pipe(
-      filter((e): e is NavigationEnd => {
-        const ok: boolean = !!(e instanceof NavigationEnd);
+      filter((e): e is NavigationStart => {
+        const ok: boolean = !!(e instanceof NavigationStart);
         return ok;
       }),
       takeWhile(() => this.alive)
-    ).subscribe((value: NavigationEnd) => {
+    ).subscribe((value: NavigationStart) => {
       if(["register", "login", "travels"].some(v => value.url.endsWith(v))) {
         // logo angular
         this.showLogo = true;
