@@ -25,15 +25,10 @@ describe('BaseServiceService', () => {
     const expectedBasees: any[] =
       [{ id: 1, name: 'A' }, { id: 2, name: 'B' }];
 
-    debugger;
-
     httpClientSpy.get.and.returnValue(of(expectedBasees));
-
-    debugger;
 
     baseService["httpGet"]("/get").subscribe(
       basees => {
-        debugger;
         expect(basees).toEqual(expectedBasees);
         done();
       },

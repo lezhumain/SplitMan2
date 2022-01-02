@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import {NavigationEnd, NavigationStart, Router} from "@angular/router";
-import {filter, first, takeWhile, tap} from "rxjs/operators";
+import {filter, first, map, takeWhile, tap} from "rxjs/operators";
 import { Location } from '@angular/common';
 import {NavBarService} from "../nav-bar.service";
 import {Observable} from "rxjs";
 import {UserModel} from "../models/user-model";
 import {UserServiceService} from "../user-service.service";
+import {main} from "@angular/compiler-cli/src/main";
 
 
 @Component({
@@ -17,6 +18,7 @@ export class NavBarComponent implements OnInit {
   private alive = true;
 
   showLogo = false;
+  // showLogo$: Observable<boolean> = new Observable<boolean>();
   headerValue$: Observable<string> | null = null;
   backUrl$: Observable<string> | null = null;
 
@@ -29,6 +31,7 @@ export class NavBarComponent implements OnInit {
               private readonly userServiceService: UserServiceService) { }
 
   ngOnInit(): void {
+    console.log("ggggggggggggggggggg");
     this.router.events.pipe(
       filter((e): e is NavigationStart => {
         const ok: boolean = !!(e instanceof NavigationStart);
@@ -47,6 +50,27 @@ export class NavBarComponent implements OnInit {
       console.log('current route: ', this.router.url.toString());
     });
 
+    // this.showLogo$ = this.router.events.pipe(
+    //   filter((e): e is NavigationStart => {
+    //     const ok: boolean = !!(e instanceof NavigationStart);
+    //     return ok;
+    //   }),
+    //   takeWhile(() => this.alive),
+    //   map((value: NavigationStart) => {
+    //     // if(["register", "login", "travels"].some(v => value.url.endsWith(v))) {
+    //     //   // logo angular
+    //     //   this.showLogo = true;
+    //     // }
+    //     // else {
+    //     //   // back icon
+    //     //   this.showLogo = false;
+    //     // }
+    //     console.log('current route: ', this.router.url.toString());
+    //
+    //     return ["register", "login", "travels"].some(v => value.url.endsWith(v));
+    //   })
+    // );
+
     this.headerValue$ = this._navService.getHeaderValue().pipe(
       takeWhile(() => this.alive)
     );
@@ -58,6 +82,7 @@ export class NavBarComponent implements OnInit {
     this.connectedUser$ = this.userServiceService.getConnectedUser().pipe(
       takeWhile(() => this.alive),
       tap(u => {
+        console.warn("NavBar user: %o", u);
         if(u) {
           this.connectedUserID = u.id;
         }
