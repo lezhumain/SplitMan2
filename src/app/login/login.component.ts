@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {UserServiceService} from "../user-service.service";
 import {ActivatedRoute, Router} from "@angular/router";
-import {filter, first, take} from "rxjs/operators";
+import {take} from "rxjs/operators";
 import {UserModel} from "../models/user-model";
+import {ToastComponent} from "../toast/toast.component";
+import {ToastMessage, ToastType} from "../toast/toast.shared";
 
 @Component({
   selector: 'app-login',
@@ -62,6 +64,8 @@ export class LoginComponent implements OnInit {
 
     this.userServiceService.setConnectedUserByObj(user, true);
     this.router.navigate(['travels']);
+
+    ToastComponent.toastdata$.next({type: ToastType.INFO, message: "Login success."} as ToastMessage);
   }
 
   goRegister() {

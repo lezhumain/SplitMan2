@@ -1,0 +1,12 @@
+<!--<ng-container *ngIf="(data$ | async) as data">-->
+
+<ng-container *ngIf="(data$ | async) as data">
+  <div #toastElem [@slideInOut] id="toast" class="toast_{{data.type}}"
+       *ngIf="data && data.message">{{data.message}}</div>
+</ng-container>
+
+<!--<ng-container *ngIf="(data$ | async) as data">-->
+<!--  <div>Data: {{data}}</div>-->
+<!--</ng-container>-->
+
+<!--<div>Data1: {{(data$ | async)}}</div>-->

@@ -136,3 +136,6 @@ fabric.properties
 
 src/assets/bootstrap
 src/assets/font-awesome
+
+*.jpg
+*.old

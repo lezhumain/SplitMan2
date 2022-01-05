@@ -1,0 +1,32 @@
+#toast {
+  width: 80%;
+  left: 10%;
+  padding: 10px 15px;
+  /*background-color: var(--bs-success);*/
+  /*color: white;*/
+  border-radius: 4px;
+
+  display: block;
+  z-index: 99999;
+  position: absolute;
+}
+
+.toast_0 {
+  background-color: var(--bs-success);
+  color: white;
+}
+
+.toast_1 {
+  background-color: var(--bs-warning);
+  color: white;
+}
+
+.toast_2 {
+  background-color: var(--bs-danger);
+  color: white;
+}
+
+.toast_3 {
+  background-color: var(--bs-primary);
+  color: white;
+}

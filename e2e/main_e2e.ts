@@ -1,13 +1,17 @@
 import * as puppeteer from 'puppeteer';
-import {Browser, ClickOptions, ElementHandle, JSHandle, Page} from "puppeteer";
+import {Browser, ClickOptions, ElementHandle, HTTPRequest, JSHandle, Page} from "puppeteer";
 
 // @ts-ignore
 import {expect} from "chai";
 import {badData} from "./data/bugData";
 import {allExpenses} from "./data/allExpenses";
-import {from, Observable, Subject} from "rxjs";
+import {from, noop, Observable, Subject} from "rxjs";
 import {filter, first} from "rxjs/operators";
 import {flatMap} from "rxjs/internal/operators";
+import {checkServerIdentity} from "tls";
+import {Expense} from "../src/app/models/expense";
+import {CreateBrowsers} from "./e2e_utils";
+import {exec, execSync} from "child_process";
 // import {badData} from "./data/bugData";
 
 const userData = {
@@ -59,15 +63,15 @@ async function waitForMS(number: number): Promise<null> {
 //   }
 // }
 
-async function scrollAndClick(elm: ElementHandle, page: Page) {
-  await page.evaluate((selector, eee) => {
+async function scrollAndClick(elm: ElementHandle, pag: Page) {
+  await pag.evaluate((selector, eee) => {
     // console.log(eee);
     // debugger;
     // document.querySelector(selector).scrollIntoView();
     eee.scrollIntoView();
   }, "#addTravel", elm);
 
-  await page.waitForTimeout(500);
+  await pag.waitForTimeout(500);
   return elm.click();
 }
 
@@ -87,7 +91,6 @@ async function handleSecrutiyStuff(page: Page) {
       .then(e => e ? e.click() : null);
   }
 }
-
 
 async function getTravelList(page: Page): Promise<string[]> {
   return page.$$(".travel-card .row:first-child .col")
@@ -167,7 +170,7 @@ async function handleLogout(page: Page) {
     await page.waitForTimeout(500);
   } catch (e) {
     console.log("Logout errorm should be ok");
-    console.log(e);
+    // console.log(e);
   }
 }
 
@@ -190,6 +193,10 @@ async function handleLogin(page: Page, userData: { pass: string; email: string; 
   // await page.waitForNavigation();
 
   await page.waitForTimeout(500);
+
+  const toastSel = "#toast";
+  await page.waitForSelector(toastSel, {visible: true, timeout: 10000});
+  await page.waitForSelector(toastSel, {hidden: true, timeout: 10000});
 }
 
 let browser: Browser, browser1: Browser;
@@ -238,7 +245,7 @@ let browser: Browser, browser1: Browser;
 
 async function checkRepartition(thePage: Page, repart: string) {
   // check repartition
-  await thePage.waitForSelector("#profile-tab", {visible: true})
+  await thePage.waitForSelector("#profile-tab", {visible: true, timeout: 10000})
     .then(e => e ? scrollAndClick(e, thePage) : null);
 
   const res = await thePage.waitForSelector("app-repartition", {visible: true})
@@ -273,15 +280,6 @@ async function checkRepartition(thePage: Page, repart: string) {
 const host = `http://127.0.0.1:4200`;
 const url = `${host}/login`;
 
-function getHeadlessParam(): boolean {
-  const regex = /-headless[= ](\w+)/;
-  const param = process.argv.find(a => regex.test(a));
-  const target = param?.replace(regex, "$1");
-
-  return target
-    ? target === "true"
-    : true;
-}
 
 let getCount = 0;
 
@@ -468,27 +466,6 @@ async function MainTestSQLLogin(params: any[]) {
   );
 }
 
-async function CreateBrowsers(): Promise<[Browser, Browser]> {
-  const isHeadless: boolean = getHeadlessParam();
-
-  const pupArgs = {
-    headless: isHeadless,
-    defaultViewport: null,
-    args: [
-      '--disable-web-security',
-      '--start-maximized',
-      '--no-sandbox' // discouraged, see https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#setting-up-chrome-linux-sandbox
-    ],
-    // executablePath: "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
-    // executablePath: "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
-  };
-
-  browser = await puppeteer.launch(pupArgs);
-  browser1 = await puppeteer.launch(JSON.parse(JSON.stringify(pupArgs)));
-
-  return Promise.resolve([browser, browser1]);
-}
-
 async function goToAndSecurity(pages: Page[]) {
   await Promise.all(
     pages.map(p => p.goto(url).then(() => {
@@ -511,22 +488,37 @@ const checkInvite$: Subject<any> = new Subject<any>();
 // )
 
 async function startCheckInviteCall(pag: Page) {
-  await pag.setRequestInterception(true);
+  // await pag.setRequestInterception(true);
 
-  const handler = async (resp: puppeteer.HTTPResponse) => {
+  const handler = async(resp: puppeteer.HTTPResponse) => {
     // console.log(request);
     try {
-      if (/\/invite$/.test(resp.url())) {
-        debugger;
+      if (/\/get$/.test(resp.url())) {
+        console.log("/get called");
+        const result = await resp.json();
+        // console.log(result);
+        console.log("After invite:");
+        const inv = result.find(a => a.type === "user" && a.username === "s").invites;
+        console.log(inv);
+
+        // let currentName = "";
+        if(!inv.find(e => e.tripName === currentName)) {
+          console.error("Couldn't find invite");
+        }
+
+        // debugger;
       }
     } catch (e) {
-      debugger;
+      // debugger;
+    }
+    finally {
+      return Promise.resolve(resp);
     }
   };
 
-  pag.on('response', handler);
-
-  checkInvite$.next(handler);
+  pag.on('response', async (r) => {
+    return handler(r);
+  });
 
   checkInvite$.pipe(
     filter(e => e === null),
@@ -537,6 +529,10 @@ async function startCheckInviteCall(pag: Page) {
   ).subscribe(() => {
     pag.off('response', handler);
   });
+
+  checkInvite$.next(handler);
+
+
 }
 
 function stopCheckInviteCall(page: Page) {
@@ -547,11 +543,213 @@ function stopCheckInviteCall(page: Page) {
   checkInvite$.next(null);
 }
 
+let currentName = "";
+function getTravelName() {
+  currentName = `Test ${new Date().toUTCString()}`;
+  return currentName;
+}
+
+async function addTravel(pag: Page): Promise<string> {
+  // add travel
+  // await page.waitForXPath("//button[contains(text(), 'Add travel')]", {visible: true})
+  //   .then(e => e ? e.click() : null);
+  const xpath = "//button[contains(text(), 'Add travel')]";
+  const elm: ElementHandle | null = await pag.waitForXPath(xpath, {visible: true}).then(e => e, () => null);
+  if (!elm) {
+    throw "Couldn't get button";
+  }
+  // await page.evaluate((selector, eee) => {
+  //   // console.log(eee);
+  //   // debugger;
+  //   // document.querySelector(selector).scrollIntoView();
+  //   eee.scrollIntoView();
+  // }, "#addTravel", elm);
+  //
+  // await elm.click();
+  await Promise.all([
+    scrollAndClick(elm, pag),
+    pag.waitForNavigation({timeout: 10000})
+  ]);
+
+  const travelNAme = getTravelName();
+  await pag.waitForSelector("#name", {visible: true})
+    .then(e => e ? e.type(travelNAme, {delay: 30}) : null);
+
+  await pag.waitForSelector("#description", {visible: true})
+    .then(e => e ? e.type("E2E test travel", {delay: 30}) : null);
+
+  await pag.waitForXPath("//button[contains(text(), 'Save Travel')]", {visible: true})
+    .then(e => e ? Promise.all([e.click(), pag.waitForNavigation({timeout: 10000})]) : null);
+
+  // await page.waitForNavigation();
+  return Promise.resolve(travelNAme);
+}
+
+async function AddPeople(pag: Page) {
+  const allPeople: { name: string, dayCount: number }[] = xpeopleMarseille.slice();
+  for (const people of allPeople) {
+    await pag.waitForSelector("#profile-tab1", {visible: true, timeout: 10000})
+      .then(e => e ? e.click() : null);
+
+    await pag.waitForXPath("//button[contains(text(), 'Add people')]", {visible: true})
+      .then(e => e ? e.click() : null);
+
+    await pag.waitForSelector("#name", {visible: true})
+      .then(e => e ? e.type(people.name, {delay: 30}) : null);
+
+    await pag.waitForSelector("#dayCount", {visible: true})
+      .then(e => e ? clearAndType(e, people.dayCount.toString()) : null);
+
+    await pag.waitForXPath("//button[contains(text(), 'Save')]", {visible: true})
+      .then(e => e ? e.click() : null);
+
+    await pag.waitForTimeout(200);
+  }
+
+  await pag.waitForTimeout(2000);
+
+  await pag.waitForSelector("#profile-tab1", {visible: true})
+    .then(e => e ? e.click() : null);
+
+  await pag.waitForTimeout(1000);
+
+  const targetXXpath = "//h3[contains(text(), 'Participants')]//following-sibling::div//div[contains(@class, 'row')]";
+  await pag.waitForXPath(targetXXpath);
+  const allPeopleRes: ElementHandle[] = await pag.$x(targetXXpath);
+  expect(allPeopleRes.length).to.equal(allPeople.length);
+
+}
+
+async function SaveWhoWeAre(page: Page, dju: string) {
+  await page.waitForSelector("#payer", {visible: true})
+    .then(e => e ? e.type(dju, {delay: 30}) : null);
+
+  await page.waitForSelector("#savePayer", {visible: true})
+    .then(e => e ? e.click() : null);
+}
+
+async function AddExpenses(page: Page, expenses: Expense[]) {
+  for (const expense of expenses) {
+    // TODO add expense with page or page1 randomly
+
+    await page.waitForXPath("//button[contains(text(), 'Add expense')]", {visible: true})
+      .then(e => e ? scrollAndClick(e, page) : null);
+
+    // await page.waitForNavigation();
+
+    await page.waitForSelector("#name", {visible: true})
+      .then(e => e ? e.type(expense.name, {delay: 30}) : null);
+
+    await page.waitForTimeout(800);
+
+    await page.waitForSelector("#amount", {visible: true})
+      .then(e => e ? clearAndType(e, expense.amount.toString()) : null);
+
+    // await page.waitForSelector("#payer", {visible: true})
+    //   .then(e => e ? e.click() : null);
+    //
+    // await page.waitForXPath(`//option[contains(text(), '${expense.payer}')]`, {visible: true})
+    //   .then(e => e ? e.click() : null);
+
+    await page.waitForSelector("#payer", {visible: true})
+      .then(e => e ? e.type(expense.payer, {delay: 30}) : null);
+
+    for (const payee of expense.payees) {
+      const line = await page.waitForXPath(`//span[contains(text(), '${payee.name}')]//ancestor::div[contains(@class, 'form-check')]`,
+        {visible: true});
+
+      await line?.$x(".//span[contains(@class, 'perc-sign')]//preceding-sibling::input")
+        .then(e => e.length > 0 ? e[0].type(payee.e4xpenseRatio.toString(), {delay: 30}) : null);
+    }
+
+    await page.waitForXPath("//button[contains(text(), 'Save Expense')]", {visible: true})
+      .then(e => e ? Promise.all([scrollAndClick(e, page), page.waitForNavigation({timeout: 10000})]) : null);
+
+    // await page.waitForNavigation();
+    await page.waitForTimeout(500);
+  }
+}
+
+async function EditLast(page: Page, expenses: Expense[]) {
+  // debugger;
+  const lastTitle = expenses[expenses.length - 1].name;
+  await page.waitForXPath(`//div[contains(@class, 'expense-card')]//h6[contains(text(), '${lastTitle}')]`, {visible: true})
+    .then(e => e ? scrollAndClick(e, page) : null);
+
+  await page.waitForXPath("//button[contains(text(), 'Edit expense')]", {visible: true})
+    .then(e => e ? scrollAndClick(e, page) : null);
+
+  await page.waitForSelector("#amount", {visible: true})
+    .then(e => e ? clearAndType(e, "34.23") : null);
+
+  await page.waitForXPath("//button[contains(text(), 'Save Expense')]")
+    .then(e => e ? scrollAndClick(e, page) : null);
+}
+
+async function DoInvite(pag: Page, email: string) {
+
+  const theHandler = async (r: HTTPRequest) => {
+    if (/\/invite$/.test(r.url())) {
+      console.warn("Calling /invite");
+      // debugger;
+    }
+  };
+  pag.on('request', theHandler);
+
+  await pag.waitForXPath("//button[contains(text(), 'Invite')]", {visible: true})
+    .then(e => e ? scrollAndClick(e, pag) : null);
+
+  // await pag.waitForNavigation();
+  await pag.waitForTimeout(500);
+
+  // send invite
+  await pag.waitForSelector("#email", {visible: true})
+    .then(e => e ? clearAndType(e, email) : null);
+
+  // if (!pageDialogHandled) {
+  //   pag.on("dialog", (dialog) => {
+  //     console.log("dialog");
+  //     try {
+  //       dialog.accept();
+  //     } catch (e) {
+  //       if (!e.toString().includes("Cannot accept dialog which is already handled")) {
+  //         throw e;
+  //       }
+  //     }
+  //   });
+  //   pageDialogHandled = true;
+  // }
+
+  await pag.waitForXPath("//button[contains(text(), 'Save')]", {visible: true})
+    .then(e => e ? scrollAndClick(e, pag) : null);
+
+  // await pag.waitForTimeout(1000);
+  // await pag.keyboard.press('Enter');
+  // // await pag.waitForNavigation();
+
+  // respond to invite
+  // debugger;
+
+  const tosterMsg: string = await pag.waitForSelector("#toast", {visible: true, timeout: 20000})
+    .then(e => e.getProperty("innerText"))
+    .then(e => {
+      return e._remoteObject.value;
+    });
+
+  console.log("Toaster msg: " + tosterMsg);
+  expect(tosterMsg.toLowerCase()).to.contain("success");
+
+  pag.off('request', theHandler);
+}
+
 async function MainTest(params: any[]) {
   let isError = null;
 
-  const targetExepense = params[0];
-  const targetReparttion = params[1];
+  // const targetExepense = params[0];
+  // const targetReparttion = params[1];
+  const [targetExepense, targetReparttion, inviteOnly] = params;
+
+
 
   let pages = [];
 
@@ -579,43 +777,13 @@ async function MainTest(params: any[]) {
       ]
     );
 
-    // add travel
-    // await page.waitForXPath("//button[contains(text(), 'Add travel')]", {visible: true})
-    //   .then(e => e ? e.click() : null);
-    const xpath = "//button[contains(text(), 'Add travel')]";
-    const elm: ElementHandle | null = await page.waitForXPath(xpath, {visible: true}).then(e => e, () => null);
-    if (!elm) {
-      throw "Couldn't get button";
-    }
-    // await page.evaluate((selector, eee) => {
-    //   // console.log(eee);
-    //   // debugger;
-    //   // document.querySelector(selector).scrollIntoView();
-    //   eee.scrollIntoView();
-    // }, "#addTravel", elm);
-    //
-    // await elm.click();
-    await Promise.all([
-      scrollAndClick(elm, page),
-      page.waitForNavigation({timeout: 10000})
-    ]);
-
-    const travelNAme = `Test ${new Date().toUTCString()}`;
-    await page.waitForSelector("#name", {visible: true})
-      .then(e => e ? e.type(travelNAme, {delay: 30}) : null);
-
-    await page.waitForSelector("#description", {visible: true})
-      .then(e => e ? e.type("E2E test travel", {delay: 30}) : null);
-
-    await page.waitForXPath("//button[contains(text(), 'Save Travel')]", {visible: true})
-      .then(e => e ? Promise.all([e.click(), page.waitForNavigation({timeout: 10000})]) : null);
-
-    // await page.waitForNavigation();
+    const travelNAme = await addTravel(page);
 
     await page.reload(); // TODO remove me
 
-    await page.waitForXPath(`//h6[contains(text(), '${travelNAme}')]`, {visible: true})
+    await page.waitForXPath(`//h6[contains(text(), '${travelNAme}')]`, {visible: true, timeout: 10000})
       .then(e => e ? scrollAndClick(e, page) : null);
+
     // if(!eeee) {
     //   throw "EEEError";
     // }
@@ -629,150 +797,45 @@ async function MainTest(params: any[]) {
     // await eeee.click();
 
     // Add people
-    const allPeople: { name: string, dayCount: number }[] = xpeopleMarseille.slice();
-    for (const people of allPeople) {
-      await page.waitForSelector("#profile-tab1", {visible: true, timeout: 10000})
-        .then(e => e ? e.click() : null);
+    await AddPeople(page);
 
-      await page.waitForXPath("//button[contains(text(), 'Add people')]", {visible: true})
-        .then(e => e ? e.click() : null);
-
-      await page.waitForSelector("#name", {visible: true})
-        .then(e => e ? e.type(people.name, {delay: 30}) : null);
-
-      await page.waitForSelector("#dayCount", {visible: true})
-        .then(e => e ? clearAndType(e, people.dayCount.toString()) : null);
-
-      await page.waitForXPath("//button[contains(text(), 'Save')]", {visible: true})
-        .then(e => e ? e.click() : null);
-
-      await page.waitForTimeout(200);
-    }
-
-    await page.waitForSelector("#profile-tab1", {visible: true})
-      .then(e => e ? e.click() : null);
-
-    await page.waitForTimeout(1000);
-
-    const targetXXpath = "//h3[contains(text(), 'Participants')]//following-sibling::div//div[contains(@class, 'row')]";
-    await page.waitForXPath(targetXXpath);
-    const allPeopleRes: ElementHandle[] = await page.$x(targetXXpath);
-    expect(allPeopleRes.length).to.equal(allPeople.length);
-
-
-    await page.waitForSelector("#payer", {visible: true})
-      .then(e => e ? e.type("Dju", {delay: 30}) : null);
-
-
-    await page.waitForSelector("#savePayer", {visible: true})
-      .then(e => e ? e.click() : null);
+    await SaveWhoWeAre(page, "Dju");
 
     // add expenses
     await page.waitForSelector("#home-tab", {visible: true})
       .then(e => e ? scrollAndClick(e, page) : null);
 
-    const expenses = targetExepense;
+    if (!inviteOnly) {
+      const expenses = targetExepense;
 
-    for (const expense of expenses) {
-      // TODO add expense with page or page1 randomly
+      await AddExpenses(page, expenses);
 
-      await page.waitForXPath("//button[contains(text(), 'Add expense')]", {visible: true})
-        .then(e => e ? scrollAndClick(e, page) : null);
+      // edit last expense
+      await EditLast(page, expenses);
 
-      // await page.waitForNavigation();
-
-      await page.waitForSelector("#name", {visible: true})
-        .then(e => e ? e.type(expense.name, {delay: 30}) : null);
-
-      await page.waitForTimeout(800);
-
-      await page.waitForSelector("#amount", {visible: true})
-        .then(e => e ? clearAndType(e, expense.amount.toString()) : null);
-
-      // await page.waitForSelector("#payer", {visible: true})
-      //   .then(e => e ? e.click() : null);
-      //
-      // await page.waitForXPath(`//option[contains(text(), '${expense.payer}')]`, {visible: true})
-      //   .then(e => e ? e.click() : null);
-
-      await page.waitForSelector("#payer", {visible: true})
-        .then(e => e ? e.type(expense.payer, {delay: 30}) : null);
-
-      for (const payee of expense.payees) {
-        const line = await page.waitForXPath(`//span[contains(text(), '${payee.name}')]//ancestor::div[contains(@class, 'form-check')]`,
-          {visible: true});
-
-        await line?.$x(".//span[contains(@class, 'perc-sign')]//preceding-sibling::input")
-          .then(e => e.length > 0 ? e[0].type(payee.e4xpenseRatio.toString(), {delay: 30}) : null);
-      }
-
-      await page.waitForXPath("//button[contains(text(), 'Save Expense')]", {visible: true})
-        .then(e => e ? Promise.all([scrollAndClick(e, page), page.waitForNavigation({timeout: 10000})]) : null);
-
-      // await page.waitForNavigation();
-      await page.waitForTimeout(500);
+      await checkRepartition(page, targetReparttion);
     }
-
-    // edit last expense
-    // debugger;
-    const lastTitle = expenses[expenses.length - 1].name;
-    await page.waitForXPath(`//div[contains(@class, 'expense-card')]//h6[contains(text(), '${lastTitle}')]`, {visible: true})
-      .then(e => e ? scrollAndClick(e, page) : null);
-
-    await page.waitForXPath("//button[contains(text(), 'Edit expense')]", {visible: true})
-      .then(e => e ? scrollAndClick(e, page) : null);
-
-    await page.waitForSelector("#amount", {visible: true})
-      .then(e => e ? clearAndType(e, "34.23") : null);
-
-    await page.waitForXPath("//button[contains(text(), 'Save Expense')]")
-      .then(e => e ? scrollAndClick(e, page) : null);
-
-
-    await checkRepartition(page, targetReparttion);
-
-    startCheckInviteCall(page);
+    else {
+      await page.waitForTimeout(1000);
+      // debugger;
+      await startCheckInviteCall(page);
+      await Promise.all([
+        page.reload({timeout: 3000}),
+        page.waitForNavigation({timeout: 5000})
+      ]);
+      // debugger;
+      await page.waitForSelector("#home-tab", {visible: true})
+        .then(e => e ? scrollAndClick(e, page) : null);
+    }
 
     // debugger;
     await page.waitForTimeout(200);
 
     // send invite
-    await page.waitForXPath("//button[contains(text(), 'Invite')]", {visible: true})
-      .then(e => e ? scrollAndClick(e, page) : null);
-
-    // await page.waitForNavigation();
-    await page.waitForTimeout(500);
-
-    // send invite
-    await page.waitForSelector("#email", {visible: true})
-      .then(e => e ? clearAndType(e, userData1.email) : null);
-
-    if (!pageDialogHandled) {
-      page.on("dialog", (dialog) => {
-        console.log("dialog");
-        try {
-          dialog.accept();
-        } catch (e) {
-          if (!e.toString().includes("Cannot accept dialog which is already handled")) {
-            throw e;
-          }
-        }
-      });
-      pageDialogHandled = true;
-    }
-
-    await page.waitForXPath("//button[contains(text(), 'Save')]", {visible: true})
-      .then(e => e ? scrollAndClick(e, page) : null);
-
-    // await page.waitForTimeout(1000);
-    // await page.keyboard.press('Enter');
-    // // await page.waitForNavigation();
-
-    // respond to invite
-    // debugger;
+    await DoInvite(page, userData1.email);
 
     await Promise.all(
-      pages.map(page => page.waitForTimeout(1000))
+      pages.map(page => page.waitForTimeout(2000))
     );
 
     await page1.reload();
@@ -786,6 +849,10 @@ async function MainTest(params: any[]) {
     //   .then(e => e?.click());
     const elmeu: ElementHandle | null = await page1.waitForSelector("i.notif", {visible: true, timeout: 5000})
       .then(e => e, () => null);
+
+    if(inviteOnly && !elmeu) {
+      throw "/invite error: couldn't find notif element";
+    }
 
     if (elmeu) {
       await elmeu.click();
@@ -805,23 +872,35 @@ async function MainTest(params: any[]) {
       await page1.waitForTimeout(3000);
     }
 
-    await page1.waitForXPath(`//h6[contains(text(), '${travelNAme}')]`, {visible: true})
-      // .then(e => e ? Promise.all([e.click(), page.waitForNavigation({timeout: 10000})]) : null);
-        .then(e => e?.click());
+    // await page1.waitForXPath(`//h6[contains(text(), '${travelNAme}')]`, {visible: true})
+    //   .then(e => e ? scrollAndClick(e, page) : null);
 
-    await page1.waitForTimeout(1000);
+    console.log("Waiting for travel " + travelNAme);
+    const travelEl = await page1.waitForXPath(`//h6[contains(text(), '${travelNAme}')]`, {visible: true});
+    console.log("Got travel " + travelNAme);
+
+    await Promise.all([
+      scrollAndClick(travelEl, page1),
+      page1.waitForNavigation()
+    ]);
+
+    await page1.waitForTimeout(2000);
 
     if (elmeu) {
       await page1.waitForSelector("#payer", {visible: true})
         .then(e => e ? e.type("Max", {delay: 30}) : null);
 
+      console.log("Saving who we are");
 
       await page1.waitForSelector("#savePayer", {visible: true})
-        .then(e => e ? e.click() : null);
+        .then(e => e ? scrollAndClick(e, page1) : null);
     }
 
     await page1.waitForTimeout(1000);
-    await checkRepartition(page1, targetReparttion);
+
+    if (!inviteOnly) {
+      await checkRepartition(page1, targetReparttion);
+    }
 
     // TODO say who we are
   } catch (e) {
@@ -933,24 +1012,37 @@ async function getPagse(): Promise<Page[]> {
 
 async function runAll() {
 // const testList = [MainTest0/*, MainTest*/];
-  await CreateBrowsers();
+  const res = await CreateBrowsers();
+  browser = res[0];
+  browser1 = res[1];
 
   const testList = [
+    // // {
+    // //   fn: runPrivNote,
+    // //   msg: "PrivNote test",
+    // //   params: undefined
+    // // },
+    // // {
+    // //   fn: runMiny,
+    // //   msg: "Mini test",
+    // //   params: undefined
+    // // },
     // {
-    //   fn: runPrivNote,
-    //   msg: "PrivNote test",
-    //   params: undefined
+    //   fn: MainTestBackBug,
+    //   msg: "Test back bug",
+    //   params: []
     // },
+
     // {
-    //   fn: runMiny,
-    //   msg: "Mini test",
-    //   params: undefined
+    //   fn: MainTest,
+    //   msg: "Test invite only",
+    //   params: [
+    //     allExpenses.slice(0, 1),
+    //     "Dju\ndoit a\n8.56€\nSuzie\nMax\ndoit a\n8.56€\nSuzie\nElyan\ndoit a\n8.56€\nSuzie",
+    //     true
+    //   ]
     // },
-    {
-      fn: MainTestBackBug,
-      msg: "Test back bug",
-      params: []
-    },
+
     {
       fn: MainTest,
       msg: "E2E with 1 expense",
@@ -1013,10 +1105,36 @@ async function runAll() {
     console.log("");
   }
   console.log("=====================");
+  console.log("Closing browsers");
+
+  // await Promise.all(
+  //   [browser, browser1].map(b => b.close())
+  // );
 
   await Promise.all(
-    [browser, browser1].map(b => b.close())
+    [browser, browser1].map(
+      b => b.close().then(() => {}, (err) => {
+        console.log(err);
+      })
+    )
   );
+
+
+  // await Promise.all(
+  //   [browser, browser1].map(
+  //     b => {
+  //       return b.close().then(() => {
+  //         console.log("ok");
+  //       }, (err) => {
+  //         console.log(err);
+  //       });
+  //     }
+  // )
+
+
+  console.log("Browsers closed");
+
+  // [browser, browser1].map(b => b.process().kill());
 
   // const allRes = ["ok"];
 
@@ -1024,6 +1142,12 @@ async function runAll() {
     // process.exit(1);
     throw "Some errors";
   }
+  else {
+    console.log("No errors");
+  }
+
+  // execSync("dir");
+  // execSync("npm run clear-chromium");
 }
 
 
@@ -1034,4 +1158,5 @@ runAll().then(e => {
 }, (e) => {
   console.error(e);
   process.exit(1);
+  // throw e;
 });

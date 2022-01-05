@@ -2,14 +2,14 @@ import { Injectable } from '@angular/core';
 import {InviteDate, UserModel} from "./models/user-model";
 import {BehaviorSubject, Observable, of} from "rxjs";
 import {User} from "./models/user";
-import {distinctUntilChanged, filter, first, map, take, tap} from "rxjs/operators";
+import {catchError, distinctUntilChanged, filter, first, map, take, tap} from "rxjs/operators";
 import {BaseService} from "./base-service.service";
 import {Travel} from "./models/travel";
 import {flatMap} from "rxjs/internal/operators";
 import {TravelModel} from "./models/travel-model";
 import {environment} from "../environments/environment";
 import {AjaxResponse} from "rxjs/ajax";
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpResponse} from "@angular/common/http";
 
 @Injectable({
   providedIn: 'root'
@@ -145,12 +145,26 @@ export class UserServiceService extends BaseService {
   }
 
   sendInvite(travelID: number | null, email: string): Observable<boolean> {
-    if(!travelID) {
+    if(travelID === null) {
+      console.error("No travelID specified.");
       return of(false);
     }
 
-    return this.httpPost(environment.api + "/invite", {tripID: travelID, email: email}).pipe(
-      map(e => true)
+    return this.httpPost(environment.api + "/invite", {tripID: travelID, email: email},
+      "json", "application/json", true, "response").pipe(
+      map((e: HttpResponse<void>) => {
+        console.log("invite response: ");
+        console.log(e);
+        const noError = /20\d/.test(e.status.toString());
+        if(!noError) {
+          console.error("/invite error 0: %o", e);
+        }
+        return !!e && noError;
+      }),
+      catchError((e) => {
+        console.error("/invite error 1: %o", e);
+        return of(e);
+      })
     );
 
     // return this.getUserByEmail(email).pipe(
