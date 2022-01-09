@@ -12,6 +12,8 @@ import {UserServiceService} from "../user-service.service";
 import {InviteDate, UserModel} from "../models/user-model";
 import {filter, first, map, takeWhile, tap} from "rxjs/operators";
 import {flatMap} from "rxjs/internal/operators";
+import {ToastComponent} from "../toast/toast.component";
+import {ToastType} from "../toast/toast.shared";
 // import {File} from "@angular/compiler-cli/src/ngtsc/file_system/testing/src/mock_file_system";
 
 @Component({
@@ -106,8 +108,25 @@ export class TravelComponent implements OnInit {
     this.router.navigate(['travels', this.travel.id, "expense", "new"]);
   }
 
-  newPerson() {
-    this.router.navigate(['travels', this.travel.id, "participants", "new"]);
+  newPerson(name?: string, isDelete = false) {
+    if (!isDelete) {
+      if (name) {
+        name = encodeURI(name);
+      }
+      this.router.navigate(['travels', this.travel.id, "participants", name ? name : "new"]);
+    }
+    else {
+      if(!name) {
+        return;
+      }
+      this.travelService.deleteParticipant(name, this.travel.id)
+        .subscribe(() => {
+          this.travel.participants = this.travel.participants?.filter(p => p.name !== name);
+          ToastComponent.toastdata$.next({type: ToastType.SUCCESS, message: "Participant removed successfully."});
+        }, () => {
+          ToastComponent.toastdata$.next({type: ToastType.ERROR, message: "Error removing participant."});
+        });
+    }
   }
 
   travelHasParticipants(): boolean {
@@ -230,5 +249,9 @@ export class TravelComponent implements OnInit {
 
     this.file = file;
     // debugger;
+  }
+
+  hasExpenses(name: string): boolean {
+    return this.expenses.some(e => e.payer === name || e.payees.some(ep => ep.name === name));
   }
 }

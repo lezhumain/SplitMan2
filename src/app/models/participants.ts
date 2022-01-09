@@ -1,6 +1,6 @@
 export class ParticipantModel {
   name = "";
-  dayCount = -1;
+  dayCount = 1;
   ratio?: number;
   // e4xpenseRatio?: number;
 
@@ -14,7 +14,7 @@ export class ParticipantModel {
 
 export class Participant {
   name = "";
-  dayCount = -1;
+  dayCount = 1;
   ratio?: number;
 
   static from(participantModel: ParticipantModel): Participant {

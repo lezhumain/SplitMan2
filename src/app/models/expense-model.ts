@@ -7,7 +7,13 @@ export class ExpenseModel {
   id: number = -1;
   tripId: number = -1;
   name: string = "";
-  amount: number = -1;
+  amount: number = 0;
+  get amountStr(): string {
+    return this.amount === 0 ? "" : this.amount.toString();
+  };
+  set amountStr(v: string) {
+    this.amount = v === "" ? 0 : Number(v);
+  };
   date: Date | null = new Date();
   payer: string = ""; // TODO list ?
   payees: ExpenseParticipantModel[] = [];

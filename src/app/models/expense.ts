@@ -26,7 +26,7 @@ export class Expense extends BaseItem {
 
   tripId: number = -1;
   name: string = "";
-  amount: number = -1;
+  amount: number = 0;
   date: Date | string | null  = null;
   payer: string = ""; // TODO list ?
   payees: ExpenseParticipant[] = [];

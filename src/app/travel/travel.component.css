@@ -17,3 +17,11 @@
   background-color: var(--bs-warning);
   padding: 5px 10px;
 }
+
+.editPart {
+  color: var(--bs-primary);
+}
+
+.deletePart {
+  color: var(--bs-danger);
+}

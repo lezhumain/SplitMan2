@@ -11,7 +11,7 @@
   position: absolute;
 }
 
-.toast_0 {
+.toast_3 {
   background-color: var(--bs-success);
   color: white;
 }
@@ -26,7 +26,7 @@
   color: white;
 }
 
-.toast_3 {
+.toast_0 {
   background-color: var(--bs-primary);
   color: white;
 }
