@@ -22,6 +22,7 @@ export class BaseService {
   };
 
   protected static USER_ID: number| null = null;
+  static USER_ID_INIT: number | null = null;
 
   constructor(private http: HttpClient) { }
 
@@ -101,8 +102,11 @@ export class BaseService {
     return allObs.pipe(
       map(all => {
         // const userLocalStor = localStorage.getItem("splitman_userid");
-        const userLocalStor = BaseService.USER_ID;
-        const userID: number | null = userLocalStor === null ? null : Number(BaseService.USER_ID);
+        const userLocalStor = BaseService.USER_ID !== null
+          ? BaseService.USER_ID
+          : (BaseService.USER_ID_INIT !== null ? BaseService.USER_ID_INIT : null);
+        BaseService.USER_ID_INIT = null;
+        const userID: number | null = userLocalStor === null ? null : Number(userLocalStor);
         if (!window.location.href.includes("/login")) {
           if ((userID === null || isNaN(userID) || userID < 0)) {
             return [];

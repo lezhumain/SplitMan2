@@ -14,6 +14,13 @@ import {CreateBrowsers} from "./e2e_utils";
 import {exec, execSync} from "child_process";
 // import {badData} from "./data/bugData";
 
+// see https://stackoverflow.com/a/69199854/3482730
+// process.on('beforeExit', (code) => {
+//   //beforeExit will run if out of callbacks, but not on an exit()
+//   console.log('We seem to be exiting purely because there are no more awaits scheduled instead of having reached and exit.  Assuming this is bad behavior from the browser process. previous exit code: ', code);
+//   process.exit(1);
+// });
+
 const userData = {
   email: "le_zhumain@msn.com",
   username: "a",
@@ -281,7 +288,108 @@ const host = `http://127.0.0.1:4200`;
 const url = `${host}/login`;
 
 
-let getCount = 0;
+let getCount = 0,
+  // inviteGetCountFor: {[key: string]: number} = null
+  inviteGetCount = 1, inviteTravelName = "";
+
+async function addInviteHandler(page1: Page, userDatum: any) {
+  await page1.setRequestInterception(true);
+  // inviteGetCountFor[userDatum.username] = 0;
+  const handler = async (request: puppeteer.HTTPRequest) => {
+    // console.log(request);
+    try {
+      if (/\/get$/.test(request.url())) {
+        // inviteGetCountFor[userDatum.username] += 1;
+        // const inviteGetCount = inviteGetCountFor[userDatum.username];
+
+        const bd: any[] = badData.slice();
+        const travels = bd.filter(b => b.type === "travel");
+        const travel = travels[0];
+
+        inviteTravelName = travel.name;
+
+        // remove travels but one
+        let newbd: any[] = bd.filter(b => b.type !== "travel");
+        newbd.push(travel);
+
+        // TODO use a single reduce loop
+
+        // remove expenses
+        newbd = newbd.filter(nn => nn.type !== "expense" || nn.tripID == travel.id);
+
+        // remove invites
+        const users = newbd.filter(n => n.type === "user"); // looks like these are references
+
+        // debugger;
+        // let inviteObj: {userName: string, inv: any[]} = {userName: "s", []};
+
+        let sInvites: any[] = [], aInvites: any[] = [];
+
+        // if(getCount === 1) {
+        //   const sInv = {tripID: travel.tripID, isAccpeted: false},
+        //         aInv = {tripID: travel.tripID, isAccpeted: true};
+        //   invites = [{tripID: travel.tripID, isAccpeted: false}];
+        // }
+
+        if (inviteGetCount === 1) {
+          aInvites = [{tripID: travel.id, isAccepted: true}];
+        }
+        else if (inviteGetCount === 2) {
+            sInvites = [{tripID: travel.id, isAccepted: false}];
+            aInvites = [{tripID: travel.id, isAccepted: true}];
+          }
+        else {
+          sInvites = [{tripID: travel.id, isAccepted: true}];
+          aInvites = [{tripID: travel.id, isAccepted: true}];
+        }
+
+        users.forEach(u => {
+          if(u.username === "s") {
+            u.invites = sInvites.slice();
+          }
+          else if(u.username === "a") {
+            u.invites = aInvites.slice();
+          }
+          else {
+            u.invites = [];
+          }
+          // u.invites = invites.slice()
+        });
+
+        // debugger;
+
+        await request.respond({
+          status: 200,
+          contentType: 'application/json',
+          headers: {"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Credentials": "true"},
+          body: JSON.stringify(newbd)
+        });
+      } else {
+        await request.continue();
+      }
+    } catch (e) {
+      // debugger;
+      // await request.continue();
+
+      if(!e.toString().includes("Request is already handled")) {
+        console.error(e);
+        throw e;
+      }
+    }
+  };
+
+  page1.on('request', handler);
+
+  // const ts = getTestState();
+  // page1.on('response', async (response) => {
+  //   // console.log(response);
+  //   if (/\/get$/.test(response.url())) {
+  //     debugger;
+  //   }
+  // });
+
+  return Promise.resolve(handler);
+}
 
 async function addHamdler(page1: Page, userDatum: any) {
   await page1.setRequestInterception(true);
@@ -391,6 +499,85 @@ async function testBackBug(pages: Page[]) {
   }
 }
 
+async function testInvite(pages: Page[]) {
+  const page0 = pages[0],
+    page1 = pages[1];
+
+  const usersData = [userData, userData1];
+
+  handlers = await Promise.all(
+    pages.map((page: Page, index: number) => addInviteHandler(page, usersData[index]))
+  );
+
+  await Promise.all(
+    [
+      handleLogin(page0, userData),
+      // page1.waitForTimeout(300).then(() => handleLogin(page1, userData1))
+      waitForMS(3000).then(() => handleLogin(page1, userData1))
+    ]
+  );
+  // await Promise.all(
+  //   pages.map((page: Page, index: number) => handleLogin(page, usersData[index]))
+  // );
+
+  // await Promise.all(
+  //   [
+  //     checkTravelCount(4, page0),
+  //     checkTravelCount(3, page1)
+  //   ]
+  // );
+
+  // expect(getCount).to.equal(1);
+
+  // only page sees it
+
+  // await Promise.all([
+  //   page0.waitForXPath(`//h6[contains(text(), '${inviteTravelName}')]`, {visible: true, timeout: 10000}),
+  //   page1.waitForSelector("i.notif", {visible: true, timeout: 5000})
+  // ]);
+  await page0.waitForXPath(`//h6[contains(text(), '${inviteTravelName}')]`, {visible: true, timeout: 10000});
+
+  inviteGetCount = 2;
+  await Promise.all([
+    page0.reload(),
+    page1.reload()
+  ]);
+
+  debugger;
+
+  await Promise.all([
+    page0.waitForXPath(`//h6[contains(text(), '${inviteTravelName}')]`, {visible: true, timeout: 10000}),
+    page1.waitForSelector("i.notif", {visible: true, timeout: 5000})
+  ]);
+
+  inviteGetCount = 3;
+  await Promise.all([
+    page0.reload(),
+    page1.reload()
+  ]);
+
+  await Promise.all([
+    page0.waitForXPath(`//h6[contains(text(), '${inviteTravelName}')]`, {visible: true, timeout: 10000}),
+    page1.waitForXPath(`//h6[contains(text(), '${inviteTravelName}')]`, {visible: true, timeout: 10000})
+  ]);
+
+  debugger;
+
+  // await page0.waitForXPath(`//h6[contains(text(), '${inviteTravelName}')]`, {visible: true, timeout: 10000});
+  // await page1.waitForSelector("i.notif", {visible: true, timeout: 5000});
+
+  const [handler0, handler1] = handlers;
+  remHandlers = async() => {
+    await page0.setRequestInterception(false);
+    page0.off('request', handler0);
+
+    await page1.setRequestInterception(false);
+    page1.off('request', handler1);
+  }
+
+  inviteTravelName = "";
+}
+
 async function removeHandlers(pages: Page[]) {
   // await Promise.all(
   //   pages.map((page: Page, index: number) => {
@@ -403,9 +590,28 @@ async function removeHandlers(pages: Page[]) {
   //   })
   // );
 
-  if(remHandlers) {
+  if (remHandlers) {
     await remHandlers();
   }
+}
+
+async function MainTestInviteShows(params: any[]) {
+  const page = await browser.pages().then(e => e[0]),
+    page1 = await browser1.pages().then(e => e[0]);
+
+  // try {
+  const pages = [page, page1];
+
+  // logout
+  await Promise.all(
+    pages.map((pagee: Page) => handleLogout(pagee))
+  );
+
+  await goToAndSecurity(pages);
+
+  await testInvite(pages);
+
+  await removeHandlers(pages);
 }
 
 async function MainTestBackBug(params: any[]) {
@@ -779,10 +985,30 @@ async function MainTest(params: any[]) {
 
     const travelNAme = await addTravel(page);
 
-    await page.reload(); // TODO remove me
+    await page.screenshot({path: "gogogo.png"});
+    debugger;
 
-    await page.waitForXPath(`//h6[contains(text(), '${travelNAme}')]`, {visible: true, timeout: 10000})
-      .then(e => e ? scrollAndClick(e, page) : null);
+    await page.reload(); // TODO remove me
+    await page.waitForTimeout(10000);
+
+    const sizes = await page.evaluate((pData, pEl) => {
+      return `${window.outerHeight} ${window.outerWidth}`;
+    });
+    console.log(sizes);
+
+    await page.screenshot({path: "gogogo.png"});
+    debugger;
+
+    // // await page.waitForXPath(`//h6[contains(text(), '${travelNAme}')]`, {visible: true, timeout: 10000})
+    // //   .then(e => e ? scrollAndClick(e, page) : null);
+    // const titleTravel =  await page.waitForXPath(`//h6[contains(text(), '${travelNAme}')]`, {visible: true, timeout: 10000});
+    // if(!titleTravel) {
+    //   throw "Couldn't find travel " + travelNAme;
+    // }
+    // await Promise.all([
+    //   scrollAndClick(titleTravel, page),
+    //   page.waitForNavigation({timeout: 10000})
+    // ]);
 
     // if(!eeee) {
     //   throw "EEEError";
@@ -847,7 +1073,7 @@ async function MainTest(params: any[]) {
 
     // await page1.waitForSelector("i.notif", {visible: true})
     //   .then(e => e?.click());
-    const elmeu: ElementHandle | null = await page1.waitForSelector("i.notif", {visible: true, timeout: 5000})
+    const elmeu: ElementHandle | null = await page1.waitForSelector("i.notif", {visible: true, timeout: 10000})
       .then(e => e, () => null);
 
     if(inviteOnly && !elmeu) {
@@ -864,8 +1090,13 @@ async function MainTest(params: any[]) {
 
       await page1.waitForTimeout(500);
 
-      await page1.waitForSelector(".iconWrapper i.fa-arrow-left", {visible: true})
-        .then(e => e?.click());
+      // await page1.waitForSelector(".iconWrapper i.fa-arrow-left", {visible: true})
+      //   .then(e => e?.click());
+      const backBtn = await page1.waitForSelector(".iconWrapper i.fa-arrow-left", {visible: true});
+      await Promise.all([
+        backBtn.click(),
+        page1.waitForNavigation({timeout: 10000})
+      ]);
 
       await page1.waitForTimeout(1000);
       await page1.reload();
@@ -876,6 +1107,8 @@ async function MainTest(params: any[]) {
     //   .then(e => e ? scrollAndClick(e, page) : null);
 
     console.log("Waiting for travel " + travelNAme);
+    await page.screenshot({path: "p1travel.png"});
+    // debugger;
     const travelEl = await page1.waitForXPath(`//h6[contains(text(), '${travelNAme}')]`, {visible: true});
     console.log("Got travel " + travelNAme);
 
@@ -934,7 +1167,7 @@ async function takeScreenshot(page: Page, doPrivNote = true) {
   const brow = page.browser();
   const pa = await brow.newPage();
 
-  const data: string = await page.screenshot({path: "./screen.jpg", type: "jpeg", encoding: "base64", quality: 33})
+  const data: string = await page.screenshot({path: "./screen.jpeg", type: "jpeg", encoding: "base64", quality: 33})
     .then(e => e.toString());
 
   if (doPrivNote) {
@@ -1027,12 +1260,18 @@ async function runAll() {
     // //   msg: "Mini test",
     // //   params: undefined
     // // },
+
+    {
+      fn: MainTestBackBug,
+      msg: "Test back bug",
+      params: []
+    },
     // {
-    //   fn: MainTestBackBug,
-    //   msg: "Test back bug",
+    //   fn: MainTestInviteShows,
+    //   msg: "Test invite shows",
     //   params: []
     // },
-
+    //
     // {
     //   fn: MainTest,
     //   msg: "Test invite only",
@@ -1042,15 +1281,15 @@ async function runAll() {
     //     true
     //   ]
     // },
-
-    {
-      fn: MainTest,
-      msg: "E2E with 1 expense",
-      params: [
-        allExpenses.slice(0, 1),
-        "Dju\ndoit a\n8.56€\nSuzie\nMax\ndoit a\n8.56€\nSuzie\nElyan\ndoit a\n8.56€\nSuzie"
-      ]
-    },
+    //
+    // {
+    //   fn: MainTest,
+    //   msg: "E2E with 1 expense",
+    //   params: [
+    //     allExpenses.slice(0, 1),
+    //     "Dju\ndoit a\n8.56€\nSuzie\nMax\ndoit a\n8.56€\nSuzie\nElyan\ndoit a\n8.56€\nSuzie"
+    //   ]
+    // },
     {
       fn: MainTest,
       msg: "E2E with all expenses",
@@ -1154,9 +1393,9 @@ async function runAll() {
 // runMiny().then(e => console.log("Done."));
 runAll().then(e => {
   console.log("Done.");
-  process.exit(0);
+  // process.exit(0);
 }, (e) => {
   console.error(e);
-  process.exit(1);
-  // throw e;
+  // process.exit(1);
+  throw e;
 });

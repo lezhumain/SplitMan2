@@ -50,9 +50,9 @@ export class TravelEditComponent implements OnInit {
   }
 
   saveTravel() {
-    this.travelService.saveTravel(this.travel, this.userServiceService).subscribe(() => {
+    this.travelService.saveTravel(this.travel, this.userServiceService).subscribe((updated: TravelModel) => {
       // TODO check for failure
-      this.router.navigate(['travels/' + this.travel.id]);
+      this.router.navigate(['travels/' + updated.id]);
     });
   }
 }
