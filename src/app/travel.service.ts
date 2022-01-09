@@ -10,6 +10,7 @@ import {map} from "rxjs/operators";
 import {Participant, ParticipantModel} from "./models/participants";
 import {UserServiceService} from "./user-service.service";
 import {HttpClient} from "@angular/common/http";
+import {UserModel} from "./models/user-model";
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +31,7 @@ export class TravelService extends BaseService{
     );
   }
 
-  saveTravel(travel: TravelModel, userService?: UserServiceService): Observable<null> {
+  saveTravel(travel: TravelModel, userService?: UserServiceService): Observable<TravelModel> {
     const data = Travel.from(travel);
 
     let obs = this.updateItem(data);
@@ -39,6 +40,7 @@ export class TravelService extends BaseService{
       obs = this.getNewId().pipe(
         flatMap((newId: number) => {
           data.id = newId;
+          travel.id = data.id;
           return this.addOrUpdateItem(data, true);
         })
       );
@@ -52,7 +54,9 @@ export class TravelService extends BaseService{
       );
     }
 
-    return obs;
+    return obs.pipe(
+      map(() => travel)
+    );
   }
 
   private getNewId(): Observable<number> {
@@ -98,7 +102,7 @@ export class TravelService extends BaseService{
           pa.ratio = pa.dayCount / totalDays;
         });
 
-        return this.saveTravel(travl);
+        return this.saveTravel(travl).pipe(map(e => null));
       })
     );
   }

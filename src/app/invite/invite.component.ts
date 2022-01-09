@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {UserServiceService} from "../user-service.service";
 import {ActivatedRoute, Router} from "@angular/router";
+import {ToastComponent} from "../toast/toast.component";
+import {ToastType} from "../toast/toast.shared";
 
 @Component({
   selector: 'app-invite',
@@ -27,10 +29,12 @@ export class InviteComponent implements OnInit {
     this.userServiceService.sendInvite(this._travelID, this.email).subscribe((res: boolean) => {
       if(!res) {
         this.onInviteError();
+        return;
       }
 
       this.router.navigate(['travels', this._travelID]).then(() => {
-        alert("Invited " + this.email + " successfully.");
+        // alert("Invited " + this.email + " successfully.");
+        ToastComponent.toastdata$.next({type: ToastType.SUCCESS, message: "Invited " + this.email + " successfully."});
       });
     }, () => {
       this.onInviteError();
@@ -38,6 +42,7 @@ export class InviteComponent implements OnInit {
   }
 
   private onInviteError() {
-    alert("Couldn't invite " + this.email + ".");
+    // alert("Couldn't invite " + this.email + ".");
+    ToastComponent.toastdata$.next({type: ToastType.ERROR, message: "Couldn't invite " + this.email + "."});
   }
 }

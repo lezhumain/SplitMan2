@@ -23,6 +23,9 @@ import { TravelCardComponent } from './travel-card/travel-card.component';
 import { UserProfileComponent } from './user-profile/user-profile.component';
 import { UserEditComponent } from './user-edit/user-edit.component';
 import {HttpClientModule} from "@angular/common/http";
+import { TestEndpointComponent } from './test-endpoint/test-endpoint.component';
+import { ToastComponent } from './toast/toast.component';
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 
 @NgModule({
   declarations: [
@@ -43,13 +46,16 @@ import {HttpClientModule} from "@angular/common/http";
     InviteListComponent,
     TravelCardComponent,
     UserProfileComponent,
-    UserEditComponent
+    UserEditComponent,
+    TestEndpointComponent,
+    ToastComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    HttpClientModule
+    HttpClientModule,
+    BrowserAnimationsModule
   ],
   providers: [AuthGuard],
   bootstrap: [AppComponent]

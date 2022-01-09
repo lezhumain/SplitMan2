@@ -133,3 +133,9 @@ com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 fabric.properties
+
+src/assets/bootstrap
+src/assets/font-awesome
+
+*.jpg
+*.old

@@ -2,14 +2,14 @@ import { Injectable } from '@angular/core';
 import {InviteDate, UserModel} from "./models/user-model";
 import {BehaviorSubject, Observable, of} from "rxjs";
 import {User} from "./models/user";
-import {distinctUntilChanged, filter, first, map, take, tap} from "rxjs/operators";
+import {catchError, distinctUntilChanged, filter, first, map, take, tap} from "rxjs/operators";
 import {BaseService} from "./base-service.service";
 import {Travel} from "./models/travel";
 import {flatMap} from "rxjs/internal/operators";
 import {TravelModel} from "./models/travel-model";
 import {environment} from "../environments/environment";
 import {AjaxResponse} from "rxjs/ajax";
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpResponse} from "@angular/common/http";
 
 @Injectable({
   providedIn: 'root'
@@ -33,6 +33,7 @@ export class UserServiceService extends BaseService {
 
     const data = this.getSessionData();
     if(data !== null && data !== undefined && Number(data) > -1) {
+      BaseService.USER_ID_INIT = Number(data);
       this.getUsers().pipe(
         filter(u => u.length > 0),
         first(),
@@ -50,13 +51,15 @@ export class UserServiceService extends BaseService {
         filter(u => !u || (!!u && u.id >= 0))
       )
       .subscribe((u: User | null) => {
-        this.setSessionData();
         BaseService.USER_ID = u ? u.id : null;
       });
   }
 
-  private setSessionData(): void {
-    const u = this._connectedUser.getValue();
+  private setSessionData(user?: User | null): void {
+    const u = user === undefined
+      ? this._connectedUser.getValue()
+      : user;
+
     if(u) {
       const id = u.id.toString();
       console.log("Stored userID " + id);
@@ -67,13 +70,13 @@ export class UserServiceService extends BaseService {
     }
   }
 
-  private getSessionData(): string | null {
+  public getSessionData(): string | null {
     const userID = localStorage.getItem(this.key);
     return userID;
   }
 
-  private getUsers(): Observable<User[]> {
-    return this.getAllByType<User>("user").pipe(
+  private getUsers(force = false): Observable<User[]> {
+    return this.getAllByType<User>("user", force).pipe(
       map((o: User[]) => {
         return o.map((oo: User) => User.fromJson(oo));
       })
@@ -128,54 +131,94 @@ export class UserServiceService extends BaseService {
     );
   }
 
-  setConnectedUserByObj(user: UserModel, reconcileWithDb = false) {
+  setConnectedUserByObj(user: UserModel, reconcileWithDb = false, setSeesion = false) {
     // debugger;
     // this.getUserByNameAndPass(username, password).subscribe(
     //   (u: User | null) => {
     // debugger;
     const u = User.from(user);
 
-    const obs$ = reconcileWithDb ? this.getUserByEmail(u.email) : of(u);
+    const obs$ = (reconcileWithDb ? this.getUserByEmail(u.email) : of(u)).pipe(
+      map((uu: User | null) => {
+        if (uu) {
+          u.invites = uu?.invites.slice();
+        }
 
-    obs$.subscribe((uu: User | null) => {
-      this._connectedUser.next(uu);
-    });
-    //   }
-    // );
-  }
-
-  sendInvite(travelID: number | null, email: string): Observable<boolean> {
-    if(!travelID) {
-      return of(false);
-    }
-
-    return this.httpPost(environment.api + "/invite", {tripID: travelID, email: email}).pipe(
-      map(e => true)
+        return u;
+      })
     );
 
-    // return this.getUserByEmail(email).pipe(
-    //   flatMap((user: User| null ) => {
-    //     if(!user) {
-    //       return of(false);
+    // obs$.subscribe((uu: User | null) => {
+    //   this.setSessionData();
+    //   this._connectedUser.next(uu);
+    // });
+
+    obs$.subscribe((uu: User | null) => {
+      if(setSeesion) {
+        this.setSessionData(uu);
+      }
+      this._connectedUser.next(uu);
+    });
+
+    //   }
+    // );
+
+
+    //
+    // const u = User.from(user);
+    //
+    // let obs$ = (reconcileWithDb ? this.getUserByEmail(u.email) : of(u)).pipe(
+    //   map((uu: User | null) => {
+    //     if (uu) {
+    //       u.invites = uu?.invites.slice();
     //     }
     //
-    //     const inviteDate = {
-    //       tripID: travelID,
-    //       isAccepted: false
-    //     };
+    //     return u;
+    //   }),
+    //   flatMap((uu: User | null) => {
+    //     this._connectedUser.next(uu);
     //
-    //     if (!user.invites) {
-    //       user.invites = [inviteDate];
-    //     }
-    //     else if(!user.invites.some(i => i.tripID === travelID)) {
-    //       user.invites.push(inviteDate);
-    //     }
-    //
-    //     return this.addOrUpdateItem(user).pipe(
-    //       map(() => true)
+    //     return this._connectedUser.pipe(
+    //       filter(o => o === uu),
+    //       first()
     //     );
     //   })
     // );
+    //
+    // if(setSeesion) {
+    //   obs$ = obs$.pipe(
+    //     tap(() => {
+    //       this.setSessionData();
+    //     })
+    //   );
+    // }
+    // obs$.subscribe((uu: User | null) => {
+    //   console.log("Set connected user: " + uu);
+    // });
+  }
+
+  sendInvite(travelID: number | null, email: string): Observable<boolean> {
+    if(travelID === null) {
+      console.error("No travelID specified.");
+      return of(false);
+    }
+
+    return this.httpPost(environment.api + "/invite", {tripID: travelID, email: email},
+      "json", "application/json", true, "response").pipe(
+      map((e: HttpResponse<void>) => {
+        console.log("invite response: ");
+        console.log(e);
+        const noError = /20\d/.test(e.status.toString());
+        if(!noError) {
+          console.error("/invite error 0: %o", e);
+        }
+        return !!e && noError;
+      }),
+      catchError((e) => {
+        console.error("/invite error 1: %o", e);
+        return of(e);
+      })
+    );
   }
 
   public getUserByEmail(email: string): Observable<User | null> {
@@ -186,8 +229,8 @@ export class UserServiceService extends BaseService {
     );
   }
 
-  public getUserByID(id: number): Observable<UserModel | null> {
-    return this.getUsers().pipe(
+  public getUserByID(id: number, force = false): Observable<UserModel | null> {
+    return this.getUsers(force).pipe(
       map((users: User[]) => {
         const target = users.find(u => u.id === id);
         return target ? target.toModel() : null;
@@ -195,11 +238,22 @@ export class UserServiceService extends BaseService {
     );
   }
 
-  getConnectedUser(): Observable<UserModel | null> {
-    // return of(this._connectedUser?.toModel() || null);
-    return this._connectedUser.pipe(
-      distinctUntilChanged(),
-      map((u: User | null) => u ? u.toModel() : null)
+  getConnectedUser(forceWithID = -1): Observable<UserModel | null> {
+    const pre: Observable<UserModel | null> = !isNaN(forceWithID) && forceWithID > -1
+      ? this.getUserByID(forceWithID, true)
+      : of(null);
+
+    return pre.pipe(
+      flatMap((user: UserModel | null) => {
+        if(user) {
+          console.log("Should change user to: %o", user);
+          this._connectedUser.next(User.from(user));
+        }
+        return this._connectedUser.pipe(
+          distinctUntilChanged(),
+          map((u: User | null) => u ? u.toModel() : null)
+        )
+      })
     );
   }
 
@@ -294,7 +348,10 @@ export class UserServiceService extends BaseService {
       flatMap(() => {
         this._connectedUser.next(null);
         return this._connectedUser.pipe(
-          first()
+          first(),
+          tap(() => {
+            this.setSessionData();
+          })
         );
       })
     );

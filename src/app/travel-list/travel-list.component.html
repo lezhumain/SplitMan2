@@ -3,9 +3,14 @@
   <br>
 <!--  LIST-->
 <!--  <div *ngFor="let t of allTravels"><a routerLink="/travels/{{t.id}}" routerLinkActive="active">{{t}}</a></div>-->
-  <div *ngFor="let t of allTravels">
-    <app-travel-card [travel]="t"></app-travel-card>
-  </div>
+  <ng-container *ngIf="allTravels && allTravels.length > 0; else noTravels">
+    <div *ngFor="let t of allTravels">
+      <app-travel-card [travel]="t"></app-travel-card>
+    </div>
+  </ng-container>
+  <ng-template #noTravels>
+    <p>No travels yet.</p>
+  </ng-template>
 </div>
 <br>
 <button id="addTravel" type="button" class="btn btn-primary mb-3" (click)="newTravel()">Add travel</button>

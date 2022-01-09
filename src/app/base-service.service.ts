@@ -22,6 +22,7 @@ export class BaseService {
   };
 
   protected static USER_ID: number| null = null;
+  static USER_ID_INIT: number | null = null;
 
   constructor(private http: HttpClient) { }
 
@@ -49,7 +50,8 @@ export class BaseService {
     );
   }
 
-  protected httpPost(url: string, data: any): Observable<any> {
+  protected httpPost(url: string, data: any, respType: "json" | "text" | "blob" | "arraybuffer" = "json",
+                     accept = 'application/json', withCred = true, obs: "body" | "response" = "body"): Observable<any> {
     const headers: any = this._headers;
     headers["User-ID"] = BaseService.USER_ID;
 
@@ -58,8 +60,8 @@ export class BaseService {
     }
 
     // return this.http.post(url, data, {withCredentials: true, headers: {"Accept": "application/json", "Content-Type": "application/json"}})
-    return this.http.post(url, data, {withCredentials: true, responseType: "json",
-      headers : new HttpHeaders({ /*'Content-Type': 'application/json', */'Accept': 'application/json' })})
+    return this.http.post(url, data, {withCredentials: withCred, responseType: respType as "json" | undefined,
+      headers : new HttpHeaders({ /*'Content-Type': 'application/json', */'Accept': accept }), observe: obs as "body" | undefined})
     // return this.http.post(url, data, {withCredentials: true})
     // return ajax({
     //   url: url,
@@ -70,10 +72,11 @@ export class BaseService {
       .pipe(
       // map(userResponse => console.log('users: ', userResponse)),
       map(userResponse => {
+        console.log('http post result: ', userResponse);
         return userResponse;
       }),
       catchError(error => {
-        console.log('error: ', error);
+        console.warn('http post error: ', error);
         return of(null);
       })
     );
@@ -99,8 +102,11 @@ export class BaseService {
     return allObs.pipe(
       map(all => {
         // const userLocalStor = localStorage.getItem("splitman_userid");
-        const userLocalStor = BaseService.USER_ID;
-        const userID: number | null = userLocalStor === null ? null : Number(BaseService.USER_ID);
+        const userLocalStor = BaseService.USER_ID !== null
+          ? BaseService.USER_ID
+          : (BaseService.USER_ID_INIT !== null ? BaseService.USER_ID_INIT : null);
+        BaseService.USER_ID_INIT = null;
+        const userID: number | null = userLocalStor === null ? null : Number(userLocalStor);
         if (!window.location.href.includes("/login")) {
           if ((userID === null || isNaN(userID) || userID < 0)) {
             return [];

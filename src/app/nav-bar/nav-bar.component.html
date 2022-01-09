@@ -1,4 +1,5 @@
 <div class="toolbar" role="banner">
+<!--  <ng-container *ngIf="(showLogo$ | async); else backIcon">-->
   <ng-container *ngIf="showLogo; else backIcon">
     <img
       width="40"
@@ -8,7 +9,7 @@
     <span>Welcome</span>
   </ng-container>
   <ng-template #backIcon>
-    <div class="iconWrapper" (click)="goBack()"><i class="fas fa-arrow-left"></i></div>
+    <div class="iconWrapper" (click)="goBack()"><i class="fa fa-arrow-left"></i></div>
     <span>{{this.headerValue$ ? (this.headerValue$ | async) : ""}}</span>
   </ng-template>
   <div class="spacer"></div>
@@ -27,29 +28,29 @@
 
 <!--  <div class="user-wrapper connected">-->
 <!--    <ng-container *ngIf="(connectedUser$ | async) as user; else notConnected">-->
-<!--      <i class="fas fa-user" title="{{user.username}}"></i>-->
+<!--      <i class="fa fa-user" title="{{user.username}}"></i>-->
 <!--    </ng-container>-->
 <!--    <ng-template #notConnected>-->
-<!--      <i class="fas fa-user"></i>-->
+<!--      <i class="fa fa-user"></i>-->
 <!--    </ng-template>-->
 <!--  </div>-->
 
 <!--  <div class="user-wrapper connected">-->
 <!--    <ng-container *ngIf="(connectedUser$ | async) as user; else notConnected">-->
-<!--      <i class="fas fa-user" title="{{user.username}}"></i>-->
-<!--      <i class="fas fa-bell" *ngIf="hasInvites(user)"></i>-->
+<!--      <i class="fa fa-user" title="{{user.username}}"></i>-->
+<!--      <i class="fa fa-bell" *ngIf="hasInvites(user)"></i>-->
 <!--      &lt;!&ndash;      <ng-template #notConnected>&ndash;&gt;-->
-<!--      &lt;!&ndash;        <i class="fas fa-user"></i>&ndash;&gt;-->
+<!--      &lt;!&ndash;        <i class="fa fa-user"></i>&ndash;&gt;-->
 <!--      &lt;!&ndash;      </ng-template>&ndash;&gt;-->
 <!--    </ng-container>-->
 <!--    <ng-template #notConnected>-->
-<!--      <i class="fas fa-user"></i>-->
+<!--      <i class="fa fa-user"></i>-->
 <!--    </ng-template>-->
 <!--  </div>-->
 
   <ng-container *ngIf="(connectedUser$ | async) as user; else notConnected">
     <div class="user-wrapper connected" *ngIf="hasInvites(user)" (click)="openInvites()">
-      <i class="fas fa-bell notif"></i>
+      <i class="fa fa-bell notif"></i>
     </div>
 
 <!--      <div class="dropdown">-->
@@ -64,7 +65,7 @@
 <!--      </div>-->
       <div class="dropdown">
         <div class="user-wrapper connected" data-bs-toggle="dropdown" aria-expanded="false">
-          <i class="fas fa-user" title="{{user.username}}"></i>
+          <i class="fa fa-user" title="{{user.username}}"></i>
         </div>
         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
           <li (click)="openProfile()"><a class="dropdown-item">Profile</a></li>
@@ -75,7 +76,7 @@
   </ng-container>
   <ng-template #notConnected>
     <div class="user-wrapper">
-      <i class="fas fa-user"></i>
+      <i class="fa fa-user"></i>
     </div>
   </ng-template>
 

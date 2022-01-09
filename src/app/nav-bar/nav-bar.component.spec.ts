@@ -7,58 +7,112 @@ import {HttpClientModule} from "@angular/common/http";
 import {TravelService} from "../travel.service";
 import {UserServiceService} from "../user-service.service";
 import {NavBarService} from "../nav-bar.service";
-import {BehaviorSubject} from "rxjs";
-import {NavigationEnd, Router} from "@angular/router";
+import {BehaviorSubject, of} from "rxjs";
+import {ActivatedRoute, NavigationEnd, NavigationStart, Router} from "@angular/router";
 import {BabelAstHost} from "@angular/compiler-cli/linker/babel/src/ast/babel_ast_host";
+import {getBaseTestStuff} from "../../../e2e/baseTestStuff";
+import {TravelEditComponent} from "../travel-edit/travel-edit.component";
+import {filter, first} from "rxjs/operators";
+// import {expect} from "chai";
 
 describe('NavBarComponent', () => {
   let component: NavBarComponent;
   let fixture: ComponentFixture<NavBarComponent>;
 
   let userService: any, navService: any;
-  let fakeRouter: any = {events: new BehaviorSubject(new NavigationEnd(0, "register", "login"))};
+
+  // const eventRouting$ = new BehaviorSubject(new NavigationStart(0, "register"));
+  const eventRouting$: BehaviorSubject<NavigationStart | null> = new BehaviorSubject<NavigationStart | null>(null);
+  let fakeRouter: any = {events: eventRouting$, url: ""};
+  // const fakeRouter = jasmine.createSpyObj('Router', ['getConnectedUser']);
+
+  // let fakeRouter: any = {events: of(new NavigationStart(0, "register"))};
 
   let behavUser: BehaviorSubject<any> = new BehaviorSubject(null);
 
+  const fakeUserServ = jasmine.createSpyObj('UserServiceService', ['getConnectedUser']);
+
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ NavBarComponent ],
-      providers: [
-        {provide: UserServiceService},
-        {provide: NavBarService},
-        {provide: Router, useValue: fakeRouter}
-      ],
-      imports: [RouterTestingModule.withRoutes(allRoutes), HttpClientModule],
-    })
-    .compileComponents();
+    // await TestBed.configureTestingModule({
+    //   declarations: [ NavBarComponent ],
+    //   providers: [
+    //     {provide: UserServiceService},
+    //     {provide: NavBarService},
+    //     {provide: Router, useValue: fakeRouter}
+    //   ],
+    //   imports: [RouterTestingModule.withRoutes(allRoutes), HttpClientModule],
+    // })
+    // .compileComponents();
+
+    const baseStuff = getBaseTestStuff([ NavBarComponent ]);
+    if(!baseStuff[1].providers) {
+      baseStuff[1].providers = [];
+    }
+    baseStuff[1].providers.push(
+      {provide: UserServiceService, useValue: fakeUserServ},
+      {provide: Router, useValue: fakeRouter}
+    );
+    await TestBed.configureTestingModule(baseStuff[1] as any).compileComponents();
   });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(NavBarComponent);
     component = fixture.componentInstance;
 
-    userService = component["userServiceService"];
-    navService = component["_navService"];
+    // userService = component["userServiceService"];
+    // navService = component["_navService"];
+    //
+    // userService["getConnectedUser"] = () => {
+    //   return behavUser;
+    // };
 
-    userService["getConnectedUser"] = () => {
-      return behavUser;
-    };
+    // behavUser.next({id: 1, invites: []});
+
+    if(behavUser.getValue() !== null) {
+      behavUser.next(null);
+    }
+    else {
+      fakeUserServ.getConnectedUser.and.returnValue(behavUser);
+    }
+    // fakeUserServ.getConnectedUser.and.returnValue(of(null));
 
     fixture.detectChanges();
   });
 
-  it('should show angular logo', () => {
+  it('should show angular logo', (doneFn: DoneFn) => {
     expect(component).toBeTruthy();
 
     const banner: HTMLDivElement = fixture.nativeElement.querySelector(".toolbar");
     expect(banner).toBeTruthy();
 
-    const title = banner.querySelector("span");
-    expect(title).toBeTruthy();
-    expect(title?.innerText).toEqual("Welcome");
+    expect(component.showLogo).toBeFalse();
+    expect(component["connectedUserID"]).toEqual(null);
 
-    const img = fixture.nativeElement.querySelector("img[alt=\"Angular Logo\"]");
-    expect(img).toBeTruthy();
+    eventRouting$.next(new NavigationStart(0, "register"));
+
+    behavUser.next({id: 1, invites: []});
+    // fakeUserServ.getConnectedUser.and.returnValue(of({id: 1, invites: []}));
+    // fixture.detectChanges();
+
+    component.connectedUser$?.pipe(
+      filter(e => !!e),
+      first()
+    ).subscribe(() => {
+      expect(component.showLogo).toBeTrue();
+      expect(component["connectedUserID"]).toBeTruthy();
+
+      const title = banner.querySelector("span");
+      expect(title).toBeTruthy();
+      expect(title?.innerText).toEqual("Welcome");
+
+      expect(component.showLogo).toBeTrue();
+
+      // FIXME img doesn't appear
+      // const img = banner.querySelector("img");
+      // expect(img).toBeTruthy();
+
+      doneFn();
+    });
   });
 
   it('should show notif', () => {

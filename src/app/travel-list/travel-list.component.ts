@@ -46,7 +46,7 @@ export class TravelListComponent implements OnInit {
         : [];
 
       // debugger;
-      this.allTravels = allTravels;
+      this.allTravels = allTravels.reverse();
     });
   }
 
