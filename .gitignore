@@ -139,3 +139,7 @@ src/assets/font-awesome
 
 *.jpg
 *.old
+
+SpliMan2-API*
+*.png
+*.jpeg

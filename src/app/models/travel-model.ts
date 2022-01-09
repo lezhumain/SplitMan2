@@ -1,5 +1,5 @@
 import {Travel} from "./travel";
-import {Participant} from "./participants";
+import {Participant, ParticipantModel} from "./participants";
 
 export class TravelModel {
   static fromTravel(t: Travel): TravelModel {
@@ -7,7 +7,7 @@ export class TravelModel {
     m.id = t.id;
     m.name = t.name;
     m.description = t.description;
-    m.participants = t.participants?.slice();
+    m.participants = t.participants?.map(p => ParticipantModel.from(p));
     m.fromDate = t.fromDate;
     m.toDate = t.toDate;
 
@@ -17,7 +17,7 @@ export class TravelModel {
   constructor() {
   }
 
-  participants?: Participant[];
+  participants?: ParticipantModel[];
   name: string = "";
   description: string = "";
   id: number = -1;

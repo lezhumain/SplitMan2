@@ -1,6 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ToastComponent } from './toast.component';
+import {AppRoutingModule} from "../app-routing/app-routing.module";
+import {TravelService} from "../travel.service";
+import {ExpenseService} from "../expense.service";
+import {NavBarService} from "../nav-bar.service";
+import {UserServiceService} from "../user-service.service";
+import {HttpClientTestingModule} from "@angular/common/http/testing";
+import {ToastComponent} from "./toast.component";
 
 describe('ToastComponent', () => {
   let component: ToastComponent;
@@ -8,15 +14,17 @@ describe('ToastComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ToastComponent ]
+      declarations: [ ToastComponent ],
+      providers: [TravelService, ExpenseService, NavBarService, UserServiceService],
+      imports:[AppRoutingModule, HttpClientTestingModule]
     })
-    .compileComponents();
+      .compileComponents();
   });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ToastComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    // fixture.detectChanges();
   });
 
   it('should create', () => {

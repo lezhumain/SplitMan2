@@ -33,6 +33,7 @@ const protectedRoutes: Routes = [
   { path: 'travels/:travelID/expense/:expenseID', component: ExpenseComponent },
   { path: 'travels/:travelID/expense/:expenseID/edit', component: ExpenseEditComponent },
   { path: 'travels/:travelID/participants/new', component: ParticipantEditComponent },
+  { path: 'travels/:travelID/participants/:participantID', component: ParticipantEditComponent },
   { path: 'users/:userlID/invites', component: InviteListComponent },
   { path: 'users/:userlID', component: UserProfileComponent },
   // { path: 'users/:userlID/edit', component: UserEditComponent },

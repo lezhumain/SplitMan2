@@ -7,7 +7,7 @@
   <div class="mb-3">
     <label for="amount" class="form-label">Amount:</label>
     <input type="number" class="form-control" id="amount"
-           [(ngModel)]="expenseModel.amount" >
+           [(ngModel)]="expenseModel.amountStr" >
   </div>
   <div class="mb-3">
     <label for="date" class="form-label">Date:</label>
@@ -46,7 +46,7 @@
                    [attr.disabled]="isPerDay || null">
             <span class="input-group-text perc-sign">%</span>
             <input type="text" class="form-control amount-input" aria-label="Amount (to the nearest dollar)"
-                   [value]="getRatioValue(user.e4xpenseRatio || 0)" disabled>
+                   [value]="getRatioValue(user.e4xpenseRatio || 0).toFixed(3)" disabled>
             <span class="input-group-text">€</span>
           </div>
         </label>

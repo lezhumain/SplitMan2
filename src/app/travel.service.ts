@@ -76,7 +76,7 @@ export class TravelService extends BaseService{
     );
   }
 
-  saveParticipant(participantModel: ParticipantModel, travelID: number): Observable<null> {
+  saveParticipant(participantModel: ParticipantModel, travelID: number, originalTravelName?: string | null): Observable<null> {
     return this.getTravelByID(travelID).pipe(
       flatMap((travl: Travel | null ) => {
         if(travl == null) {
@@ -89,8 +89,12 @@ export class TravelService extends BaseService{
           travl.participants = [];
         }
 
-        if (!travl.participants.some(t => t.name === participantModel.name)) {
+        const partIndex = travl.participants.findIndex(t => t.name === (originalTravelName || p.name));
+        if (partIndex === -1) {
           travl.participants.push(p);
+        }
+        else {
+          travl.participants.splice(partIndex, 1, p);
         }
 
         const totalDays = travl.participants.reduce((res: number, item: Participant) => {
@@ -110,6 +114,19 @@ export class TravelService extends BaseService{
   getTravelsByIDs(allIds: number[]): Observable<Travel[]> {
     return this.getTravels().pipe(
       map(e => e.filter(r => allIds.includes(r.id)))
+    );
+  }
+
+  deleteParticipant(name: string, travelID: number): Observable<null> {
+    return this.getTravelByID(travelID).pipe(
+      flatMap((p) => {
+        if(!p) {
+          return of(null);
+        }
+        p.participants = p?.participants?.filter(p => p.name !== name) || [];
+        return this.saveTravel(p);
+      }),
+      map(() => null)
     );
   }
 }

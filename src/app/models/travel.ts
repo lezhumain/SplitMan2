@@ -8,7 +8,7 @@ export class Travel extends BaseItem {
     t.id = model.id;
     t.name = model.name
     t.description = model.description;
-    t.participants = model.participants;
+    t.participants = model.participants?.map(p => Participant.from(p));
     t.fromDate = model.fromDate;
     t.toDate = model.toDate;
 
