@@ -4,5 +4,5 @@ export const environment = {
   // api: "http://192.168.0.22:8080/api"
 
   app: "https://PROD_IP",
-  api: "https://PROD_IP"
+  api: "https://PROD_IP/api"
 };

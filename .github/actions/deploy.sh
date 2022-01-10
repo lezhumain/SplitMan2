@@ -25,7 +25,7 @@ mv package.json package.json.old
 mv package.json.new package.json
 
 ENV_FILE="src/environments/environment.prod.ts"
-sed "s/PROD_IP/$INPUT_EXT_ADDR/" "$ENV_FILE" > "$ENV_FILE.new"
+sed "s/PROD_IP/$INPUT_EXT_ADDR/g" "$ENV_FILE" > "$ENV_FILE.new"
 mv "$ENV_FILE" "$ENV_FILE.old"
 mv "$ENV_FILE.new" "$ENV_FILE"
 
@@ -43,7 +43,7 @@ git stash
 git checkout master
 git pull
 
-sed "s/http:\/\/127.0.0.1:4200/https:\/\/86.18.16.122:8083\/api/" src/main/java/com/dju/demo/SaveController.java > src/main/java/com/dju/demo/SaveController.java.new
+sed "s/http:\/\/127.0.0.1:4200/https:\/\/86.18.16.122:8083/" src/main/java/com/dju/demo/SaveController.java > src/main/java/com/dju/demo/SaveController.java.new
 mv src/main/java/com/dju/demo/SaveController.java src/main/java/com/dju/demo/SaveController.java.old
 mv src/main/java/com/dju/demo/SaveController.java.new src/main/java/com/dju/demo/SaveController.java
 
