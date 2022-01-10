@@ -48,6 +48,9 @@ mv src/main/java/com/dju/demo/SaveController.java src/main/java/com/dju/demo/Sav
 mv src/main/java/com/dju/demo/SaveController.java.new src/main/java/com/dju/demo/SaveController.java
 
 #/c/Program\ Files/JetBrains/IntelliJ\ IDEA\ 2021.3.1/plugins/maven/lib/maven3/bin/mvn package
+if [ -d target ]; then
+  rm -r target
+fi
 mvn package
 
 cd target
