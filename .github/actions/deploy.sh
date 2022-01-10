@@ -43,7 +43,7 @@ git stash
 git checkout master
 git pull
 
-sed "s/http:\/\/127.0.0.1:4200/https:\/\/86.18.16.122:8083/" src/main/java/com/dju/demo/SaveController.java > src/main/java/com/dju/demo/SaveController.java.new
+sed "s/http:\/\/127.0.0.1:4200/https:\/\/86.18.16.122:8083\/api/" src/main/java/com/dju/demo/SaveController.java > src/main/java/com/dju/demo/SaveController.java.new
 mv src/main/java/com/dju/demo/SaveController.java src/main/java/com/dju/demo/SaveController.java.old
 mv src/main/java/com/dju/demo/SaveController.java.new src/main/java/com/dju/demo/SaveController.java
 
