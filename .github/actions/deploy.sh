@@ -24,6 +24,10 @@ sed "s/0.0.0/$INPUT_VERSION/" package.json > package.json.new
 mv package.json package.json.old
 mv package.json.new package.json
 
+sed "s/PROD_IP/$INPUT_EXT_ADDR/" src/environments/environment.prod.ts > environment.prod.ts.new
+mv environment.prod.ts environment.prod.ts.old
+mv environment.prod.ts.new environment.prod.ts
+
 npm run build:prod
 
 # TODO SSH key
@@ -45,12 +49,11 @@ cp demo-*.jar "demo-$INPUT_VERSION-SNAPSHOT.jar"
 # TODO SSH key
 scp "demo-$INPUT_VERSION-SNAPSHOT.jar" "pi@$INPUT_SSHSERVER:$INPUT_APIPATH"
 
-# export INPUT_VERSION="1.0.6"; export INPUT_SSHSERVER="192.168.0.17"; export INPUT_APIPATH="/home/pi/servers"; export INPUT_APPPATH="/var/www/splitman/html/"
+# export INPUT_VERSION="1.0.6"; export INPUT_SSHSERVER="192.168.0.17"; export INPUT_APIPATH="/home/pi/servers"; export INPUT_APPPATH="/var/www/splitman/html/"; export INPUT_EXT_ADDR=""
 
 # TODO SSH key
-ssh -oBatchMode=yes pi@$INPUT_SSHSERVER bash << EOF
-  SERVER_PID="$(ps -fu $USER| grep "[d]emo" | awk '{print $2}')"
-  kill "$SERVER_PID"
+ssh -oBatchMode=yes "pi@$INPUT_SSHSERVER" bash << EOF
+  SERVER_PID="$(ps -fu $USER| grep "[d]emo" | awk '{print $2}')" && kill "$SERVER_PID"
   cd servers
   java -jar "$(ls | grep "demo" | sort | tail -n 1)" --server.port=8888 &
 EOF
