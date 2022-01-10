@@ -28,7 +28,8 @@ export class TravelListComponent implements OnInit {
 
     combineLatest([
       this.userServiceService.getConnectedUser(),
-      this.traverlService.getTravels(true)
+      // this.traverlService.getTravels(true)
+      this.traverlService.getTravels()
     ])
 
     // this.userServiceService.getConnectedUser().pipe(

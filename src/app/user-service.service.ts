@@ -10,6 +10,7 @@ import {TravelModel} from "./models/travel-model";
 import {environment} from "../environments/environment";
 import {AjaxResponse} from "rxjs/ajax";
 import {HttpClient, HttpResponse} from "@angular/common/http";
+import {IAPIResult} from "./models/iapiresult";
 
 @Injectable({
   providedIn: 'root'
@@ -105,13 +106,22 @@ export class UserServiceService extends BaseService {
 
   getUserByPass(username: string, pass: string, isLogin = true): Observable<UserModel | null> {
     // return this.getUserByNameAndPass(username, pass).pipe(
-    return this.httpPost(environment.api + "/login", {password: pass, username: username}).pipe(
-      map((u: User) => {
+    return this.httpPost(environment.api + "/login", {password: pass, username: username}, "json", "application/json", true, "body").pipe(
+      map((u: User | IAPIResult) => {
         // if(u && isLogin) {
         //   this._connectedUser.next(u);
         // }
         // debugger;
         // return !!u && u.hasOwnProperty("email") ? u as UserModel : null;
+
+        const hasErrorProp = u.hasOwnProperty("hasError");
+
+        if(hasErrorProp) {
+          console.warn("Maybe login error");
+          console.warn(u);
+          return null;
+        }
+
         return !!u && u.hasOwnProperty("email") ? User.fromJson(u).toModel() : null;
       })
     );
