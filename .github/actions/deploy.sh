@@ -24,9 +24,10 @@ sed "s/0.0.0/$INPUT_VERSION/" package.json > package.json.new
 mv package.json package.json.old
 mv package.json.new package.json
 
-sed "s/PROD_IP/$INPUT_EXT_ADDR/" src/environments/environment.prod.ts > environment.prod.ts.new
-mv environment.prod.ts environment.prod.ts.old
-mv environment.prod.ts.new environment.prod.ts
+ENV_FILE="src/environments/environment.prod.ts"
+sed "s/PROD_IP/$INPUT_EXT_ADDR/" "$ENV_FILE" > "$ENV_FILE.new"
+mv "$ENV_FILE" "$ENV_FILE.old"
+mv "$ENV_FILE.new" "$ENV_FILE"
 
 npm run build:prod
 
