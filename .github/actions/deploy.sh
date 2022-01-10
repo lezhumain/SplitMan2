@@ -34,8 +34,14 @@ npm run build:prod
 # TODO SSH key
 scp -r dist/SplitMan21/* "pi@$INPUT_SSHSERVER:$INPUT_APPPATH"
 
-git clone git@github.com:lezhumain/SplitMan2-API.git
+if [ ! -d "SplitMan2-API"]; then
+  git clone git@github.com:lezhumain/SplitMan2-API.git
+fi
+
 cd SplitMan2-API
+git stash
+git checkout master
+git pull
 
 sed "s/http:\/\/127.0.0.1:4200/https:\/\/86.18.16.122:8083/" src/main/java/com/dju/demo/SaveController.java > src/main/java/com/dju/demo/SaveController.java.new
 mv src/main/java/com/dju/demo/SaveController.java src/main/java/com/dju/demo/SaveController.java.old
