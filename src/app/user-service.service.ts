@@ -356,6 +356,7 @@ export class UserServiceService extends BaseService {
     return this.httpGet(environment.api + "/logout").pipe(
       take(1),
       flatMap(() => {
+        BaseService.USER_ID_INIT = null;
         this._connectedUser.next(null);
         return this._connectedUser.pipe(
           first(),

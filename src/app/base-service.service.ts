@@ -23,6 +23,7 @@ export class BaseService {
 
   protected static USER_ID: number| null = null;
   static USER_ID_INIT: number | null = null;
+  private static loaded = false;
   constructor(private http: HttpClient) { }
 
   private static _allItems$: BehaviorSubject<BaseItem[]> = new BehaviorSubject<BaseItem[]>([]);
@@ -42,6 +43,9 @@ export class BaseService {
       // map(userResponse => console.log('users: ', userResponse)),
       map(userResponse => {
         // debugger;
+        if(!BaseService.loaded) {
+          BaseService.loaded = true;
+        }
         return userResponse;
       }),
       catchError(error => {
@@ -84,11 +88,26 @@ export class BaseService {
   }
 
   protected getAll(force: boolean = false): Observable<BaseItem[]> {
-    if (!force) {
-      return BaseService._allItems$.pipe(first());
-    }
+    // if (!force && BaseService.loaded) {
+    //   return BaseService._allItems$.pipe(first());
+    // }
 
-    return this.pGetAll(force).pipe(
+  // .pipe(
+  //     map(all => {
+  //       // const userLocalStor = localStorage.getItem("splitman_userid");
+  //       return this.filterAll(all);
+  //     })
+  //   )
+
+    const obs$ = !force && BaseService.loaded
+      ? BaseService._allItems$.pipe(first())
+      : this.pGetAll(force)
+
+    return obs$.pipe(
+      map(all => {
+        // const userLocalStor = localStorage.getItem("splitman_userid");
+        return this.filterAll(all);
+      }),
       flatMap((aa: BaseItem[]) => {
         BaseService._allItems$.next(aa);
         return BaseService._allItems$.pipe(
@@ -115,52 +134,7 @@ export class BaseService {
         })
       );
 
-    return allObs.pipe(
-      map(all => {
-        // const userLocalStor = localStorage.getItem("splitman_userid");
-        const userLocalStor = BaseService.USER_ID !== null
-          ? BaseService.USER_ID
-          : (BaseService.USER_ID_INIT !== null ? BaseService.USER_ID_INIT : null);
-        BaseService.USER_ID_INIT = null;
-        const userID: number | null = userLocalStor === null ? null : Number(userLocalStor);
-        if (!window.location.href.includes("/login")) {
-          if ((userID === null || isNaN(userID) || userID < 0)) {
-            return [];
-          }
-
-          // TODO login server side
-
-          const user: any = all.find(a => a.type === "user" && a.id === userID);
-          if (!user) {
-            return [];
-          }
-
-          // TODO filter other items
-          // all = all.filter(a => ;
-          // all = all.filter(a => );
-
-          const indexesToRemove: number[] = all.reduce((res: number[], a: any, index: number) => {
-            if ((a.type === "travel"
-                && (!user.invites || !user.invites.some((ui: any) => ui.tripID === a.id)))
-              || a.type === "expense"
-              && (!user.invites || !user.invites.some((ui: any) => ui.tripID === a.tripId))) {
-              res.push(index);
-            }
-
-            return res;
-          }, []);
-
-          // for (const ind of indexesToRemove) {
-          //   all.splice(ind, 1);
-          // }
-          const newArr = all.filter((_: any, index: number) => !indexesToRemove.includes(index));
-          // debugger;
-          all = newArr.slice()
-        }
-
-        return all;
-      })
-    );
+    return allObs;
   }
 
   protected getAllByType<T>(type: string, force = false): Observable<T[]> {
@@ -273,4 +247,47 @@ export class BaseService {
   //     })
   //   );
   // }
+  private filterAll(all: BaseItem[]): BaseItem[] {
+    const userLocalStor = BaseService.USER_ID !== null
+      ? BaseService.USER_ID
+      : (BaseService.USER_ID_INIT !== null ? BaseService.USER_ID_INIT : null);
+    BaseService.USER_ID_INIT = null;
+    const userID: number | null = userLocalStor === null ? null : Number(userLocalStor);
+    if (!window.location.href.includes("/login")) {
+      if ((userID === null || isNaN(userID) || userID < 0)) {
+        return [];
+      }
+
+      // TODO login server side
+
+      const user: any = all.find(a => a.type === "user" && a.id === userID);
+      if (!user) {
+        return [];
+      }
+
+      // TODO filter other items
+      // all = all.filter(a => ;
+      // all = all.filter(a => );
+
+      const indexesToRemove: number[] = all.reduce((res: number[], a: any, index: number) => {
+        if ((a.type === "travel"
+            && (!user.invites || !user.invites.some((ui: any) => ui.tripID === a.id)))
+          || a.type === "expense"
+          && (!user.invites || !user.invites.some((ui: any) => ui.tripID === a.tripId))) {
+          res.push(index);
+        }
+
+        return res;
+      }, []);
+
+      // for (const ind of indexesToRemove) {
+      //   all.splice(ind, 1);
+      // }
+      const newArr = all.filter((_: any, index: number) => !indexesToRemove.includes(index));
+      // debugger;
+      all = newArr.slice()
+    }
+
+    return all;
+  }
 }
