@@ -34,7 +34,7 @@ npm run build:prod
 # TODO SSH key
 scp -r dist/SplitMan21/* "pi@$INPUT_SSHSERVER:$INPUT_APPPATH"
 
-if [ ! -d "SplitMan2-API"]; then
+if [ ! -d "SplitMan2-API" ]; then
   git clone git@github.com:lezhumain/SplitMan2-API.git
 fi
 
@@ -47,11 +47,11 @@ sed "s/http:\/\/127.0.0.1:4200/https:\/\/86.18.16.122:8083/" src/main/java/com/d
 mv src/main/java/com/dju/demo/SaveController.java src/main/java/com/dju/demo/SaveController.java.old
 mv src/main/java/com/dju/demo/SaveController.java.new src/main/java/com/dju/demo/SaveController.java
 
-#/c/Program\ Files/JetBrains/IntelliJ\ IDEA\ 2021.3.1/plugins/maven/lib/maven3/bin/mvn package
 if [ -d target ]; then
   rm -r target
 fi
 mvn package
+#/c/Program\ Files/JetBrains/IntelliJ\ IDEA\ 2021.3.1/plugins/maven/lib/maven3/bin/mvn package
 
 cd target
 cp demo-*.jar "demo-$INPUT_VERSION-SNAPSHOT.jar"
@@ -59,8 +59,7 @@ cp demo-*.jar "demo-$INPUT_VERSION-SNAPSHOT.jar"
 # TODO SSH key
 scp "demo-$INPUT_VERSION-SNAPSHOT.jar" "pi@$INPUT_SSHSERVER:$INPUT_APIPATH"
 
-# export INPUT_VERSION="1.0.6"; export INPUT_SSHSERVER="192.168.0.17"; export INPUT_APIPATH="/home/pi/servers"; export INPUT_APPPATH="/var/www/splitman/html/"; export INPUT_EXT_ADDR=""
-
+# export INPUT_VERSION="1.0.6"; export INPUT_SSHSERVER="192.168.0.17"; export INPUT_APIPATH="/home/pi/servers"; export INPUT_APPPATH="/var/www/splitman/html/"; export INPUT_EXT_ADDR=""; JAVA_HOME="/c/Program Files/Java/openjdk-12+32_windows-x64_bin"
 # TODO SSH key
 ssh -oBatchMode=yes "pi@$INPUT_SSHSERVER" bash << EOF
   SERVER_PID="$(ps -fu $USER| grep "[d]emo" | awk '{print $2}')" && kill "$SERVER_PID"
