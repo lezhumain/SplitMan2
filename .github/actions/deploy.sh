@@ -76,6 +76,6 @@ echo "Restarting API server..."
 #EOF
 ssh -oBatchMode=yes "pi@$INPUT_SSHSERVER" bash << EOF
   cd /home/pi/servers
-  ./relaunchServer.sh
+  ./relaunchServer.sh &
 EOF
 
