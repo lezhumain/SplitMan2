@@ -68,9 +68,7 @@ ssh -oBatchMode=yes "pi@$INPUT_SSHSERVER" bash << EOF
   ps axjf | grep "[d]emo"
   netstat -lapute | grep :8888
 
-  SERVER_PID="$(ps -fu $USER| grep "[d]emo" | awk '{print $2}')"
-  echo "SERVER_PID: $SERVER_PID"
-  if [ ! -z "$SERVER_PID" ]; then kill "$SERVER_PID"; fi
+  SERVER_PID="$(ps -fu $USER| grep "[d]emo" | awk '{print $2}')"; echo "SERVER_PID: $SERVER_PID"; if [ ! -z "$SERVER_PID" ]; then kill "$SERVER_PID"; fi
   cd /home/pi/servers
   java -jar "$(ls | grep "demo" | sort | tail -n 1)" --server.port=8888 &
 EOF
