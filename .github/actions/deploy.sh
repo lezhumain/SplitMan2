@@ -76,6 +76,9 @@ echo "Restarting API server..."
 #EOF
 ssh -oBatchMode=yes "pi@$INPUT_SSHSERVER" bash << EOF
   cd /home/pi/servers
-  ./relaunchServer.sh &
+#  ./relaunchServer.sh &
+
+  ./stopServer.sh
+  java -jar "$(ls | grep "demo" | sort | tail -n 1)" --server.port=8888 &
 EOF
 
