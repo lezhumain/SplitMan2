@@ -62,13 +62,20 @@ set -e
 #scp "demo-$INPUT_VERSION-SNAPSHOT.jar" "pi@$INPUT_SSHSERVER:$INPUT_APIPATH"
 
 # export INPUT_VERSION="1.0.6"; export INPUT_SSHSERVER="192.168.0.17"; export INPUT_APIPATH="/home/pi/servers"; export INPUT_APPPATH="/var/www/splitman/html/"; export INPUT_EXT_ADDR=""; JAVA_HOME="/c/Program Files/Java/openjdk-12+32_windows-x64_bin"
+
 # TODO SSH key
 echo "Restarting API server..."
+#ssh -oBatchMode=yes "pi@$INPUT_SSHSERVER" bash << EOF
+#  ps axjf | grep "[d]emo"
+#  netstat -lapute | grep :8888
+#
+#  # SERVER_PID="$(ps -fu $USER| grep "[d]emo" | awk '{print $2}')"; echo "SERVER_PID: $SERVER_PID"; if [ ! -z "$SERVER_PID" ]; then kill "$SERVER_PID"; fi
+#  cd /home/pi/servers
+#  ./stopServer.sh
+#  java -jar "$(ls | grep "demo" | sort | tail -n 1)" --server.port=8888 &
+#EOF
 ssh -oBatchMode=yes "pi@$INPUT_SSHSERVER" bash << EOF
-  ps axjf | grep "[d]emo"
-  netstat -lapute | grep :8888
-
-  SERVER_PID="$(ps -fu $USER| grep "[d]emo" | awk '{print $2}')"; echo "SERVER_PID: $SERVER_PID"; if [ ! -z "$SERVER_PID" ]; then kill "$SERVER_PID"; fi
   cd /home/pi/servers
-  java -jar "$(ls | grep "demo" | sort | tail -n 1)" --server.port=8888 &
+  ./relaunchServer.sh
 EOF
+
