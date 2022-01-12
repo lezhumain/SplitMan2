@@ -8,7 +8,8 @@ import {Travel} from "./models/travel";
 import {someTravels} from "../test-data/travels";
 import {User} from "./models/user";
 import {flatMap} from "rxjs/internal/operators";
-import {catchError} from "rxjs/operators";
+import {catchError, filter, first} from "rxjs/operators";
+import {BaseService} from "./base-service.service";
 
 describe('TravelService', () => {
   let service: TravelService;
@@ -18,6 +19,8 @@ describe('TravelService', () => {
     // TODO: spy on other methods too
     httpClientSpy = jasmine.createSpyObj('HttpClient', ['get']);
     service = new TravelService(httpClientSpy);
+
+    BaseService["loaded"] = false;
   });
 
   it('should be created', () => {
@@ -37,10 +40,15 @@ describe('TravelService', () => {
 
     const userService = new UserServiceService(httpClientSpy);
     userService["_connectedUser"].next(userObj);
+    BaseService.USER_ID_INIT = null; // hacky ?
+
     // userService["getConnectedUser"] = () => {
     //
     // };
 
+    // userService.logOut().subscribe(() => {
+    //   this.router.navigate(['login']);
+    // });
     userService.getConnectedUser().pipe(
       flatMap((u) => {
         return service["getTravels"]();
@@ -48,13 +56,13 @@ describe('TravelService', () => {
       catchError(() => of(undefined))
     ).subscribe((received: Travel[] | undefined) => {
       expect(received).toBeTruthy();
-      if (received !== undefined) {
-        expect(received.length).toEqual(0);
-      }
+      expect(received?.length).toEqual(0);
+
       doneFn();
     });
   });
 
+  // FIXME
   it("should return user's travels", (doneFn: DoneFn) => {
     expect(service).toBeTruthy();
     const data: any[] = someTravels.slice();
@@ -76,7 +84,9 @@ describe('TravelService', () => {
     //
     // };
 
-    userService.getConnectedUser().pipe(
+    userService["_connectedUser"].pipe(
+      filter(u => !!u),
+      first(),
       flatMap((u) => {
           return service["getTravels"]();
       }),
