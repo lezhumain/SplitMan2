@@ -4,17 +4,18 @@ import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {environment} from "../environments/environment";
 import {ExpenseModel} from "./models/expense-model";
+import {ApiService} from "./api.service";
 
 @Injectable({
   providedIn: 'root'
 })
 export class TestEndpointService extends BaseService {
 
-  constructor(http: HttpClient) {
+  constructor(http: HttpClient, private readonly _apiService: ApiService) {
     super(http)
   }
 
   go(s: string): Observable<any> {
-    return this.httpPost(environment.api + "/genimg", s, "arraybuffer", "image/png", false);
+    return this._apiService.httpPost(environment.api + "/genimg", s, "arraybuffer", "image/png", false);
   }
 }

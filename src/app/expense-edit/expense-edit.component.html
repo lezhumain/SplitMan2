@@ -55,6 +55,12 @@
   </div>
 
   <div class="col-auto">
-    <button type="button" class="btn btn-primary mb-3" (click)="saveExpense()">Save Expense</button>
+    <button type="button" class="btn btn-primary mb-3" (click)="saveExpense()">
+<!--    <button type="button" class="btn btn-primary mb-3" (click)="saveTravel()">-->
+      <ng-container *ngIf="!savingExpense; else saving">Save Expense</ng-container>
+      <ng-template #saving>
+        <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+      </ng-template>
+    </button>
   </div>
 </div>

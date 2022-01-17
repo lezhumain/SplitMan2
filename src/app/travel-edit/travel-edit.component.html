@@ -20,6 +20,11 @@
   <br>
 
   <div class="col-auto">
-    <button type="button" class="btn btn-primary mb-3" (click)="saveTravel()">Save Travel</button>
+    <button type="button" class="btn btn-primary mb-3" (click)="saveTravel()">
+      <ng-container *ngIf="!savingTravel; else saving">Save Travel</ng-container>
+      <ng-template #saving>
+        <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+      </ng-template>
+    </button>
   </div>
 </div>

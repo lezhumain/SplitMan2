@@ -10,17 +10,26 @@ import {User} from "./models/user";
 import {flatMap} from "rxjs/internal/operators";
 import {catchError, filter, first} from "rxjs/operators";
 import {BaseService} from "./base-service.service";
+import {ApiService} from "./api.service";
 
 describe('TravelService', () => {
+  let apiService: ApiService;
   let service: TravelService;
   let httpClientSpy: jasmine.SpyObj<HttpClient>;
 
-  beforeEach(() => {
+  beforeEach(async() => {
     // TODO: spy on other methods too
-    httpClientSpy = jasmine.createSpyObj('HttpClient', ['get']);
-    service = new TravelService(httpClientSpy);
+    httpClientSpy = jasmine.createSpyObj('HttpClient', ['get', 'post']);
 
-    BaseService["loaded"] = false;
+    apiService = new ApiService(httpClientSpy);
+    service = new TravelService(httpClientSpy, apiService);
+
+    apiService["_allItems$"].next(null)
+
+    await apiService["_allItems$"].pipe(
+      filter(e => e === null),
+      first()
+    ).toPromise();
   });
 
   it('should be created', () => {
@@ -38,7 +47,7 @@ describe('TravelService', () => {
     // const userClientSpy = jasmine.createSpyObj('UserServiceService', ['getConnectedUser']);
     // userClientSpy.get.and.returnValue(of(userObj);
 
-    const userService = new UserServiceService(httpClientSpy);
+    const userService = new UserServiceService(httpClientSpy, new ApiService(httpClientSpy));
     userService["_connectedUser"].next(userObj);
     BaseService.USER_ID_INIT = null; // hacky ?
 
@@ -78,7 +87,7 @@ describe('TravelService', () => {
     // const userClientSpy = jasmine.createSpyObj('UserServiceService', ['getConnectedUser']);
     // userClientSpy.get.and.returnValue(of(userObj);
 
-    const userService = new UserServiceService(httpClientSpy);
+    const userService = new UserServiceService(httpClientSpy, new ApiService(httpClientSpy));
     userService["_connectedUser"].next(User.fromJson(userObj));
     // userService["getConnectedUser"] = () => {
     //

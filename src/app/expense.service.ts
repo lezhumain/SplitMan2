@@ -8,6 +8,7 @@ import {ExpenseModel} from "./models/expense-model";
 import {flatMap} from "rxjs/internal/operators";
 import {UserServiceService} from "./user-service.service";
 import {HttpClient} from "@angular/common/http";
+import {ApiService} from "./api.service";
 
 @Injectable({
   providedIn: 'root'
@@ -15,12 +16,12 @@ import {HttpClient} from "@angular/common/http";
 export class ExpenseService extends BaseService {
   private readonly storeKey = "expense";
 
-  constructor(http: HttpClient) {
+  constructor(http: HttpClient, private readonly _apiService: ApiService) {
     super(http);
   }
 
   getExpenses(): Observable<Expense[]> {
-    return this.getAllByType<Expense>(this.storeKey).pipe(
+    return this._apiService.getAllByType<Expense>(this.storeKey).pipe(
       map((o: Expense[]) => {
         return o.map((oo: Expense) => Expense.fromJson(oo));
       })
@@ -60,12 +61,12 @@ export class ExpenseService extends BaseService {
           return this.getNewId().pipe(
             flatMap((newId: number) => {
               data.id = newId;
-              return this.addOrUpdateItem(data);
+              return this._apiService.saveInDb(data);
             })
           );
         }
 
-        return this.updateItem(data);
+        return this._apiService.updateItem(data);
       })
     ).pipe(
       map(() => null)

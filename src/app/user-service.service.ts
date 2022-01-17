@@ -11,6 +11,8 @@ import {environment} from "../environments/environment";
 import {AjaxResponse} from "rxjs/ajax";
 import {HttpClient, HttpResponse} from "@angular/common/http";
 import {IAPIResult} from "./models/iapiresult";
+import {combineLatest} from "rxjs";
+import {ApiService} from "./api.service";
 
 @Injectable({
   providedIn: 'root'
@@ -25,10 +27,9 @@ export class UserServiceService extends BaseService {
   // }
   // private _connectedUser: User | null = null;
 
-  private readonly key = "splitman_userid";
   private _connectedUser: BehaviorSubject<User | null> = new BehaviorSubject<User | null>(null);
 
-  constructor(http: HttpClient) {
+  constructor(http: HttpClient, private readonly _apiService: ApiService) {
     super(http);
     // const sessionIDName = localStorage.getItem("")
 
@@ -49,7 +50,8 @@ export class UserServiceService extends BaseService {
 
     this._connectedUser
       .pipe(
-        filter(u => !u || (!!u && u.id >= 0))
+        distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr))
+        // filter(u => !u || (!!u && u.id >= 0))
       )
       .subscribe((u: User | null) => {
         BaseService.USER_ID = u ? u.id : null;
@@ -64,20 +66,20 @@ export class UserServiceService extends BaseService {
     if(u) {
       const id = u.id.toString();
       console.log("Stored userID " + id);
-      localStorage.setItem(this.key, id);
+      localStorage.setItem(ApiService.STORAGE_KEY, id);
     }
     else {
-      localStorage.removeItem(this.key);
+      localStorage.removeItem(ApiService.STORAGE_KEY);
     }
   }
 
   public getSessionData(): string | null {
-    const userID = localStorage.getItem(this.key);
+    const userID = localStorage.getItem(ApiService.STORAGE_KEY);
     return userID;
   }
 
   private getUsers(force = false): Observable<User[]> {
-    return this.getAllByType<User>("user", force).pipe(
+    return this._apiService.getAllByType<User>("user", force).pipe(
       map((o: User[]) => {
         return o.map((oo: User) => User.fromJson(oo));
       })
@@ -91,12 +93,12 @@ export class UserServiceService extends BaseService {
     return newID$.pipe(
       flatMap((lastID: number) => {
         data.id = lastID;
-        return this.updateItem(data);
+        return this._apiService.updateItem(data);
       })
     );
   }
 
-  getUserByNameAndPass(username: string, pass: string): Observable<User | null> {
+  getUserByNameAndPass(username?: string, pass?: string): Observable<User | null> {
     return this.getUsers().pipe(
       map((users: User[]) => {
         return users.find(u => u.username === username && u.password === pass) || null;
@@ -106,7 +108,7 @@ export class UserServiceService extends BaseService {
 
   getUserByPass(username: string, pass: string, isLogin = true): Observable<UserModel | null> {
     // return this.getUserByNameAndPass(username, pass).pipe(
-    return this.httpPost(environment.api + "/login", {password: pass, username: username}, "json", "application/json", true, "body").pipe(
+    return this._apiService.httpPost(environment.api + "/login", {password: pass, username: username}, "json", "application/json", true, "body").pipe(
       map((u: User | IAPIResult) => {
         // if(u && isLogin) {
         //   this._connectedUser.next(u);
@@ -114,7 +116,7 @@ export class UserServiceService extends BaseService {
         // debugger;
         // return !!u && u.hasOwnProperty("email") ? u as UserModel : null;
 
-        const hasErrorProp = u.hasOwnProperty("hasError");
+        const hasErrorProp = u && u.hasOwnProperty("hasError");
 
         if(hasErrorProp) {
           console.warn("Maybe login error");
@@ -123,7 +125,14 @@ export class UserServiceService extends BaseService {
         }
 
         return !!u && u.hasOwnProperty("email") ? User.fromJson(u).toModel() : null;
-      })
+      }),
+      flatMap((u: UserModel | null) => {
+        if(!u) {
+          return of(u);
+        }
+        return this.setConnectedUserByObj(u, true, true);
+      }),
+      tap(() => console.log("bloop"))
     );
   }
 
@@ -133,20 +142,33 @@ export class UserServiceService extends BaseService {
     return  u ? u.username : "";
   }
 
-  setConnectedUser(username: string, password: string) {
-    this.getUserByNameAndPass(username, password).subscribe(
-      (u: User | null) => {
+  setConnectedUser(username?: string, password?: string): Observable<User> {
+    // this.getUserByNameAndPass(username, password).subscribe(
+    //   (u: User | null) => {
+    //     this._connectedUser.next(u);
+    //   }
+    // );
+
+    return this.getUserByNameAndPass(username, password).pipe(
+      flatMap((u: User | null) => {
         this._connectedUser.next(u);
-      }
+
+        return this._connectedUser.pipe(
+          filter(cu => {
+            return cu === u;
+          }),
+          first()
+        ) as Observable<User>;
+      })
     );
   }
 
-  setConnectedUserByObj(user: UserModel, reconcileWithDb = false, setSeesion = false) {
+  setConnectedUserByObj(user: UserModel | User, reconcileWithDb = false, setSeesion = false): Observable<UserModel | null> {
     // debugger;
     // this.getUserByNameAndPass(username, password).subscribe(
     //   (u: User | null) => {
     // debugger;
-    const u = User.from(user);
+    const u = user instanceof UserModel ? User.from(user) : user;
 
     const obs$ = (reconcileWithDb ? this.getUserByEmail(u.email) : of(u)).pipe(
       map((uu: User | null) => {
@@ -163,12 +185,32 @@ export class UserServiceService extends BaseService {
     //   this._connectedUser.next(uu);
     // });
 
-    obs$.subscribe((uu: User | null) => {
-      if(setSeesion) {
-        this.setSessionData(uu);
-      }
-      this._connectedUser.next(uu);
-    });
+
+
+    // obs$.subscribe((uu: User | null) => {
+    //   if(setSeesion) {
+    //     this.setSessionData(uu);
+    //   }
+    //   this._connectedUser.next(uu);
+    // });
+    return obs$.pipe(
+      flatMap((uu: User | null) => {
+        if(setSeesion) {
+          this.setSessionData(uu);
+        }
+        this._connectedUser.next(uu);
+
+        return this._connectedUser.pipe(
+          filter(t => {
+            return JSON.stringify(t) === JSON.stringify(uu);
+          }),
+          first(),
+          map(u => u?.toModel() || null)
+        )
+      })
+    );
+
+
 
     //   }
     // );
@@ -213,7 +255,7 @@ export class UserServiceService extends BaseService {
       return of(false);
     }
 
-    return this.httpPost(environment.api + "/invite", {tripID: travelID, email: email},
+    return this._apiService.httpPost(environment.api + "/invite", {tripID: travelID, email: email},
       "json", "application/json", true, "response").pipe(
       map((e: HttpResponse<void>) => {
         console.log("invite response: ");
@@ -249,21 +291,29 @@ export class UserServiceService extends BaseService {
   }
 
   getConnectedUser(forceWithID = -1): Observable<UserModel | null> {
-    const pre: Observable<UserModel | null> = !isNaN(forceWithID) && forceWithID > -1
+    const pre$: Observable<UserModel | null> = !isNaN(forceWithID) && forceWithID > -1
       ? this.getUserByID(forceWithID, true)
       : of(null);
 
-    return pre.pipe(
-      flatMap((user: UserModel | null) => {
-        if(user) {
+    return combineLatest([pre$, this._connectedUser]).pipe(
+      // first(),
+      flatMap(([user, currentUser]: [UserModel | null, User | null]) => {
+        const userM: User | null = user ? User.from(user) : (currentUser || null);
+        // if(user && userM !== currentUser) {
+        // if(currentUser && user && userM?.equals(currentUser)) {
+        if(user && JSON.stringify(userM) !== JSON.stringify(currentUser)) {
           console.log("Should change user to: %o", user);
-          this._connectedUser.next(User.from(user));
+          this._connectedUser.next(userM);
+
+          return this._connectedUser.pipe(
+            first(),
+            map((u: User | null) => u ? u.toModel() : null)
+          )
         }
-        return this._connectedUser.pipe(
-          distinctUntilChanged(),
-          map((u: User | null) => u ? u.toModel() : null)
-        )
-      })
+
+        return of(currentUser?.toModel() || null);
+      }),
+      distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr))
     );
   }
 
@@ -286,10 +336,15 @@ export class UserServiceService extends BaseService {
     if (connectedUser.invites) {
       connectedUser.invites.push(gr);
     }
-    return this.updateItem(connectedUser).pipe(
-      tap(() => {
-        this._connectedUser.next(connectedUser);
-      })
+    return this._apiService.updateItem(connectedUser).pipe(
+      // tap(() => {
+      //   this._connectedUser.next(connectedUser);
+      // })
+      flatMap(() => {
+        // this._connectedUser.next(connectedUser);
+        return this.setConnectedUserByObj(connectedUser);
+      }),
+      map(() => null)
     );
   }
 
@@ -326,7 +381,7 @@ export class UserServiceService extends BaseService {
           }
         }
 
-        let obs$ = this.updateItem(u);
+        let obs$ = this._apiService.updateItem(u);
         if(cu?.id === userlID) {
           obs$ = obs$.pipe(
             tap(() => this._connectedUser.next(u))
@@ -336,7 +391,7 @@ export class UserServiceService extends BaseService {
         return obs$;
       }),
       flatMap(() => {
-        return this.getAll(true).pipe(
+        return this._apiService.getAll(true).pipe(
           map((all) => {
             const us = this._connectedUser.getValue();
             if(us) {
@@ -353,16 +408,15 @@ export class UserServiceService extends BaseService {
   }
 
   logOut() {
-    return this.httpGet(environment.api + "/logout").pipe(
+    return this._apiService.httpGet(environment.api + "/logout").pipe(
       take(1),
       flatMap(() => {
         BaseService.USER_ID_INIT = null;
         this._connectedUser.next(null);
+        this.setSessionData(null);
         return this._connectedUser.pipe(
-          first(),
-          tap(() => {
-            this.setSessionData();
-          })
+          filter(r => !r),
+          first()
         );
       })
     );
