@@ -14,6 +14,7 @@ export class ApiService {
   static readonly STORAGE_KEY = "splitman_userid";
 
   // private _allItems: BaseItem[] = [];
+  private userID: number | null = null;
 
   constructor(private http: HttpClient) { }
 
@@ -197,7 +198,7 @@ export class ApiService {
   //   );
   // }
   private filterAll(all: BaseItem[]): BaseItem[] {
-    const userLocalStor = localStorage.getItem(ApiService.STORAGE_KEY);
+    const userLocalStor = localStorage.getItem(ApiService.STORAGE_KEY) || this.userID;
     const userID: number | null = userLocalStor === null ? null : Number(userLocalStor);
 
     if (!window.location.href.includes("/login")) {

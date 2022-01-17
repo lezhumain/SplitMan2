@@ -16,14 +16,15 @@ import {ApiService} from "./api.service";
 
 describe('UserServiceService', () => {
   let service: UserServiceService;
+  let apiService: ApiService;
   let httpClientSpy: jasmine.SpyObj<HttpClient>;
 
   beforeEach(async() => {
     // TODO: spy on other methods too
     httpClientSpy = httpClientSpy = jasmine.createSpyObj('HttpClient', ['get', 'post']);
 
-    const apiService = new ApiService(httpClientSpy);
-    const userService = new UserServiceService(httpClientSpy, apiService);
+    apiService = new ApiService(httpClientSpy);
+    service = new UserServiceService(httpClientSpy, apiService);
 
     apiService["_allItems$"].next(null)
 
@@ -69,6 +70,9 @@ describe('UserServiceService', () => {
 
     service["_connectedUser"].next(User.fromJson(us));
     // await service.setConnectedUser("a", "a").toPromise();
+    apiService["userID"] = userID;
+
+
 
     service.getConnectedUser().pipe(
       // delay(750),

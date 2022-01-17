@@ -79,10 +79,12 @@ describe('TravelService', () => {
     httpClientSpy.get.and.returnValue(of(data));
 
     const userObj: any = {
-        type: "user",
-        id: 2,
-        invites: [{tripID: 0}, {tripID: 1}]
-      };
+      type: "user",
+      id: 2,
+      invites: [{tripID: 0}, {tripID: 1}]
+    };
+
+    apiService["userID"] = userObj.id;
 
     // const userClientSpy = jasmine.createSpyObj('UserServiceService', ['getConnectedUser']);
     // userClientSpy.get.and.returnValue(of(userObj);
