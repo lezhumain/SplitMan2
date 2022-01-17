@@ -7,6 +7,9 @@ class TestObj {
   surname = "";
   birth = "";
   date = "";
+  constructor() {
+    this.date = new Date().toISOString().replace(/\.\d{3}Z$/, "+02:00");
+  }
 }
 
 @Component({
