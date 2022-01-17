@@ -15,7 +15,9 @@ export class TestEndpointService extends BaseService {
     super(http)
   }
 
-  go(s: string): Observable<any> {
-    return this._apiService.httpPost(environment.api + "/genimg", s, "arraybuffer", "image/png", false);
+  go(s: FormData): Observable<any> {
+    return this._apiService.httpPost(environment.api + "/genimg", s, "arraybuffer", "image/png",
+      // false, "body", {"Content-Type": "multipart/form-data"});
+    false, "body");
   }
 }

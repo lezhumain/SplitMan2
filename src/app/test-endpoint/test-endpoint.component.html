@@ -20,6 +20,11 @@
     <input type="text" class="form-control" id="date" placeholder="YYYY-MM-DD<T>HH:MM:SS+hh:mm"
            [(ngModel)]="payload.date" >
   </div>
+  <div class="mb-3">
+<!--    <label for="date" class="form-label">Date</label>-->
+    <input type="file" class="file-upload" (change)="fileChanged($event.target)">
+  </div>
+
 
   <br>
   <br>

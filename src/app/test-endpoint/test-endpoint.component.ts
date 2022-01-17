@@ -19,6 +19,7 @@ class TestObj {
 })
 export class TestEndpointComponent implements OnInit {
   payload: TestObj = new TestObj();
+  private _file?: File;
 
   constructor(private readonly _service: TestEndpointService) { }
 
@@ -26,10 +27,27 @@ export class TestEndpointComponent implements OnInit {
   }
 
   doTest() {
-    this._service.go(JSON.stringify(this.payload)).subscribe((da: any) => {
+
+    if(!this._file) {
+      return;
+    }
+
+    const fileName = this._file.name;
+    const formData = new FormData();
+    formData.append("document", this._file);
+    formData.append("fileName", fileName);
+    formData.append("payload", JSON.stringify(this.payload));
+
+
+    // const upload$ = this.http.post("/api/thumbnail-upload", formData);
+    // upload$.subscribe();
+
+    this._service.go(formData).subscribe((da: any) => {
       // TODO check for failure
       console.log(da);
       this.downloadImg(da);
+
+      this._file = undefined;
     });
   }
 
@@ -47,4 +65,8 @@ export class TestEndpointComponent implements OnInit {
   }
 
 
+  fileChanged(target: EventTarget | null) {
+    const files = (<HTMLInputElement>target)?.files;
+    this._file = files ? files[0] : undefined;
+  }
 }

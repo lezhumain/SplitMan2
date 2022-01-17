@@ -42,17 +42,22 @@ export class ApiService {
     );
   }
 
-  httpPost(url: string, data: any, respType: "json" | "text" | "blob" | "arraybuffer" = "json",
-                     accept = 'application/json', withCred = true, obs: "body" | "response" = "body"): Observable<any> {
+  httpPost(url: string, data: any | string | FormData, respType: "json" | "text" | "blob" | "arraybuffer" = "json",
+                     accept = 'application/json', withCred = true, obs: "body" | "response" = "body",
+                    addHeaders?: {[key: string]: string}): Observable<any> {
 
     // const headers: any = this._headers;
 
-    if(typeof data === 'object') {
+    if(typeof data === 'object' && !(data instanceof FormData)) {
       data = JSON.stringify(data);
     }
 
+    let headers = addHeaders || {};
+    headers["Accept"] = accept;
+
     return this.http.post(url, data, {withCredentials: withCred, responseType: respType as "json" | undefined,
-      headers : new HttpHeaders({ /*'Content-Type': 'application/json', */'Accept': accept }), observe: obs as "body" | undefined})
+      // headers : new HttpHeaders({ /*'Content-Type': 'application/json', */'Accept': accept }), observe: obs as "body" | undefined})
+        headers : new HttpHeaders(headers), observe: obs as "body" | undefined})
       .pipe(
         map(userResponse => {
           console.log('http post result: ', userResponse);
