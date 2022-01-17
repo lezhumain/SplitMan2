@@ -14,6 +14,7 @@ import {filter, first, map, takeWhile, tap} from "rxjs/operators";
 import {flatMap} from "rxjs/internal/operators";
 import {ToastComponent} from "../toast/toast.component";
 import {ToastType} from "../toast/toast.shared";
+import {BaseService} from "../base-service.service";
 // import {File} from "@angular/compiler-cli/src/ngtsc/file_system/testing/src/mock_file_system";
 
 @Component({
@@ -57,14 +58,33 @@ export class TravelComponent implements OnInit {
         this.connectedUser$.next(u);
       });
 
-      const obs = [
-        this.travelService.getTravelByID(travelID),
-        this.expenseService.getExpensesByTripID(travelID),
-        this.connectedUser$
-      ];
+      // const obs = [
+      //   this.travelService.getTravelByID(travelID),
+      //   this.expenseService.getExpensesByTripID(travelID),
+      //   this.connectedUser$
+      // ];
+      // const theObs$ = combineLatest(obs);
+
+      const theObs$ = this.connectedUser$.pipe(
+        filter(u => !!u),
+        first(),
+        flatMap((u) => {
+          if(u) {
+            BaseService.USER_ID_INIT = u.id;
+          }
+
+          const obs = [
+            this.travelService.getTravelByID(travelID),
+            this.expenseService.getExpensesByTripID(travelID),
+            this.connectedUser$
+          ];
+
+          return combineLatest(obs);
+        })
+      );
 
       // combineLatest(obs).subscribe(([t, expenses]: [Travel | null, Expense[]]) => {
-      combineLatest(obs).pipe(
+      theObs$.pipe(
         takeWhile(() => this.alive)
       ).subscribe((res: any[]) => {
         const t: Travel | null = res[0],

@@ -83,9 +83,12 @@ async function scrollAndClick(elm: ElementHandle, pag: Page) {
 }
 
 async function clearAndType(e: ElementHandle, s: string) {
+  await waitForMS(200);
   return clickAndDelay(e, { clickCount: 3 }).then(() => {
     return e.type(s);
-  })
+  });
+
+  // return e.clea
 }
 
 async function handleSecrutiyStuff(page: Page) {
@@ -797,6 +800,8 @@ async function AddPeople(pag: Page) {
     await pag.waitForSelector("#profile-tab1", {visible: true, timeout: 10000})
       .then(e => e ? e.click() : null);
 
+    await pag.waitForTimeout(200);
+
     await pag.waitForXPath("//button[contains(text(), 'Add people')]", {visible: true})
       .then(e => e ? e.click() : null);
 
@@ -806,10 +811,25 @@ async function AddPeople(pag: Page) {
     await pag.waitForSelector("#dayCount", {visible: true})
       .then(e => e ? clearAndType(e, people.dayCount.toString()) : null);
 
-    await pag.waitForXPath("//button[contains(text(), 'Save')]", {visible: true})
-      .then(e => e ? e.click() : null);
-
     await pag.waitForTimeout(200);
+
+    const saveBtnXPath = "//button[contains(text(), 'Save')]";
+    await pag.waitForXPath(saveBtnXPath, {visible: true})
+      // .then(e => e ? e.click() : null);
+      .then(e => e ? Promise.all([e.click(), pag.waitForNavigation({timeout: 10000})]) : null);
+
+
+    await pag.waitForXPath(saveBtnXPath, {hidden: true});
+
+    // await pag.waitForResponse("saveOne");
+    // await pag.waitForTimeout(200);
+
+    // await pag.waitForResponse("saveOne");
+
+    await pag.waitForSelector("#payer", {timeout: 10000});
+
+    await pag.waitForTimeout(2000);
+
   }
 
   await pag.waitForTimeout(2000);
@@ -834,62 +854,76 @@ async function SaveWhoWeAre(page: Page, dju: string) {
     .then(e => e ? e.click() : null);
 }
 
-async function AddExpenses(page: Page, expenses: Expense[]) {
+async function AddExpenses(pag: Page, expenses: Expense[]) {
   for (const expense of expenses) {
-    // TODO add expense with page or page1 randomly
+    // TODO add expense with pag or page1 randomly
 
-    await page.waitForXPath("//button[contains(text(), 'Add expense')]", {visible: true})
-      .then(e => e ? scrollAndClick(e, page) : null);
+    await pag.waitForTimeout(1000);
 
-    // await page.waitForNavigation();
+    // await pag.waitForXPath("//button[contains(text(), 'Add expense')]", {visible: true})
+    //   .then(e => e ? Promise.all([scrollAndClick(e, pag), pag.waitForNavigation({timeout: 10000})]) : null);
+    const addExpBtn = await pag.waitForXPath("//button[contains(text(), 'Add expense')]", {visible: true});
 
-    await page.waitForSelector("#name", {visible: true})
+    await scrollAndClick(addExpBtn, pag);
+    await pag.waitForNavigation({timeout: 10000});
+
+
+    await pag.waitForTimeout(1000);
+
+    // await pag.waitForNavigation();
+
+    await pag.waitForSelector("#name", {visible: true})
       .then(e => e ? e.type(expense.name, {delay: 30}) : null);
 
-    await page.waitForTimeout(800);
+    await pag.waitForTimeout(800);
 
-    await page.waitForSelector("#amount", {visible: true})
+    await pag.waitForSelector("#amount", {visible: true})
       .then(e => e ? clearAndType(e, expense.amount.toString()) : null);
 
-    // await page.waitForSelector("#payer", {visible: true})
+    // await pag.waitForSelector("#payer", {visible: true})
     //   .then(e => e ? e.click() : null);
     //
-    // await page.waitForXPath(`//option[contains(text(), '${expense.payer}')]`, {visible: true})
+    // await pag.waitForXPath(`//option[contains(text(), '${expense.payer}')]`, {visible: true})
     //   .then(e => e ? e.click() : null);
 
-    await page.waitForSelector("#payer", {visible: true})
+    await pag.waitForSelector("#payer", {visible: true})
       .then(e => e ? e.type(expense.payer, {delay: 30}) : null);
 
     for (const payee of expense.payees) {
-      const line = await page.waitForXPath(`//span[contains(text(), '${payee.name}')]//ancestor::div[contains(@class, 'form-check')]`,
+      const line = await pag.waitForXPath(`//span[contains(text(), '${payee.name}')]//ancestor::div[contains(@class, 'form-check')]`,
         {visible: true});
 
       await line?.$x(".//span[contains(@class, 'perc-sign')]//preceding-sibling::input")
         .then(e => e.length > 0 ? e[0].type(payee.e4xpenseRatio.toString(), {delay: 30}) : null);
     }
 
-    await page.waitForXPath("//button[contains(text(), 'Save Expense')]", {visible: true})
-      .then(e => e ? Promise.all([scrollAndClick(e, page), page.waitForNavigation({timeout: 10000})]) : null);
+    await pag.waitForXPath("//button[contains(text(), 'Save Expense')]", {visible: true})
+      .then(e => e ? Promise.all([scrollAndClick(e, pag), pag.waitForNavigation({timeout: 10000})]) : null);
 
-    // await page.waitForNavigation();
-    await page.waitForTimeout(500);
+    // await pag.waitForNavigation();
+    await pag.waitForNetworkIdle();
+    await pag.waitForTimeout(1000);
   }
 }
 
-async function EditLast(page: Page, expenses: Expense[]) {
+async function EditLast(pag: Page, expenses: Expense[]) {
   // debugger;
   const lastTitle = expenses[expenses.length - 1].name;
-  await page.waitForXPath(`//div[contains(@class, 'expense-card')]//h6[contains(text(), '${lastTitle}')]`, {visible: true})
-    .then(e => e ? scrollAndClick(e, page) : null);
+  await pag.waitForXPath(`//div[contains(@class, 'expense-card')]//h6[contains(text(), '${lastTitle}')]`, {visible: true})
+    .then(e => e ? Promise.all([scrollAndClick(e, pag), pag.waitForNavigation({timeout: 10000})]) : null);
 
-  await page.waitForXPath("//button[contains(text(), 'Edit expense')]", {visible: true})
-    .then(e => e ? scrollAndClick(e, page) : null);
+  await pag.waitForXPath("//button[contains(text(), 'Edit expense')]", {visible: true})
+    .then(e => e ? Promise.all([scrollAndClick(e, pag), pag.waitForNavigation({timeout: 10000})]) : null);
 
-  await page.waitForSelector("#amount", {visible: true})
-    .then(e => e ? clearAndType(e, "34.23") : null);
+  await pag.waitForTimeout(300);
 
-  await page.waitForXPath("//button[contains(text(), 'Save Expense')]")
-    .then(e => e ? scrollAndClick(e, page) : null);
+  await pag.waitForSelector("#amount", {visible: true})
+    .then(e => e ? clearAndType(e, 34.23.toString()) : null);
+
+  // debugger;
+
+  await pag.waitForXPath("//button[contains(text(), 'Save Expense')]")
+    .then(e => e ? scrollAndClick(e, pag) : null);
 }
 
 async function DoInvite(pag: Page, email: string) {
@@ -986,7 +1020,7 @@ async function MainTest(params: any[]) {
     const travelNAme = await addTravel(page);
 
     await page.screenshot({path: "gogogo.png"});
-    debugger;
+
 
     await page.reload(); // TODO remove me
     await page.waitForTimeout(10000);
@@ -997,7 +1031,7 @@ async function MainTest(params: any[]) {
     console.log(sizes);
 
     await page.screenshot({path: "gogogo.png"});
-    debugger;
+
 
     // // await page.waitForXPath(`//h6[contains(text(), '${travelNAme}')]`, {visible: true, timeout: 10000})
     // //   .then(e => e ? scrollAndClick(e, page) : null);
@@ -1261,11 +1295,11 @@ async function runAll() {
     // //   params: undefined
     // // },
 
-    {
-      fn: MainTestBackBug,
-      msg: "Test back bug",
-      params: []
-    },
+    // {
+    //   fn: MainTestBackBug,
+    //   msg: "Test back bug",
+    //   params: []
+    // },
     // {
     //   fn: MainTestInviteShows,
     //   msg: "Test invite shows",
@@ -1282,22 +1316,22 @@ async function runAll() {
     //   ]
     // },
     //
-    // {
-    //   fn: MainTest,
-    //   msg: "E2E with 1 expense",
-    //   params: [
-    //     allExpenses.slice(0, 1),
-    //     "Dju\ndoit a\n8.56€\nSuzie\nMax\ndoit a\n8.56€\nSuzie\nElyan\ndoit a\n8.56€\nSuzie"
-    //   ]
-    // },
     {
       fn: MainTest,
-      msg: "E2E with all expenses",
+      msg: "E2E with 1 expense",
       params: [
-        allExpenses.slice(),
-        "Elyan\ndoit a\n17.30€\nDju"
+        allExpenses.slice(0, 1),
+        "Dju\ndoit a\n8.56€\nSuzie\nMax\ndoit a\n8.56€\nSuzie\nElyan\ndoit a\n8.56€\nSuzie"
       ]
-    }
+    },
+    // {
+    //   fn: MainTest,
+    //   msg: "E2E with all expenses",
+    //   params: [
+    //     allExpenses.slice(),
+    //     "Elyan\ndoit a\n17.30€\nDju"
+    //   ]
+    // }
   ];
 
   const allRes: {msg: string, errorMsg?: string, hasError: boolean, links?: string[]}[] = [];

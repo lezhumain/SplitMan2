@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import {Observable, of} from "rxjs";
 import {InviteDate, UserModel} from "../models/user-model";
-import {combineLatest, first, map, takeWhile, tap} from "rxjs/operators";
+import {combineLatest} from "rxjs";
+import {first, map, takeWhile, tap} from "rxjs/operators";
 import {UserServiceService} from "../user-service.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {flatMap} from "rxjs/internal/operators";

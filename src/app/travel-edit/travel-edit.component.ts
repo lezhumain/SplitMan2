@@ -20,6 +20,7 @@ export class TravelEditComponent implements OnInit {
   travel: TravelModel = new TravelModel();
 
   // private mode: EditMode = EditMode.Create;
+  savingTravel = false;
 
   constructor(private readonly travelService: TravelService,
               private readonly userServiceService: UserServiceService,
@@ -50,8 +51,10 @@ export class TravelEditComponent implements OnInit {
   }
 
   saveTravel() {
+    this.savingTravel = true;
     this.travelService.saveTravel(this.travel, this.userServiceService).subscribe((updated: TravelModel) => {
       // TODO check for failure
+      this.savingTravel = false;
       this.router.navigate(['travels/' + updated.id]);
     });
   }

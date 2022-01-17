@@ -63,7 +63,7 @@ export class LoginComponent implements OnInit {
     //   this.router.navigate(['travels']);
     // });
 
-    this.userServiceService.setConnectedUserByObj(user, true, true);
+    // this.userServiceService.setConnectedUserByObj(user, true, true);
     this.router.navigate(['travels']);
 
     ToastComponent.toastdata$.next({type: ToastType.INFO, message: "Login success."} as ToastMessage);

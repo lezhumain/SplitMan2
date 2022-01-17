@@ -6,6 +6,9 @@ import {ParticipantModel} from "../models/participants";
 import {TravelModel} from "../models/travel-model";
 import {Travel} from "../models/travel";
 import {needsLinking} from "@angular/compiler-cli/linker";
+import {catchError} from "rxjs/operators";
+import {ToastComponent} from "../toast/toast.component";
+import {ToastType} from "../toast/toast.shared";
 
 @Component({
   selector: 'app-participant-edit',
@@ -17,6 +20,7 @@ export class ParticipantEditComponent implements OnInit {
   private _travelID: number = -1;
 
   partOriginalName: string | null = null;
+  savingParticipant = false;
 
   constructor(private readonly route: ActivatedRoute,
               private readonly router: Router,
@@ -58,9 +62,16 @@ export class ParticipantEditComponent implements OnInit {
     }
 
     const travelID = this._travelID;
+    this.savingParticipant = true;
     this.travelService.saveParticipant(this.participantModel, travelID, this.partOriginalName).subscribe(() => {
       // TODO check for failure
+      this.savingParticipant = false;
       this.router.navigate(['travels', travelID]);
+    },(err) => {
+      this.savingParticipant = false;
+      console.warn("Save part error:");
+      console.warn(err);
+      ToastComponent.toastdata$.next({type: ToastType.ERROR, message: "Couldn't add participant."});
     });
   }
 }

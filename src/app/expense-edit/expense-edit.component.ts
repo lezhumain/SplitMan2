@@ -21,6 +21,7 @@ export class ExpenseEditComponent implements OnInit {
   travelUsers: ParticipantModel[] = [];
 
   expParts: ExpenseParticipantModel[] = [];
+  savingExpense = false;
 
   private _isPerDay = false;
   set isPerDay(v: boolean) {
@@ -157,8 +158,10 @@ export class ExpenseEditComponent implements OnInit {
       });
     this.expenseModel.payees = participants;
 
+    this.savingExpense = true;
     this.expenseService.saveExpense(this.expenseModel, this.userServiceService).subscribe(() => {
       // TODO check for failure
+      this.savingExpense = false;
       this.router.navigate(['travels', this.expenseModel.tripId]);
     });
   }

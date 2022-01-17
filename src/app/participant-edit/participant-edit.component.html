@@ -11,7 +11,12 @@
   </div>
 
   <div class="col-auto">
-    <button type="button" class="btn btn-primary mb-3" (click)="saveParticipant()">Save</button>
+    <button type="button" class="btn btn-primary mb-3" (click)="saveParticipant()">
+      <ng-container *ngIf="!savingParticipant; else saving">Save</ng-container>
+      <ng-template #saving>
+        <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+      </ng-template>
+    </button>
   </div>
 </div>
 <ng-template #noModel>

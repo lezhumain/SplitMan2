@@ -11,6 +11,7 @@ import {Participant, ParticipantModel} from "./models/participants";
 import {UserServiceService} from "./user-service.service";
 import {HttpClient} from "@angular/common/http";
 import {UserModel} from "./models/user-model";
+import {ApiService} from "./api.service";
 
 @Injectable({
   providedIn: 'root'
@@ -18,13 +19,13 @@ import {UserModel} from "./models/user-model";
 export class TravelService extends BaseService{
   private readonly storeKey = "travel";
 
-  constructor(http: HttpClient) {
+  constructor(http: HttpClient, private readonly _apiService: ApiService) {
     super(http);
   }
 
   getTravels(force = false): Observable<Travel[]> {
     // debugger;
-    return this.getAllByType<Travel>(this.storeKey, force).pipe(
+    return this._apiService.getAllByType<Travel>(this.storeKey, force).pipe(
       map((o: Travel[]) => {
         return o.map((oo: Travel) => Travel.fromJson(oo));
       })
@@ -34,14 +35,14 @@ export class TravelService extends BaseService{
   saveTravel(travel: TravelModel, userService?: UserServiceService): Observable<TravelModel> {
     const data = Travel.from(travel);
 
-    let obs = this.updateItem(data);
+    let obs = this._apiService.updateItem(data);
 
     if(data.id === -1) {
       obs = this.getNewId().pipe(
         flatMap((newId: number) => {
           data.id = newId;
           travel.id = data.id;
-          return this.addOrUpdateItem(data, true);
+          return this._apiService.saveInDb(data);
         })
       );
     }
@@ -55,7 +56,10 @@ export class TravelService extends BaseService{
     }
 
     return obs.pipe(
-      map(() => travel)
+      map(() => {
+        debugger;
+        return travel;
+      })
     );
   }
 
