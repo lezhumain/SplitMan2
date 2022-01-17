@@ -67,7 +67,9 @@ scp "demo-$INPUT_VERSION-SNAPSHOT.jar" "pi@$INPUT_SSHSERVER:$INPUT_APIPATH"
 echo "Restarting API server..."
 ssh -oBatchMode=yes "pi@$INPUT_SSHSERVER" bash << EOF
   cd /home/pi/servers
-  ./stopServer.sh
-  java -jar "$(ls | grep "demo" | sort | tail -n 1)" --server.port=8888 &
+#  ./stopServer.sh
+#  java -jar "$(ls | grep "demo" | sort | tail -n 1)" --server.port=8888 &
+
+  nohup ./relaunchServer.sh &
 EOF
 
