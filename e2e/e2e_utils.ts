@@ -1,5 +1,20 @@
-import {Browser} from "puppeteer";
+import {Browser, Viewport} from "puppeteer";
 import * as puppeteer from "puppeteer";
+
+const honor10Viewport: Viewport = {
+  width: 360,
+  height: 631,
+  deviceScaleFactor: 3,
+  hasTouch: true,
+  isMobile: true,
+  isLandscape: false
+}
+
+export const honor10 = {
+  name: "Honor 10",
+  userAgent: "",
+  viewport: honor10Viewport
+};
 
 function getHeadlessParam(): boolean {
   const regex = /-headless[= ](\w+)/;

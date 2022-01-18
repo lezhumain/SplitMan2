@@ -10,8 +10,9 @@ import {filter, first} from "rxjs/operators";
 import {flatMap} from "rxjs/internal/operators";
 import {checkServerIdentity} from "tls";
 import {Expense} from "../src/app/models/expense";
-import {CreateBrowsers} from "./e2e_utils";
+import {CreateBrowsers, honor10} from "./e2e_utils";
 import {exec, execSync} from "child_process";
+import * as stream from "stream";
 // import {badData} from "./data/bugData";
 
 // see https://stackoverflow.com/a/69199854/3482730
@@ -168,45 +169,66 @@ async function testCommonTravels(pages: puppeteer.Page[]) {
   console.log("okff");
 }
 
-async function handleLogout(page: Page) {
-  try {
-    await page.waitForSelector(".fa-user", {visible: true})
-      .then(e => e ? e.click() : null);
+async function handleLogout(pag: Page) {
+  // try {
+    // await pag.waitForSelector(".fa-user", {visible: true})
+    //   .then(e => e ? e.click() : null);
 
-    await page.waitForXPath("//a[contains(text(), 'Log out')]", {visible: true})
-      .then(e => e ? Promise.all([scrollAndClick(e, page), page.waitForNavigation({timeout: 10000})]) : null);
+    const userIcon: ElementHandle = await pag.waitForSelector(".fa-user", {visible: true});
+    const userIconColor: string = await pag.evaluate((eee) => {
+      return window.getComputedStyle(eee).color;
+    }, userIcon);
 
-    expect(page.url()).to.contain("/login");
-    await page.waitForTimeout(500);
-  } catch (e) {
-    console.log("Logout errorm should be ok");
-    // console.log(e);
-  }
+    // logged out "rgb(255, 255, 255)"
+    // logged in "rgb(0, 128, 0)"
+
+    if(userIconColor === "rgb(255, 255, 255)") {
+      console.log("Already logged out.");
+      return;
+    }
+
+    await pag.evaluate(() => {window.scrollTo(0, 0);});
+
+    await userIcon.click();
+
+    await pag.waitForXPath("//a[contains(text(), 'Log out')]", {visible: true})
+      .then(e => e ? Promise.all([e.click(), pag.waitForNavigation({timeout: 10000})]) : null);
+
+    expect(pag.url()).to.contain("/login");
+    await pag.waitForTimeout(500);
+  // } catch (e) {
+  //   console.log("Logout errorm should be ok");
+  //   // console.log(e);
+  // }
 }
 
-async function handleLogin(page: Page, userData: { pass: string; email: string; username: string }) {
+async function handleLogin(pag: Page, userData: { pass: string; email: string; username: string }) {
+  if(pag.url().endsWith("/travels")) {
+    return;
+  }
+
   try {
-    await page.waitForSelector("#username", {visible: true, timeout: 20000})
+    await pag.waitForSelector("#username", {visible: true, timeout: 20000})
       .then(e => e ? e.type(userData.username) : null);
 
-    await page.waitForSelector("#password", {visible: true})
+    await pag.waitForSelector("#password", {visible: true})
       .then(e => e ? e.type(userData.pass) : null);
   } catch (e) {
     debugger;
   }
 
-  await page.waitForTimeout(500);
+  await pag.waitForTimeout(500);
 
-  await page.waitForXPath("//button[contains(text(), 'Login')]", {visible: true})
-    .then(e => e ? Promise.all([e.click(), page.waitForNavigation({timeout: 10000})]) : null);
+  await pag.waitForXPath("//button[contains(text(), 'Login')]", {visible: true})
+    .then(e => e ? Promise.all([e.click(), pag.waitForNavigation({timeout: 10000})]) : null);
 
-  // await page.waitForNavigation();
+  // await pag.waitForNavigation();
 
-  await page.waitForTimeout(500);
+  await pag.waitForTimeout(500);
 
   const toastSel = "#toast";
-  await page.waitForSelector(toastSel, {visible: true, timeout: 10000});
-  await page.waitForSelector(toastSel, {hidden: true, timeout: 10000});
+  await pag.waitForSelector(toastSel, {visible: true, timeout: 10000});
+  await pag.waitForSelector(toastSel, {hidden: true, timeout: 10000});
 }
 
 let browser: Browser, browser1: Browser;
@@ -602,15 +624,18 @@ async function MainTestInviteShows(params: any[]) {
   const page = await browser.pages().then(e => e[0]),
     page1 = await browser1.pages().then(e => e[0]);
 
+  await page1.emulate(honor10);
+
+
   // try {
   const pages = [page, page1];
+
+  await goToAndSecurity(pages);
 
   // logout
   await Promise.all(
     pages.map((pagee: Page) => handleLogout(pagee))
   );
-
-  await goToAndSecurity(pages);
 
   await testInvite(pages);
 
@@ -621,8 +646,12 @@ async function MainTestBackBug(params: any[]) {
   const page = await browser.pages().then(e => e[0]),
     page1 = await browser1.pages().then(e => e[0]);
 
+  await page1.emulate(honor10);
+
   // try {
     const pages = [page, page1];
+
+    await goToAndSecurity(pages);
 
     // logout
     await Promise.all(
@@ -654,6 +683,8 @@ async function MainTestBackBug(params: any[]) {
 async function MainTestSQLLogin(params: any[]) {
   const page = await browser.pages().then(e => e[0]),
     page1 = await browser1.pages().then(e => e[0]);
+
+  await page1.emulate(honor10);
 
   const pages = [page, page1];
 
@@ -999,15 +1030,17 @@ async function MainTest(params: any[]) {
     const page = await browser.pages().then(e => e[0]),
       page1 = await browser1.pages().then(e => e[0]);
 
+    await page1.emulate(honor10);
+
     pages = [page, page1];
+
+    // await page.goto(url).then(() => {}, () => {});
+    await goToAndSecurity(pages);
 
     // logout
     await Promise.all(
       pages.map((pagee: Page) => handleLogout(pagee))
     );
-
-    // await page.goto(url).then(() => {}, () => {});
-    await goToAndSecurity(pages);
 
     // login
     await Promise.all(
@@ -1305,6 +1338,7 @@ async function runAll() {
     //   msg: "Test invite shows",
     //   params: []
     // },
+
     //
     // {
     //   fn: MainTest,
@@ -1324,14 +1358,14 @@ async function runAll() {
         "Dju\ndoit a\n8.56€\nSuzie\nMax\ndoit a\n8.56€\nSuzie\nElyan\ndoit a\n8.56€\nSuzie"
       ]
     },
-    // {
-    //   fn: MainTest,
-    //   msg: "E2E with all expenses",
-    //   params: [
-    //     allExpenses.slice(),
-    //     "Elyan\ndoit a\n17.30€\nDju"
-    //   ]
-    // }
+    {
+      fn: MainTest,
+      msg: "E2E with all expenses",
+      params: [
+        allExpenses.slice(),
+        "Elyan\ndoit a\n17.30€\nDju"
+      ]
+    }
   ];
 
   const allRes: {msg: string, errorMsg?: string, hasError: boolean, links?: string[]}[] = [];

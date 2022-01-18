@@ -243,4 +243,8 @@ export class ApiService {
 
     return all;
   }
+
+  resetData() {
+    this._allItems$.next(null);
+  }
 }

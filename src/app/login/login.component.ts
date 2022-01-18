@@ -38,7 +38,7 @@ export class LoginComponent implements OnInit {
   }
 
   doLogin() {
-    this.userServiceService.getUserByPass(this.username, this.password).subscribe((user: any) => {
+    this.userServiceService.getUserByPass(this.username, this.password, true).subscribe((user: any) => {
       if(user) {
         this.loginOK(user);
       }

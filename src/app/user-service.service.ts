@@ -106,7 +106,7 @@ export class UserServiceService extends BaseService {
     );
   }
 
-  getUserByPass(username: string, pass: string, isLogin = true): Observable<UserModel | null> {
+  getUserByPass(username: string, pass: string, isLogin = false): Observable<UserModel | null> {
     // return this.getUserByNameAndPass(username, pass).pipe(
     return this._apiService.httpPost(environment.api + "/login", {password: pass, username: username}, "json", "application/json", true, "body").pipe(
       map((u: User | IAPIResult) => {
@@ -130,7 +130,7 @@ export class UserServiceService extends BaseService {
         if(!u) {
           return of(u);
         }
-        return this.setConnectedUserByObj(u, true, true);
+        return this.setConnectedUserByObj(u, !isLogin, isLogin);
       }),
       tap(() => console.log("bloop"))
     );
@@ -163,7 +163,7 @@ export class UserServiceService extends BaseService {
     );
   }
 
-  setConnectedUserByObj(user: UserModel | User, reconcileWithDb = false, setSeesion = false): Observable<UserModel | null> {
+  setConnectedUserByObj(user: UserModel | User, reconcileWithDb = false, setSeesion = false): Observable<UserModel> {
     // debugger;
     // this.getUserByNameAndPass(username, password).subscribe(
     //   (u: User | null) => {
@@ -202,10 +202,16 @@ export class UserServiceService extends BaseService {
 
         return this._connectedUser.pipe(
           filter(t => {
-            return JSON.stringify(t) === JSON.stringify(uu);
+            return t !== null && JSON.stringify(t) === JSON.stringify(uu);
           }),
           first(),
-          map(u => u?.toModel() || null)
+          map((u) => {
+            const res = u?.toModel() || null;
+            // if (!res) {
+            //   this._apiService.resetData();
+            // }
+            return res as UserModel;
+          })
         )
       })
     );
@@ -407,17 +413,18 @@ export class UserServiceService extends BaseService {
     );
   }
 
-  logOut() {
+  logOut(): Observable<null> {
     return this._apiService.httpGet(environment.api + "/logout").pipe(
       take(1),
       flatMap(() => {
         BaseService.USER_ID_INIT = null;
         this._connectedUser.next(null);
-        this.setSessionData(null);
+        this.setSessionData(undefined);
         return this._connectedUser.pipe(
-          filter(r => !r),
+          filter(r => r === null),
           first()
-        );
+        ) as Observable<null>;
+        // return this.setConnected(null)
       })
     );
   }
