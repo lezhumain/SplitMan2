@@ -13,7 +13,8 @@
     "test:headless": "ng test --browsers ChromeHeadless --watch=false",
     "e2e": "npx ts-node e2e/main_e2e.ts",
     "clear-chromium": "clearChromium.sh",
-    "cp-libs": "npx cp-cli node_modules/bootstrap/dist src/assets/bootstrap && npx make-dir-cli src/assets/font-awesome && npx cp-cli node_modules/font-awesome/css/ src/assets/font-awesome/css && npx cp-cli node_modules/font-awesome/fonts src/assets/font-awesome/fonts"
+    "fix_font_awesome": "fixFontAwesome.sh",
+    "cp-libs": "npx cp-cli node_modules/bootstrap/dist src/assets/bootstrap && npx make-dir-cli src/assets/font-awesome && npx cp-cli node_modules/font-awesome/css/ src/assets/font-awesome/css && npx cp-cli node_modules/font-awesome/fonts src/assets/font-awesome/fonts $$ npm run fix_font_awesome"
   },
   "private": true,
   "dependencies": {
