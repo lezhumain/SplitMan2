@@ -190,9 +190,12 @@ async function handleLogout(pag: Page) {
     await pag.evaluate(() => {window.scrollTo(0, 0);});
 
     await userIcon.click();
+    await pag.waitForTimeout(300);
 
     await pag.waitForXPath("//a[contains(text(), 'Log out')]", {visible: true})
       .then(e => e ? Promise.all([e.click(), pag.waitForNavigation({timeout: 10000})]) : null);
+
+    await pag.waitForTimeout(1000);
 
     expect(pag.url()).to.contain("/login");
     await pag.waitForTimeout(500);
@@ -280,16 +283,38 @@ async function checkRepartition(thePage: Page, repart: string) {
   await thePage.waitForSelector("#profile-tab", {visible: true, timeout: 10000})
     .then(e => e ? scrollAndClick(e, thePage) : null);
 
-  const res = await thePage.waitForSelector("app-repartition", {visible: true})
-    .then(e => e?.getProperty("innerText"))
-    .then(e => {
-      return e?._remoteObject.value;
-    });
+  const res0 = await thePage.$("app-repartition > div > div:last-child")
 
-  // if(res !== "Elyan\ndoit a\n17.30€\nDju") {
-  // if(res !== "Dju\ndoit a\n8.56€\nSuzie\nMax\ndoit a\n8.56€\nSuzie\nElyan\ndoit a\n8.56€\nSuzie") {
-  if(res !== repart) {
-    throw "Wrong repartition!: " + res;
+  const res1: ElementHandle[] = await thePage.$$("app-repartition > div > div").then((allLines: ElementHandle[]) => {
+    return allLines.filter((l: ElementHandle, lIndex: number) => {
+      return lIndex < allLines.length - 1; // remove last
+    });
+  });
+
+  const res: string = await Promise.all(
+    res1.map(e => {
+      return e?.getProperty("innerText")
+        .then(e => {
+          return e?._remoteObject.value;
+        });
+    })
+  ).then((allText: string[]) => {
+    return allText.join(" ");
+  });
+
+
+  // const res: string = await thePage.waitForSelector ("app-repartition", {visible: true})
+  //   .then(e => e?.getProperty("innerText"))
+  //   .then(e => {
+  //     return e?._remoteObject.value;
+  //   });
+
+  const trimedRes = res.replace(/\n/g, " ").replace(/ +/g, " ").trim();
+
+
+  if(trimedRes !== repart) {
+    // throw "Wrong repartition!: " + res;
+    throw `Wrong repartition!: ${trimedRes} - ${repart}`;
   }
 
   const url = thePage.url();
@@ -1345,7 +1370,7 @@ async function runAll() {
     //   msg: "Test invite only",
     //   params: [
     //     allExpenses.slice(0, 1),
-    //     "Dju\ndoit a\n8.56€\nSuzie\nMax\ndoit a\n8.56€\nSuzie\nElyan\ndoit a\n8.56€\nSuzie",
+    //     "Dju doit a 8.56€ Suzie Max doit a 8.56€ Suzie Elyan doit a 8.56€ Suzie",
     //     true
     //   ]
     // },
@@ -1355,7 +1380,7 @@ async function runAll() {
       msg: "E2E with 1 expense",
       params: [
         allExpenses.slice(0, 1),
-        "Dju\ndoit a\n8.56€\nSuzie\nMax\ndoit a\n8.56€\nSuzie\nElyan\ndoit a\n8.56€\nSuzie"
+        "Dju doit a 8.56€ Suzie Max doit a 8.56€ Suzie Elyan doit a 8.56€ Suzie"
       ]
     },
     {
@@ -1363,7 +1388,7 @@ async function runAll() {
       msg: "E2E with all expenses",
       params: [
         allExpenses.slice(),
-        "Elyan\ndoit a\n17.30€\nDju"
+        "Elyan doit a 17.30€ Dju"
       ]
     }
   ];
