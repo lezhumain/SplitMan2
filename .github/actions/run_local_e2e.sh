@@ -15,8 +15,8 @@ unzip SplitMan2-API.zip > /dev/null
 echo "Build APP"
 npm ci
 npm run cp-libs
-#npm run fix_font_awesome
-./fixFontAwesome.sh
+npm run fix_font_awesome
+#./fixFontAwesome.sh
 
 echo "Changing API port to $API_PORT"
 sed "s/:8080/:$API_PORT/g" src/environments/environment.ts > src/environments/environment.test.ts
