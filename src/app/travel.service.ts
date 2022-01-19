@@ -57,7 +57,6 @@ export class TravelService extends BaseService{
 
     return obs.pipe(
       map(() => {
-        debugger;
         return travel;
       })
     );

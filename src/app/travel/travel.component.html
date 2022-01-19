@@ -44,7 +44,8 @@
     </div>
     <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
       <h3>Repartition</h3>
-      <app-repartition [expenses]="expenses" [connectedUser]="(connectedUser$ | async)"></app-repartition>
+      <app-repartition [expenses]="expenses" [connectedUser]="(connectedUser$ | async)"
+        [travelParticipants]="travel.participants"></app-repartition>
     </div>
     <div class="tab-pane fade" id="profile1" role="tabpanel" aria-labelledby="profile-tab1">
       <h3>Participants:</h3>

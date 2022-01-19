@@ -3,4 +3,17 @@
 <!--    {{s}}-->
     <app-repartition-card [expense]="s" [connectedUser]="connectedUser"></app-repartition-card>
   </div>
+  <br>
+  <div>
+    <h4>Spent</h4>
+    <div class="container">
+      <div class="row" *ngFor="let pers of allWhoSpent">
+        <div class="col">{{pers}}</div>
+        <ng-container *ngIf="howMuchSpentStr(pers) as spent">
+          <div class="col col-mid">{{spent}}</div>
+          <div class="col col-amount">{{spentPerDay(pers, spent).toFixed(2)}} /j</div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
 </div>

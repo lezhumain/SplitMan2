@@ -37,17 +37,20 @@ export class TravelEditComponent implements OnInit {
 
     // this.mode = travelID === null ? EditMode.Edit : EditMode.Create;
 
+    let backTarget = "/travels";
     if(travelID !== null) {
       this.travelService.getTravelByID(travelID).subscribe((t: Travel | null) => {
         if (t) {
           this.travel = t;
         }
       });
+
+      backTarget += "/" + travelID;
     }
 
     console.log("travelID: " + travelID);
 
-    this._navService.setBackValue("/travels/" + travelID);
+    this._navService.setBackValue(backTarget);
   }
 
   saveTravel() {

@@ -3,6 +3,7 @@ import {ExpenseModel} from "../models/expense-model";
 import {ExpenseParticipantModel} from "../models/expenseParticipants";
 import {UserModel} from "../models/user-model";
 import {Utils} from "../utilities/utils";
+import {Participant, ParticipantModel} from "../models/participants";
 
 export interface IRepartitionItem {
   person: string;
@@ -26,7 +27,11 @@ export class RepartitionComponent implements OnInit {
     return this._expenses.slice();
   }
 
+  allWhoSpent: string[] = [];
+
   @Input() connectedUser: UserModel | null = null;
+
+  @Input() travelParticipants?: ParticipantModel[];
 
   allDeps: IRepartitionItem[] = [];
   allStr: string[] = [];
@@ -59,10 +64,13 @@ export class RepartitionComponent implements OnInit {
 
     this.allDeps = newArr1;
     this.allStr = this.allDeps.map(e => JSON.stringify(e));
+
+    this.allWhoSpent = this.getWhoSpent();
   }
 
   private handleRepartition(current?: IRepartitionItem[]): IRepartitionItem[] {
     let gvbdf0: IRepartitionItem[] = current || [];
+
     if(gvbdf0.length === 0) {
       gvbdf0 = this._expenses.map(exp => {
         const payer = exp.payer;
@@ -213,5 +221,40 @@ export class RepartitionComponent implements OnInit {
     return res.length <= 1 || JSON.stringify(res) === JSON.stringify(current)
       ? res
       : this.handleRepartition(res);
+  }
+
+  private getWhoSpent() {
+    if(!this.expenses) {
+      return [];
+    }
+
+    return this.expenses.reduce((res: string[], item: ExpenseModel) => {
+      // if(item.payees.)
+      const thePayees = item.payees.filter(p => !!p.e4xpenseRatio && !res.includes(p.name)).map(value => value.name);
+      return res.concat(thePayees);
+    }, []);
+  }
+
+  howMuchSpentStr(pers: string): string {
+    return this.howMuchSpent(pers).toFixed(2);
+  }
+
+  howMuchSpent(pers: string): number {
+    // return this.expenses.filter(e => e.payees.some(ep => ep.name === pers)).reduce((res: number, item: ExpenseModel), 0)
+    return this.expenses.filter(e => e.payees.some(ep => ep.name === pers && !!ep.e4xpenseRatio)).reduce((res: number, item: ExpenseModel) => {
+      const target = item.payees.find(ip => ip.name === pers);
+      if(target && target.e4xpenseRatio) {
+        res += item.amount * target.e4xpenseRatio;
+      }
+      return res;
+    }, 0);
+  }
+
+  spentPerDay(pers: string, spent: string): number {
+    const targetPart = this.travelParticipants?.find(tp => tp.name === pers);
+    if(!targetPart) {
+      return 0;
+    }
+    return Number(spent) / targetPart.dayCount
   }
 }
