@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpHeaders} from "@angular/common/http";
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {BehaviorSubject, combineLatest, Observable, of} from "rxjs";
 import {BaseItem} from "./models/baseItem";
 import {catchError, debounceTime, filter, first, map, tap} from "rxjs/operators";

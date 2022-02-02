@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {TestEndpointService} from "../test-endpoint.service";
 import {ExpenseModel} from "../models/expense-model";
+import {DomSanitizer, SafeHtml, SafeUrl} from "@angular/platform-browser";
 
 class TestObj {
   name = "";
@@ -20,8 +21,10 @@ class TestObj {
 export class TestEndpointComponent implements OnInit {
   payload: TestObj = new TestObj();
   private _file?: File;
+  private _file_blob: any;
+  public _file_url?: SafeHtml;
 
-  constructor(private readonly _service: TestEndpointService) { }
+  constructor(private readonly _service: TestEndpointService, private sanitizer: DomSanitizer) { }
 
   ngOnInit(): void {
   }
@@ -42,7 +45,7 @@ export class TestEndpointComponent implements OnInit {
     // const upload$ = this.http.post("/api/thumbnail-upload", formData);
     // upload$.subscribe();
 
-    this._service.go(formData).subscribe((da: any) => {
+    this._service.go(formData).subscribe((da: Blob) => {
       // TODO check for failure
       console.log(da);
       this.downloadImg(da);
@@ -56,6 +59,10 @@ export class TestEndpointComponent implements OnInit {
       type: "image/png"
     });
 
+    this.downloadImgFromBlob(blob);
+  }
+
+  downloadImgFromBlob(blob: Blob) {
     const hiddenElement = document.createElement('a');
     // hiddenElement.href = 'data:image/png,' + encodeURI(textToSave);
     hiddenElement.href = window.URL.createObjectURL(blob);

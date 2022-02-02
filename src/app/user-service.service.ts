@@ -419,7 +419,7 @@ export class UserServiceService extends BaseService {
       flatMap(() => {
         BaseService.USER_ID_INIT = null;
         this._connectedUser.next(null);
-        this.setSessionData(undefined);
+        this.setSessionData(null);
         return this._connectedUser.pipe(
           filter(r => r === null),
           first()
