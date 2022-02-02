@@ -73,13 +73,10 @@ async function waitForMS(number: number): Promise<null> {
 
 async function scrollAndClick(elm: ElementHandle, pag: Page) {
   await pag.evaluate((selector, eee) => {
-    // console.log(eee);
-    // debugger;
-    // document.querySelector(selector).scrollIntoView();
     eee.scrollIntoView();
   }, "#addTravel", elm);
 
-  await pag.waitForTimeout(500);
+  await pag.waitForTimeout(1000); // TODO add "travel search"
   return elm.click();
 }
 
@@ -320,8 +317,8 @@ async function checkRepartition(thePage: Page, repart: string) {
   const url = thePage.url();
   await thePage.reload();
 
-  await thePage.waitForNavigation({timeout: 1000}).then(() => {}, () => {});
-  await thePage.setDefaultTimeout(1000);
+  await thePage.waitForNavigation({timeout: 5000}).then(() => {}, () => {});
+  await thePage.setDefaultTimeout(5000);
 
   const currentURL = thePage.url();
   const lastBit = currentURL.replace(host, "");
