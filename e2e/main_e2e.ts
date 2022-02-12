@@ -226,8 +226,15 @@ async function handleLogin(pag: Page, userData: { pass: string; email: string; u
 
   await pag.waitForTimeout(500);
 
-  const toastSel = "#toast";
-  await pag.waitForSelector(toastSel, {visible: true, timeout: 10000});
+  // const toastSel = ".toast_SUCCESS#toast";
+  // await pag.waitForSelector(toastSel, {visible: true, timeout: 10000});
+
+  // const toastSel = "#toast";
+  const toastSel = "#toast.toast_0";
+  const elm = await pag.waitForSelector(toastSel, {visible: true, timeout: 10000});
+  const classfg = await elm.getProperty("className").then(e => e._remoteObject.value);
+  console.log("\t" + classfg);
+
   await pag.waitForSelector(toastSel, {hidden: true, timeout: 10000});
 }
 
@@ -728,14 +735,19 @@ async function MainTestSQLLogin(params: any[]) {
   );
 }
 
-async function goToAndSecurity(pages: Page[]) {
+async function goToAndSecurity(pages: Page[], target?: string) {
+  let theURL = url;
+  if(target) {
+    theURL = theURL.replace("/login", target);
+  }
+
   await Promise.all(
-    pages.map(p => p.goto(url).then(() => {
+    pages.map(p => p.goto(theURL).then(() => {
     }, () => {
     }))
   );
 
-  if (url.startsWith("https")) { // SSL security stuff
+  if (theURL.startsWith("https")) { // SSL security stuff
     await Promise.all(
       pages.map(p => handleSecrutiyStuff(p))
     );
@@ -1035,6 +1047,80 @@ async function DoInvite(pag: Page, email: string) {
   pag.off('request', theHandler);
 }
 
+async function doRegister(pag: Page) {
+  // await pag.waitForXPath("//button[contains(text(), 'Save Travel')]", {visible: true})
+  //   .then(e => e ? Promise.all([e.click(), pag.waitForNavigation({timeout: 10000})]) : null);
+
+  await pag.waitForXPath("//button[contains(text(), 'Register')]", {visible: true})
+    .then(e => e ? Promise.all([e.click(), pag.waitForNavigation({timeout: 10000})]) : null);
+
+  const tstamp = (new Date()).getTime();
+  const name = `Dju_${tstamp}`, email = `dju_${tstamp}@lol.com`, pass ="secretPASS";
+
+  await pag.waitForSelector("#email", {visible: true, timeout: 20000})
+    .then(e => e ? e.type(email) : null);
+
+  await pag.waitForSelector("#username", {visible: true, timeout: 20000})
+    .then(e => e ? e.type(name) : null);
+
+  await pag.waitForSelector("#password", {visible: true, timeout: 20000})
+    .then(e => e ? e.type(pass) : null);
+
+  await pag.waitForSelector("#password1", {visible: true, timeout: 20000})
+    .then(e => e ? e.type(pass) : null);
+
+  await pag.waitForXPath("//button[contains(text(), 'Register')]", {visible: true})
+    .then(e => e ? Promise.all([e.click(), pag.waitForNavigation({timeout: 10000})]) : null);
+
+  expect(pag.url()).to.contain("/login");
+
+  await handleLogin(pag, {pass: pass, email: email, username: name})
+
+  debugger;
+}
+
+
+async function MainRegister(params: any[]) {
+  let isError = null;
+
+  try {
+
+    // Wait for creating the new page.
+    const page = await browser.pages().then(e => e[0]),
+      page1 = await browser1.pages().then(e => e[0]);
+
+    await page1.emulate(honor10);
+
+    const pages = [page, page1];
+
+    // await page.goto(url).then(() => {}, () => {});
+    await goToAndSecurity(pages/*, "/register"*/);
+
+    // logout
+    await Promise.all(
+      pages.map((pagee: Page) => handleLogout(pagee))
+    );
+
+    await doRegister(page);
+    debugger;
+  } catch (e) {
+    console.error(e);
+    isError = e;
+  } finally {
+    // // logout
+    // await Promise.all(
+    //   pages.map((pagee: Page) => handleLogout(pagee))
+    // );
+
+    const [page] = await getPagse();
+    stopCheckInviteCall(page);
+
+    if(isError) {
+      throw isError;
+    }
+  }
+}
+
 async function MainTest(params: any[]) {
   let isError = null;
 
@@ -1225,6 +1311,7 @@ async function MainTest(params: any[]) {
     }
 
     // TODO say who we are
+
   } catch (e) {
     console.error(e);
     isError = e;
@@ -1372,6 +1459,14 @@ async function runAll() {
     //   ]
     // },
     //
+    {
+      fn: MainRegister,
+      msg: "Register",
+      params: [
+        [],
+        ""
+      ]
+    },
     {
       fn: MainTest,
       msg: "E2E with 1 expense",
