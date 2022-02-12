@@ -86,14 +86,15 @@ export class UserServiceService extends BaseService {
     );
   }
 
-  addOrUpdateUser(model: UserModel, isUpdate = false): Observable<any> {
+  addOrUpdateUser(model: UserModel, isUpdate = false, isRegister = false): Observable<any> {
     const data: User = User.from(model);
-    const newID$ = isUpdate ? of(data.id) : this.getLastID().pipe(map(id => id + 1));
+    // const newID$ = isUpdate && !isRegister ? of(data.id) : this.getLastID().pipe(map(id => id + 1));
+    const newID$ = !isUpdate && !isRegister ? this.getLastID().pipe(map(id => id + 1)) : of(data.id);
 
     return newID$.pipe(
       flatMap((lastID: number) => {
-        data.id = lastID;
-        return this._apiService.updateItem(data);
+        data.id = isRegister ? -2 : lastID;
+        return this._apiService.updateItem(data, isRegister);
       })
     );
   }
@@ -108,7 +109,7 @@ export class UserServiceService extends BaseService {
 
   getUserByPass(username: string, pass: string, isLogin = false): Observable<UserModel | null> {
     // return this.getUserByNameAndPass(username, pass).pipe(
-    return this._apiService.httpPost(environment.api + "/login", {password: pass, username: username}, "json", "application/json", true, "body").pipe(
+    return this._apiService.httpPost(environment.api + "/login", {password: pass, username: username}, "json", "application/json", false, "body").pipe(
       map((u: User | IAPIResult) => {
         // if(u && isLogin) {
         //   this._connectedUser.next(u);

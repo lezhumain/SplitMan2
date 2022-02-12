@@ -56,8 +56,8 @@ export class ApiService {
     headers["Accept"] = accept;
 
     return this.http.post(url, data, {withCredentials: withCred, responseType: respType as "json" | undefined,
-      // headers : new HttpHeaders({ /*'Content-Type': 'application/json', */'Accept': accept }), observe: obs as "body" | undefined})
-        headers : new HttpHeaders(headers), observe: obs as "body" | undefined})
+      headers : new HttpHeaders({ 'Content-Type': 'application/json', 'Accept': accept }), observe: obs as "body" | undefined})
+        // headers : new HttpHeaders(headers), observe: obs as "body" | undefined})
       .pipe(
         map(userResponse => {
           console.log('http post result: ', userResponse);
@@ -122,8 +122,8 @@ export class ApiService {
     );
   }
 
-  saveInDb(obj: any): Observable<null> {
-    return this.httpPost(environment.api + "/saveOne", obj).pipe(
+  saveInDb(obj: any, isRegister = false): Observable<null> {
+    return this.httpPost(environment.api + (isRegister ? "/register" : "/saveOne"), obj,"json", "application/json", !isRegister).pipe(
       flatMap(() => {
         const currentAll = this._allItems$.getValue() || [];
         const currentAllStr = JSON.stringify(currentAll);
@@ -150,7 +150,7 @@ export class ApiService {
     );
   }
 
-  updateItem(model: any): Observable<any> {
+  updateItem(model: any, isRegister = false): Observable<any> {
     // TODO refactor with add
     // return this.getAll().pipe(
     //   flatMap((existing: BaseItem[]) => {
@@ -176,7 +176,7 @@ export class ApiService {
     //   })
     // );
 
-    return this.saveInDb(model);
+    return this.saveInDb(model, isRegister);
   }
 
   // addOrUpdateUser(model: UserModel): Observable<any> {

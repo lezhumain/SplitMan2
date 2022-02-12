@@ -22,13 +22,19 @@ export class RegisterComponent implements OnInit {
 
 
   constructor(private readonly userServiceService: UserServiceService,
-              private readonly router: Router) { }
+              private readonly router: Router) {
+    // const  nowDate = new Date();
+    // this.user.email = `g${nowDate.getTime()}@g.com`;
+    // this.user.username = "Dju" + (nowDate.toISOString());
+    // this.user.password = "dju";
+    // this.user.password1 = "dju";
+  }
 
   ngOnInit(): void {
   }
 
   doRegister() {
-    this.userServiceService.addOrUpdateUser(this.user).subscribe(() => {
+    this.userServiceService.addOrUpdateUser(this.user, false, true).subscribe(() => {
       console.log("User saved");
       // debugger;
       this.router.navigate(['login']);
