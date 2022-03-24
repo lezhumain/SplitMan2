@@ -30,13 +30,13 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
 #      # Runs a single command using the runners shell
-#      - name: Send greeting
-##        run: echo "Hello ${{ github.event.inputs.name }}"
+      - name: Send greeting
+        run: echo "Hello ${{ github.event.inputs.name }}"
 #        run: .github/actions/deploy.sh ${{ github.event.inputs.version }}
-      - uses: .github/actions/deploy.sh
-        with:
-          sshkey: ${{ secrets.SSH_SECRET }}
-          sshserver: ${{ secrets.SSH_SERVER }}
-          apppath: ${{ secrets.SSH_APPPATH }}
-          apipath: ${{ secrets.SSH_APIPATH }}
-          version: ${{ github.event.inputs.version }}
+#      - uses: .github/actions/deploy.sh ${{ github.event.inputs.version }}
+#        with:
+#          sshkey: ${{ secrets.SSH_SECRET }}
+#          sshserver: ${{ secrets.SSH_SERVER }}
+#          apppath: ${{ secrets.SSH_APPPATH }}
+#          apipath: ${{ secrets.SSH_APIPATH }}
+#          version: ${{ github.event.inputs.version }}
