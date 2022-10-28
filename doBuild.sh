@@ -15,5 +15,6 @@ function sedi()
 # change IP
 #sed -i.bak -e "s|PROD_IP|$1|g" src/environments/environment.prod.ts
 sedi -e "s|PROD_IP|$1|g" src/environments/environment.prod.ts
+sedi -e "s|/api|$2|g" src/environments/environment.prod.ts
 
 docker build -t splitman2 .
