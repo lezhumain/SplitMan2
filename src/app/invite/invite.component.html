@@ -1,9 +1,15 @@
 <h3>Invite someone to the trip</h3>
 <div>
   <div class="mb-3">
-    <label for="email" class="form-label">Email address</label>
-    <input type="email" class="form-control" id="email"
-           [(ngModel)]="email" placeholder="name@example.com">
+<!--    <label for="email" class="form-label">Email address</label>-->
+<!--    <input type="email" class="form-control" id="email"-->
+<!--           [(ngModel)]="email" placeholder="name@example.com">-->
+
+    <label for="payer" class="form-label">User to invite:</label>
+    <select id="payer" class="form-select" aria-label="Default select example" [(ngModel)]="email">
+      <!--      <option selected>Payer</option>-->
+      <option *ngFor="let user of users" value="{{user.username}}" >{{user.username}}</option>
+    </select>
   </div>
   <div>This will not send any email but search for the user in db.</div>
 
