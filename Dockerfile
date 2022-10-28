@@ -6,8 +6,8 @@ RUN apk add vim
 WORKDIR /app
 COPY . /app
 
-RUN cd /app && mvn npm ci
+RUN cd /app && npm i
 
-CMD ["npx", "ng", "serve", "--host", "0.0.0.0"]
+CMD ["npx", "ng", "serve", "--host", "0.0.0.0", "--prod"]
 
 EXPOSE 4200/tcp
