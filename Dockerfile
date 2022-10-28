@@ -8,6 +8,6 @@ COPY . /app
 
 RUN cd /app && npm i
 
-CMD ["npx", "ng", "serve", "--host", "0.0.0.0", "--prod"]
+CMD ["npx", "ng", "serve", "--host", "0.0.0.0", "--configuration", "production"]
 
 EXPOSE 4200/tcp
