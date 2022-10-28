@@ -4,10 +4,10 @@ function sedi()
 {
   if [ -z "$(uname -a | grep -i darwin)" ]; then
     #linux
-    sed -i .bak $@
+    sed -i .bak $1 $2 $3
   else
     # macos
-    sed -i".bak" $@
+    sed -i".bak" $1 $2 $3
   fi
 }
 
