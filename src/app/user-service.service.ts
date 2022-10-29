@@ -78,7 +78,7 @@ export class UserServiceService extends BaseService {
     return userID;
   }
 
-  private getUsers(force = false): Observable<User[]> {
+  public getUsers(force = false): Observable<User[]> {
     return this._apiService.getAllByType<User>("user", force).pipe(
       map((o: User[]) => {
         return o.map((oo: User) => User.fromJson(oo));

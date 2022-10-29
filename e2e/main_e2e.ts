@@ -337,8 +337,8 @@ async function checkRepartition(thePage: Page, repart: string) {
   }
 }
 
-// const host = `https://86.18.16.122:8083`; // TODO cmd line arg to switch
-const host = `http://127.0.0.1:4200`;
+const host = `https://86.18.16.122:8083`; // TODO cmd line arg to switch
+// const host = `http://127.0.0.1:4200`;
 const url = `${host}/login`;
 
 
