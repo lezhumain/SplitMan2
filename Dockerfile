@@ -6,7 +6,7 @@ RUN apk add vim
 WORKDIR /app
 COPY . /app
 
-RUN cd /app && npm i
+RUN cd /app && npm i && npm run cp-libs
 
 CMD ["npx", "ng", "serve", "--host", "0.0.0.0", "--configuration", "production"]
 
