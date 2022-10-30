@@ -8,6 +8,6 @@ COPY . /app
 
 RUN cd /app && npm i && npm run cp-libs
 
-CMD ["npx", "ng", "serve", "--host", "0.0.0.0", "--configuration", "production"]
+CMD ["npx", "ng", "serve", "--host", "0.0.0.0", "--configuration", "production", "--live-reload", "false", "--watch", "false"]
 
 EXPOSE 4200/tcp
