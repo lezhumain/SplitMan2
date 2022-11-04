@@ -24,12 +24,18 @@ jobs:
           CURRENT_VERSION="$(cat package.json | grep "puppeteer" | grep -Eo "\^[^\"]+" | sed 's|\^||')"
           echo "$LAST_VERSION"
           echo "$CURRENT_VERSION"
-          export VAR_TEST="exported"
+          #export VAR_TEST="exported"
+
+          TARGET_STATUS="fail"
+          if [ "$LAST_VERSION" == "v$CURRENT_VERSION" ]; then
+            TARGET_STATUS="pass"
+          fi
+          echo "TARGET_STATUS=$TARGET_STATUS" >> $GITHUB_ENV
 
       - uses: emibcn/badge-action@v1.2.1
         with:
           label: 'Latest Puppeteer_${VAR_TEST}'
-          status: '53.4%'
+          status: "${{ env.TARGET_STATUS }}"
           color: 'blue,555,daf'
           path: '.github/badges/coverage.svg'
 
