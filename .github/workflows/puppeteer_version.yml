@@ -24,11 +24,12 @@ jobs:
           CURRENT_VERSION="$(cat package.json | grep "puppeteer" | grep -Eo "\^[^\"]+" | sed 's|\^||')"
           echo "$LAST_VERSION"
           echo "$CURRENT_VERSION"
+          export VAR_TEST="exported"
 
       - uses: emibcn/badge-action@v1.2.1
         with:
-          label: 'Latest Puppeteer'
+          label: 'Latest Puppeteer_${VAR_TEST}'
           status: '53.4%'
           color: 'blue,555,daf'
-          path: '.github/badges/coverage.svg'
+          path: 'https://github.com/emibcn/badge-action/workflows/.github/workflows/test.yml/badge.svg'
 
