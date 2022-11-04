@@ -27,15 +27,15 @@ jobs:
           #export VAR_TEST="exported"
 
           TARGET_STATUS="fail"
-          if [ "$LAST_VERSION" == "v$CURRENT_VERSION" ]; then
-            TARGET_STATUS="pass"
+          if [ "$LAST_VERSION" != "v$CURRENT_VERSION" ]; then
+            exit 1
           fi
-          echo "TARGET_STATUS=$TARGET_STATUS" >> $GITHUB_ENV
+          #echo "TARGET_STATUS=$TARGET_STATUS" >> $GITHUB_ENV
 
-      - uses: emibcn/badge-action@v1.2.1
-        with:
-          label: 'Latest Puppeteer_${VAR_TEST}'
-          status: "${{ env.TARGET_STATUS }}"
-          color: 'blue,555,daf'
-          path: '.github/badges/coverage.svg'
+#      - uses: emibcn/badge-action@v1.2.1
+#        with:
+#          label: 'Latest Puppeteer_${VAR_TEST}'
+#          status: "${{ env.TARGET_STATUS }}"
+#          color: 'blue,555,daf'
+#          path: '.github/badges/coverage.svg'
 
