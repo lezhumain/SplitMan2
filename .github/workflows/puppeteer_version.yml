@@ -31,5 +31,5 @@ jobs:
           label: 'Latest Puppeteer_${VAR_TEST}'
           status: '53.4%'
           color: 'blue,555,daf'
-          path: 'https://github.com/emibcn/badge-action/workflows/.github/workflows/test.yml/badge.svg'
+          path: '.github/badges/coverage.svg'
 
