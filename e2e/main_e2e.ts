@@ -89,14 +89,25 @@ async function clearAndType(e: ElementHandle, s: string) {
   // return e.clea
 }
 
-async function handleSecrutiyStuff(page: Page) {
-  const hasError = await page.waitForSelector("#details-button", {visible: true})
+async function handleSecrutiyStuff(page: Page, doThrow = false) {
+  await page.waitForTimeout(500);
+  const hasErrorXpath = "#details-button";
+  const hasError = await page.waitForSelector(hasErrorXpath, {visible: true})
     .then((e: ElementHandle) => e, () => null);
 
   if (hasError) {
     await hasError.click();
-    await page.waitForSelector("#proceed-link", {visible: true})
-      .then((e: ElementHandle) => e ? e.click() : null);
+    // await page.waitForSelector(hasErrorXpath, {hidden: true})
+
+    const proceedXpath = "#proceed-link";
+    const e = await page.waitForSelector(proceedXpath, {visible: true});
+    await page.waitForTimeout(200);
+    await e.click();
+    // await page.waitForSelector(proceedXpath, {hidden: true});
+
+    // await page.waitForFunction((sel: string) => {
+    //   return document.querySelector(sel) === null;
+    // }, {timeout: 5000}, proceedXpath);
   }
 }
 
@@ -237,7 +248,9 @@ async function handleLogin(pag: Page, userData: { pass: string; email: string; u
   const classfg = await elm.getProperty("className").then((e: JSHandle) => e.remoteObject().value);
   console.log("\t" + classfg);
 
+  console.log("a1")
   await pag.waitForSelector(toastSel, {hidden: true, timeout: 10000});
+  console.log("a2")
 }
 
 let browser: Browser, browser1: Browser;
@@ -887,8 +900,9 @@ async function AddPeople(pag: Page) {
       // .then((e: ElementHandle) => e ? e.click() : null);
       .then((e: ElementHandle) => e ? Promise.all([e.click(), pag.waitForNavigation({timeout: 10000})]) : null);
 
-
+    console.log("a11")
     await pag.waitForXPath(saveBtnXPath, {hidden: true});
+    console.log("a22")
 
     // await pag.waitForResponse("saveOne");
     // await pag.waitForTimeout(200);
