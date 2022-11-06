@@ -23,15 +23,22 @@ steps:
       secureFile: 'example.key'
 
   - script: |
+      echo "$(whoami)"
       sudo chown $(whoami):root $(sslCert.secureFilePath)
       sudo chmod 600 $(sslCert.secureFilePath)
       sudo chown $(whoami):root $(sslKey.secureFilePath)
       sudo chmod 600 $(sslKey.secureFilePath)
-      mkdir -p ~/.ssl
-      sudo ln -s $(sslCert.secureFilePath) ~/.ssl/example.crt
-      sudo ln -s $(sslKey.secureFilePath) ~/.ssl/example.key
-      echo "files"
-      ls -al ~/.ssl
+
+      TARGET_DIR="/home/$(whoami)/.ssl"
+      mkdir -p "$TARGET_DIR"
+      sudo ln -s $(sslCert.secureFilePath) "$TARGET_DIR/example.crt"
+      sudo ln -s $(sslKey.secureFilePath) "$TARGET_DIR/example.key"
+      echo "files:"
+      ls -al "$$TARGET_DIR"
+      sudo chown $(whoami):root "$TARGET_DIR/*"
+      sudo chmod 600 $(whoami):root "$TARGET_DIR/*"
+      ls -al "$$TARGET_DIR"
+
     displayName: 'Prepare SSL key and cert'
 
   - script: |
