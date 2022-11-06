@@ -85,7 +85,7 @@ fi
 #  exit 1
 #fi
 
-npm ci
+npm i
 
 echo "Waiting for web server"
 bash .github/actions/waitForServer.sh "127.0.0.1:4200"
