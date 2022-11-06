@@ -72,12 +72,16 @@ steps:
       exit 1
     fi
 
+    sleep 40
     WEB_UP="$(curl -s "$HOST_IP:4200/login")"
-    while [ -z "$WEB_UP" ]
-    do
-      sleep 2
-      WEB_UP="$(curl -s "$HOST_IP:4200/login")"
-    done
+    #while [ -z "$WEB_UP" ]
+    #do
+    #  sleep 2
+    #  WEB_UP="$(curl -s "$HOST_IP:4200/login")"
+    #done
+    if [ -z "$WEB_UP" ]; then
+      exit 1
+    fi
 
     npm ci
     npm run e2e -- --headless=true
