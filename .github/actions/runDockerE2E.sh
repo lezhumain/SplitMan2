@@ -49,7 +49,7 @@ pwd
 
 export CERT_PATH="$HOME/.ssl/example"
 echo "11"
-sudo ls -d "~/.ssl"
+sudo ls -d "$HOME/.ssl"
 sudo ls -d "$CERT_PATH".*
 echo "22"
 ls -al "/home/$(whoami)/.ssl"
