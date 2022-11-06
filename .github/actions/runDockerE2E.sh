@@ -44,15 +44,15 @@ function update_dir()
 }
 
 # bash doBuild.sh "https://$HOST_IP:8081" "/api" # web
+ls -al
+pwd
 
 export CERT_PATH="~/.ssl/example"
 echo "11"
+sudo ls -d "~/.ssl"
 sudo ls -d "$CERT_PATH".*
 echo "22"
 ls -al "/home/$(whoami)/.ssl"
-
-ls -al
-pwd
 
 update_dir ".." "SplitMan2-nginx" "main"
 bash doBuild.sh "http://$HOST_IP" # nginx

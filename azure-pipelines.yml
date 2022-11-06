@@ -35,7 +35,7 @@ steps:
       sudo ln -s $(sslCert.secureFilePath) "$TARGET_DIR/example.crt"
       sudo ln -s $(sslKey.secureFilePath) "$TARGET_DIR/example.key"
       echo "files:"
-      #ls -al "$TARGET_DIR"
+      ls -al "$TARGET_DIR"
       #sudo chown "$(whoami)" "$TARGET_DIR"/*
       #sudo chmod 600 "$TARGET_DIR"/*
       #ls -al "$TARGET_DIR"
