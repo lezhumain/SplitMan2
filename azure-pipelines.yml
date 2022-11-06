@@ -55,25 +55,30 @@ steps:
             fi
     }
 
-
-    update_dir ".." "SplitMan2-nginx" "main"
-    bash doBuild.sh "http://$HOST_IP" # nginx
-
-    update_dir ".." "SplitMan2-API"
-    bash doBuild.sh "https://$HOST_IP:8081" # api
-
-    update_dir ".." "SplitMan2"
     bash doBuild.sh "https://$HOST_IP:8081" "/api" # web
 
-    docker-compose up -d
+    update_dir ".." "SplitMan2-nginx" "main"
+    #bash doBuild.sh "http://$HOST_IP" # nginx
 
-    WEB_UP="$(curl -s "$HOST_IP:4200/login")"
-    while [ -z "$WEB_UP" ]
-    do
-      sleep 2
-      WEB_UP="$(curl -s "$HOST_IP:4200/login")"
-    done
+    update_dir ".." "SplitMan2-API"
+    #bash doBuild.sh "https://$HOST_IP:8081" # api
 
-    npm ci
-    npm run e2e -- --headless=true
+    #update_dir ".." "SplitMan2"
+    #bash doBuild.sh "https://$HOST_IP:8081" "/api" # web
+
+    cd "$CURRENT"
+    ls
+    pwd
+
+    #docker-compose up -d
+
+    #WEB_UP="$(curl -s "$HOST_IP:4200/login")"
+    #while [ -z "$WEB_UP" ]
+    #do
+    #  sleep 2
+    #  WEB_UP="$(curl -s "$HOST_IP:4200/login")"
+    #done
+
+    #npm ci
+    #npm run e2e -- --headless=true
   displayName: 'Run E2E'
