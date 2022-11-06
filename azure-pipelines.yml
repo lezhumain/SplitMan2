@@ -65,8 +65,8 @@ steps:
     update_dir ".." "SplitMan2"
     bash doBuild.sh "https://$HOST_IP:8081" "/api" # web
 
-    #docker-compose up -d
-    #sleep 40
+    docker-compose up -d
+    sleep 40
 
-    #npm run e2e -- --headless=true
+    npm run e2e -- --headless=true
   displayName: 'Run a multi-line script'
