@@ -1,0 +1,21 @@
+version: "3.3"
+services:
+  web:
+    image: "splitman2"
+    ports:
+      - "4200:4200"
+  api:
+    image: "splitman2api"
+    ports:
+      - "8080:8080"
+  nginx:
+    image: "splitman2nginx"
+    ports:
+      - "8081:443"
+  mongodb:
+    image: "mongo"
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=AzureDiamond
+      - MONGO_INITDB_ROOT_PASSWORD=hunter2
