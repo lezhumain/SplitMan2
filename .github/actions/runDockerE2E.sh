@@ -47,7 +47,7 @@ function update_dir()
 ls -al
 pwd
 
-export CERT_PATH="~/.ssl/example"
+export CERT_PATH="$HOME/.ssl/example"
 echo "11"
 sudo ls -d "~/.ssl"
 sudo ls -d "$CERT_PATH".*
