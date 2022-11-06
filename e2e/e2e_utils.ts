@@ -17,7 +17,7 @@ export const honor10 = {
 };
 
 function getHeadlessParam(): boolean {
-  const regex = /-headless[= ](\w+)/;
+  const regex = /-+headless[= ](\w+)/;
   const param = process.argv.find(a => regex.test(a));
   const target = param?.replace(regex, "$1");
 
