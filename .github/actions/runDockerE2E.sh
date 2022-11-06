@@ -58,7 +58,7 @@ ls -al "/home/$(whoami)/.ssl"
 update_dir ".." "SplitMan2-nginx" "main"
 bash doBuild.sh "http://$HOST_IP" # nginx
 
-exit 0
+#exit 0
 
 update_dir ".." "SplitMan2-API"
 bash doBuild.sh "https://$HOST_IP:8081" # api
