@@ -30,6 +30,8 @@ steps:
       mkdir -p ~/.ssl
       sudo ln -s $(sslCert.secureFilePath) ~/.ssl/example.crt
       sudo ln -s $(sslKey.secureFilePath) ~/.ssl/example.key
+      echo "files"
+      ls -al ~/.ssl
     displayName: 'Prepare SSL key and cert'
 
   - script: |
