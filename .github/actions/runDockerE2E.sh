@@ -26,13 +26,14 @@ function update_dir()
         DBRANCH="$3"
     fi
 
-    cd "$DPATH"
+    # cd "$DPATH"
+    cd "$1"
     if [ -z "$USE_HTTPS" ]; then
+        cd "$2"
         git stash
         git checkout master
         git pull
     else
-        cd ..
         rm -rf "$DNAME" || true
         curl "https://codeload.github.com/lezhumain/$DNAME/zip/refs/heads/$DBRANCH" -o master.zip
         ls
