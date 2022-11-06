@@ -56,11 +56,11 @@ steps:
     }
 
 
-    #update_dir ".." "SplitMan2-nginx" "main"
-    #bash doBuild.sh "http://$HOST_IP" # nginx
+    update_dir ".." "SplitMan2-nginx" "main"
+    bash doBuild.sh "http://$HOST_IP" # nginx
 
-    #update_dir ".." "SplitMan2-API"
-    #bash doBuild.sh "https://$HOST_IP:8081" # api
+    update_dir ".." "SplitMan2-API"
+    bash doBuild.sh "https://$HOST_IP:8081" # api
 
     update_dir ".." "SplitMan2"
     bash doBuild.sh "https://$HOST_IP:8081" "/api" # web
