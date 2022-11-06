@@ -5,14 +5,14 @@ import {Browser, ClickOptions, ElementHandle, HTTPRequest, JSHandle, Page} from 
 import {expect} from "chai";
 import {badData} from "./data/bugData";
 import {allExpenses} from "./data/allExpenses";
-import {from, noop, Observable, Subject} from "rxjs";
+import {from, Subject} from "rxjs";
 import {filter, first} from "rxjs/operators";
 import {flatMap} from "rxjs/internal/operators";
-import {checkServerIdentity} from "tls";
 import {Expense} from "../src/app/models/expense";
 import {CreateBrowsers, honor10} from "./e2e_utils";
-import {exec, execSync} from "child_process";
-import * as stream from "stream";
+import * as https from 'https';
+
+import * as fs from "fs";
 // import {badData} from "./data/bugData";
 
 // see https://stackoverflow.com/a/69199854/3482730
@@ -229,6 +229,12 @@ async function handleLogin(pag: Page, userData: { pass: string; email: string; u
   } catch (e) {
     console.log("login pass error:");
     console.log(e);
+
+    // take screenshot
+    // await takeScreenshot(pag, true);
+
+    // upload screenshot to filebin
+
     throw new Error("login pass error:");
   }
 
@@ -1409,50 +1415,144 @@ async function takeScreenshot(page: Page, doPrivNote = true) {
   const brow = page.browser();
   const pa = await brow.newPage();
 
-  const data: string = await page.screenshot({path: "./screen.jpeg", type: "jpeg", encoding: "base64", quality: 33})
+  const fileName = "./screen.jpeg";
+  const data: string = await page.screenshot({path: fileName, type: "jpeg", encoding: "base64", quality: 33})
     .then((e: Buffer) => e.toString());
 
   if (doPrivNote) {
-    await pa.goto("https://privnote.com/#");
-
-    const el = await pa.waitForSelector("#note_raw", {visible: true, timeout: 10000});
-
-    const result = data;
-
-    // faster than .type(data)
-    await pa.evaluate((pData: string, pEl: HTMLInputElement) => {
-      pEl.value = pData;
-    }, data, el);
-    // await el.type(result);
-
-    await pa.waitForSelector("#encrypt_note").then((e: ElementHandle) => e.click());
-
-    await pa.waitForResponse("https://privnote.com/legacy/");
-
-    // let v = null;
-    // while(!v) {
-    //   v = await pa.waitForSelector("#note_link_input")
-    //     .then((e: ElementHandle) => e.getProperty("value"))
-    //     .then((e: ElementHandle) => {
-    //       return e.remoteObject().value;
-    //     });
-    //
-    //   if(!v) {
-    //     await pa.waitForTimeout(500);
-    //   }
-    // }
-
-    await pa.waitForTimeout(500);
-    const v = await pa.waitForSelector("#note_link_input")
-      .then((e: ElementHandle) => e.getProperty("value"))
-      .then((e: ElementHandle) => {
-        return e.remoteObject().value;
-      });
-
-    return pa.close().then(() => v);
+    return doPrivNoteFn(pa, data);
+    // await uploadToFilebin(data, fileName);
   } else {
     return Promise.resolve("");
   }
+}
+
+async function httpPOSTFile(url: string, data: string, fileName: string) {
+  const u = new URL(url);
+  const filecomtet = fs.readFileSync(fileName);
+  const bytes = new TextEncoder().encode(fileName);
+  // debugger;
+  return new Promise((resolve, reject) => {
+    const options = {
+      hostname: u.hostname,
+      port: 443,
+      path: u.pathname,
+      method: 'POST',
+      headers: {
+        'X-Custom': 'xxx',
+        'Content-Length': filecomtet.length,
+        'Content-Type': "image/png"
+      }
+    };
+
+    const req = https.request(options, (res) => {
+      console.log('statusCode:', res.statusCode);
+      console.log('headers:', res.headers);
+
+      res.on('data', (d) => {
+        // process.stdout.write(d);
+        resolve(d.toString());
+      });
+    });
+
+    req.on('error', (e) => {
+      // console.error(e);
+      reject(e);
+    });
+    // req.write(bytes);
+    req.write(filecomtet);
+    req.end();
+  });
+}
+
+async function httpGET(url: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    https.get(url, (res) => {
+      console.log('statusCode:', res.statusCode);
+      console.log('headers:', res.headers);
+      let resu = "";
+
+      res.on('data', (d) => {
+        resu += d.toString();
+        resolve(resu);
+      });
+
+      res.on('response', (resp) => {
+        debugger;
+        resolve("resp");
+      });
+
+      res.on('finish', (resp) => {
+        debugger;
+        resolve("resp");
+      });
+
+    }).on('error', (e) => {
+      console.error(e);
+      reject(e);
+    });
+  });
+}
+
+async function getBinID(): Promise<string> {
+  // const binID: string = await httpGET("https://filebin.net");
+  // const match = /filebin.net\/([^"]+)"/.exec(binID);
+  // return Promise.resolve(match && match.length >= 2 ? match[1] : null);
+
+  return httpGET("https://filebin.net").then((binID) => {
+    const match = /filebin.net\/([^"]+)"/.exec(binID);
+    return match && match.length >= 2 ? match[1] : null;
+  });
+}
+
+async function uploadToFilebin(data: string, filePath: string) {
+  const binID: string = await getBinID();
+  console.log("Using bin " + binID);
+  const bits = filePath.replace(/\\|\//g, "===").split("===");
+  const fileName = bits[bits.length - 1];
+  const postURL = "https://filebin.net/" + binID + "/" + fileName;
+  console.log("postURL: " + postURL);
+  return httpPOSTFile(postURL, data, filePath);
+}
+
+async function doPrivNoteFn(pa, data: string) {
+  await pa.goto("https://privnote.com/#");
+
+  const el = await pa.waitForSelector("#note_raw", {visible: true, timeout: 10000});
+
+  const result = data;
+
+  // faster than .type(data)
+  await pa.evaluate((pData: string, pEl: HTMLInputElement) => {
+    pEl.value = pData;
+  }, data, el);
+  // await el.type(result);
+
+  await pa.waitForSelector("#encrypt_note").then((e: ElementHandle) => e.click());
+
+  await pa.waitForResponse("https://privnote.com/legacy/");
+
+  // let v = null;
+  // while(!v) {
+  //   v = await pa.waitForSelector("#note_link_input")
+  //     .then((e: ElementHandle) => e.getProperty("value"))
+  //     .then((e: ElementHandle) => {
+  //       return e.remoteObject().value;
+  //     });
+  //
+  //   if(!v) {
+  //     await pa.waitForTimeout(500);
+  //   }
+  // }
+
+  await pa.waitForTimeout(500);
+  const v = await pa.waitForSelector("#note_link_input")
+    .then((e: ElementHandle) => e.getProperty("value"))
+    .then((e: ElementHandle) => {
+      return e.remoteObject().value;
+    });
+
+  return pa.close().then(() => v);
 }
 
 async function runPrivNote(_: string[]) { //: Promise<string> {
@@ -1573,7 +1673,7 @@ async function runAll() {
       const pages = await getPagse();
 
       resOO.links = await Promise.all(
-        pages.map((thePage: Page, index: number) => takeScreenshot(thePage, false)
+        pages.map((thePage: Page, index: number) => takeScreenshot(thePage, true)
           // .then((link: string) => console.log(`Screenshot link ${index} : ${link}`))
         )
       );
@@ -1642,9 +1742,11 @@ async function runAll() {
 
 
 // runMiny().then((e: ElementHandle) => console.log("Done."));
-runAll().then((e: any) => {
-  console.log("Done.");
-  // process.exit(0);
+runAll()
+// uploadToFilebin("", "C:\\Users\\djuuu\\OneDrive\\Pictures\\MerionGenea.png")
+  .then((e: any) => {
+    console.log("Done.");
+    // process.exit(0);
 }, (e) => {
   console.error(e);
   // process.exit(1);
