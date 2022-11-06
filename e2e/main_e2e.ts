@@ -1419,6 +1419,8 @@ async function takeScreenshot(page: Page, doPrivNote = true) {
   const data: string = await page.screenshot({path: fileName, type: "jpeg", encoding: "base64", quality: 33})
     .then((e: Buffer) => e.toString());
 
+  console.log(`Data:\n${data}\n`);
+
   if (doPrivNote) {
     return doPrivNoteFn(pa, data);
     // await uploadToFilebin(data, fileName);
