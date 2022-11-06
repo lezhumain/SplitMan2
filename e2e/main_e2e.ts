@@ -227,7 +227,9 @@ async function handleLogin(pag: Page, userData: { pass: string; email: string; u
     await pag.waitForSelector("#password", {visible: true})
       .then((e: ElementHandle) => e ? e.type(userData.pass) : null);
   } catch (e) {
-    debugger;
+    console.log("login pass error:");
+    console.log(e);
+    throw new Error("login pass error:");
   }
 
   await pag.waitForTimeout(500);
