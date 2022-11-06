@@ -69,10 +69,10 @@ cd "$CURRENT"
 
 docker images
 
-#docker-compose up -d
-#if [ "$?" != "0" ]; then
-#  exit 1
-#fi
+docker-compose up -d
+if [ "$?" != "0" ]; then
+  exit 1
+fi
 
 #sleep 40
 #WEB_UP="$(curl -s "$HOST_IP:4200/login")"
@@ -85,5 +85,10 @@ docker images
 #  exit 1
 #fi
 
-#npm ci
-#npm run e2e -- --headless=true
+npm ci
+
+echo "Waiting for web server"
+bash .github/actions/waitForServer.sh "127.0.0.1:4200"
+
+echo "Running E2E tests"
+npm run e2e -- --headless=true
