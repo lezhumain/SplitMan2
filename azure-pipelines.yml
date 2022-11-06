@@ -69,4 +69,4 @@ steps:
     sleep 40
 
     npm run e2e -- --headless=true
-  displayName: 'Run a multi-line script'
+  displayName: 'Run E2E
