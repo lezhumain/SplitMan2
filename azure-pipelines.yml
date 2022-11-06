@@ -1,0 +1,79 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
+
+- script: |
+    echo Add other tasks to build, test, and deploy your project.
+    echo See https://aka.ms/yaml
+    CURRENT="$(pwd)"
+    cd ..
+    git clone git@github.com:lezhumain/SplitMan2-API.git
+    git clone git@github.com:lezhumain/SplitMan2-nginx.git
+    #cd "$CURRENT"
+    HOST_IP="127.0.0.1"
+
+    # buid all
+    function update_dir()
+    {
+            local DPATH="$1/$2"
+            local DNAME="$2"
+            local DBRANCH="master"
+            if [ -n "$3" ]; then
+                    DBRANCH="$3"
+            fi
+
+            cd "$DPATH"
+            if [ -z "$USE_HTTPS" ]; then
+                    git stash
+                    git checkout master
+                    git pull
+            else
+                    cd ..
+                    rm -rf "$DNAME" || true
+                    curl "https://codeload.github.com/lezhumain/$DNAME/zip/refs/heads/$DBRANCH" -o master.zip
+                    ls
+                    unzip master.zip
+                    ls
+                    mv "$DNAME-$DBRANCH" "$DNAME"
+                    cd "$DNAME"
+            fi
+    }
+
+
+    update_dir ".." "SplitMan2-nginx" "main"
+    cd ../SplitMan2-nginx
+    git stash
+    git checkout master
+    git pull
+    bash doBuild.sh "http://$HOST_IP" # nginx
+
+    update_dir ".." "SplitMan2-API"
+    cd ../SplitMan2-API
+    git stash
+    git checkout master
+    git pull
+    bash doBuild.sh "https://$HOST_IP:8081" # api
+
+    update_dir ".." "SplitMan2"
+    cd ../SplitMan2
+    git stash
+    git checkout master
+    git pull
+    bash doBuild.sh "https://$HOST_IP:8081" "/api" # web
+
+    docker-compose up -d
+    sleep 40
+
+    npm run e2e -- --headless=true
+  displayName: 'Run a multi-line script'
