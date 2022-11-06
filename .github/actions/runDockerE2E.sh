@@ -90,5 +90,17 @@ npm i
 echo "Waiting for web server"
 bash .github/actions/waitForServer.sh "127.0.0.1:4200"
 
+ed e2e/main_e2e.ts << EOF
+/const host
+c
+const host = "https://127.0.0.1:8081";
+.
+wq
+EOF
+
+echo "==========="
+cat e2e/main_e2e.ts
+echo "==========="
+
 echo "Running E2E tests"
 npm run e2e -- --headless=true
