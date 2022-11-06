@@ -14,6 +14,10 @@ steps:
   displayName: 'Run a one-line script'
 
 - script: |
+    node -v
+    npm -v
+    exit 1
+
     echo Add other tasks to build, test, and deploy your project.
     echo See https://aka.ms/yaml
     CURRENT="$(pwd)"
