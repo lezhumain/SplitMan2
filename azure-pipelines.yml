@@ -21,7 +21,7 @@ steps:
     echo Add other tasks to build, test, and deploy your project.
     echo See https://aka.ms/yaml
     CURRENT="$(pwd)"
-    
+
     #git clone git@github.com:lezhumain/SplitMan2-API.git
     #git clone git@github.com:lezhumain/SplitMan2-nginx.git
     #cd "$CURRENT"
@@ -66,7 +66,14 @@ steps:
     bash doBuild.sh "https://$HOST_IP:8081" "/api" # web
 
     docker-compose up -d
-    sleep 40
 
+    WEB_UP="$(curl -s "$HOST_IP:4200/login")"
+    while [ -z "$WEB_UP" ]
+    do
+      sleep 2
+      WEB_UP="$(curl -s "$HOST_IP:4200/login")"
+    done
+
+    npm ci
     npm run e2e -- --headless=true
   displayName: 'Run E2E'
