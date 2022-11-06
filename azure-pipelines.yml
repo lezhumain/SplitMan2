@@ -10,8 +10,27 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+  - task: DownloadSecureFile@1
+    name: sslCert
+    displayName: 'Download cert'
+    inputs:
+      secureFile: 'example.crt'
+
+  - task: DownloadSecureFile@1
+    name: sslKey
+    displayName: 'Download key'
+    inputs:
+      secureFile: 'example.key'
+
+  - script: |
+      sudo chown $(whoami):root $(sslCert.secureFilePath)
+      sudo chmod 600 $(sslCert.secureFilePath)
+      sudo chown $(whoami):root $(sslKey.secureFilePath)
+      sudo chmod 600 $(sslKey.secureFilePath)
+      mkdir -p ~/.ssl
+      sudo ln -s $(sslCert.secureFilePath) ~/.ssl/example.crt
+      sudo ln -s $(sslKey.secureFilePath) ~/.ssl/example.key
+    displayName: 'Prepare SSL key and cert'
 
 - script: |
     node -v
@@ -57,6 +76,7 @@ steps:
 
     bash doBuild.sh "https://$HOST_IP:8081" "/api" # web
 
+    export CERT_PATH="~/.ssl/example"
     update_dir ".." "SplitMan2-nginx" "main"
     bash doBuild.sh "http://$HOST_IP" # nginx
 
