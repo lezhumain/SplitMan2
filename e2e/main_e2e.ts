@@ -241,18 +241,20 @@ async function handleLogin(pag: Page, userData: { pass: string; email: string; u
   await pag.waitForTimeout(500);
 
   await pag.waitForXPath("//button[contains(text(), 'Login')]", {visible: true})
-    .then((e: ElementHandle) => e ? Promise.all([e.click(), pag.waitForNavigation({timeout: 10000})]) : null);
+    .then((e: ElementHandle) => {
+      return e ? Promise.all([e.click(), pag.waitForNavigation({timeout: 40000, waitUntil: "networkidle2"})]) : null
+    });
 
   // await pag.waitForNavigation();
 
-  await pag.waitForTimeout(500);
+  // await pag.waitForTimeout(500);
 
   // const toastSel = ".toast_SUCCESS#toast";
   // await pag.waitForSelector(toastSel, {visible: true, timeout: 10000});
 
   // const toastSel = "#toast";
   const toastSel = "#toast.toast_0";
-  const elm = await pag.waitForSelector(toastSel, {visible: true, timeout: 10000});
+  const elm = await pag.waitForSelector(toastSel, {visible: true, timeout: 10010});
   const classfg = await elm.getProperty("className").then((e: JSHandle) => e.remoteObject().value);
   console.log("\t" + classfg);
 
@@ -361,7 +363,8 @@ async function checkRepartition(thePage: Page, repart: string) {
 }
 
 // TODO cmd line arg to switch
-const host = "https://192.168.0.19:8081";
+const host = "http://127.0.0.1:4200";
+// const host = "https://192.168.0.19:8081";
 
 const url = `${host}/login`;
 
