@@ -33,10 +33,12 @@ export async function CreateBrowsers(): Promise<[Browser, Browser]> {
     headless: isHeadless,
     defaultViewport: null,
     args: [
-      '--disable-web-security',
       '--start-maximized',
       '--no-sandbox', // discouraged, see https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#setting-up-chrome-linux-sandbox
-      '--window-size=1920,978'
+      '--window-size=1920,978',
+      '--disable-web-security',
+      '--disable-features=IsolateOrigins',
+      '--disable-site-isolation-trials'
     ],
     // executablePath: "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
     // executablePath: "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
