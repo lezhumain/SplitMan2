@@ -176,6 +176,7 @@ export class ApiService {
     //   })
     // );
 
+    model["updating"] = true;
     return this.saveInDb(model, isRegister);
   }
 
