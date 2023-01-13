@@ -1,9 +1,11 @@
 import {Expense} from "./expense";
-import {ExpenseParticipant, ExpenseParticipantModel} from "./expenseParticipants";
-import {ParticipantModel} from "./participants";
+import {ExpenseParticipantModel} from "./expenseParticipants";
 import {Utils} from "../utilities/utils";
+import {IMongoID} from "./imongoid";
 
 export class ExpenseModel {
+  _id?: String | IMongoID;
+  _rev?: String;
   id: number = -1;
   tripId: number = -1;
   name: string = "";
@@ -59,6 +61,8 @@ export class ExpenseModel {
   static fromExpense(t: Expense): ExpenseModel {
     const m = new ExpenseModel();
     m.id = t.id;
+    m._id = t._id;
+    m._rev = t._rev;
     m.name = t.name;
     m.date = ExpenseModel.dateFromISO(t.date);
     m.amount = t.amount;

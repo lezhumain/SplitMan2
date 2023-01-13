@@ -1,26 +1,4 @@
-import {UserModel} from "./models/user-model";
-import {BehaviorSubject, combineLatest, Observable, of} from "rxjs";
-import {User} from "./models/user";
-import {
-  catchError,
-  debounceTime,
-  distinctUntilChanged,
-  filter,
-  first,
-  map,
-  shareReplay,
-  skip,
-  take,
-  tap
-} from "rxjs/operators";
-import {BaseItem} from "./models/baseItem";
-import {ajax, AjaxRequest} from "rxjs/ajax";
-import {flatMap} from "rxjs/internal/operators";
-import {UserServiceService} from "./user-service.service";
-import {environment} from "../environments/environment";
-import {badData} from "../../e2e/data/bugData";
-import {AjaxObservable} from "rxjs/internal-compatibility";
-import {HttpHeaders, HttpRequest} from "@angular/common/http";
+import {BehaviorSubject, Observable} from "rxjs";
 import { HttpClient } from '@angular/common/http';
 
 enum BaseServiceState {

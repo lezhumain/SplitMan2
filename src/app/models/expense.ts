@@ -10,6 +10,8 @@ export class Expense extends BaseItem {
     u.payees = model.payees.slice();
     u.payer = model.payer;
     u.id = model.id;
+    u._id = model._id;
+    u._rev = model._rev;
     u.tripId = model.tripId;
     u.name = model.name;
     u.createdAt = model.createdAt;
