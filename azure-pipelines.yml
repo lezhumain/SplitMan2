@@ -106,3 +106,11 @@ stages:
               echo "RES: $RES"
               [ "$RES" == "TODO" ]
             displayName: 'Run containers'
+
+  - stage: Run E2E
+    jobs:
+      - job: Run_E2E_Tests
+        steps:
+          - script: |
+              npm run e2e -- --headless=false
+            displayName: 'Run E2E Tests'
