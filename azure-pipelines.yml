@@ -50,7 +50,7 @@ stages:
 
   - stage: Build
     jobs:
-      - job: Prepare_SSL_files
+      - job: Build_Docker_Containers
         steps:
           - task: DownloadSecureFile@1
             name: sslCert
@@ -76,6 +76,8 @@ stages:
               mkdir -p "$TARGET_DIR"
               sudo ln -s $(sslCert.secureFilePath) "$TARGET_DIR/example.crt"
               sudo ln -s $(sslKey.secureFilePath) "$TARGET_DIR/example.key"
+              #sudo cp $(sslCert.secureFilePath) "$TARGET_DIR/example.crt"
+              #sudo cp $(sslKey.secureFilePath) "$TARGET_DIR/example.key"
               echo "files:"
               ls -al "$TARGET_DIR"
               #sudo chown "$(whoami)" "$TARGET_DIR"/*
@@ -84,11 +86,9 @@ stages:
               sudo chown -R "$(whoami)" "$TARGET_DIR"
             displayName: 'Prepare SSL key and cert'
 
-      - job: Build_Docker_Containers
-        steps:
           - script: |
-              TARGET_DIR="/home/$(whoami)/.ssl"
-              ls -al "$TARGET_DIR"
+              #TARGET_DIR="/home/$(whoami)/.ssl"
+              #ls -al "$TARGET_DIR"
               #bash .github/actions/runDockerE2E.sh
               export CERT_PATH="$HOME/.ssl/example"
               bash .github/actions/run_docker_e2e.sh "" "https"
