@@ -98,7 +98,7 @@ stages:
               docker ps
               sleep 60
               HOST_IP="$(ip addr show eth0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)"
-              echo "HOST_IP: $HOST_IP
+              echo "HOST_IP: $HOST_IP"
               RES="$(curl -s "https://$HOST_IP:8081/api/version")"
               echo "RES: $RES"
               [ "$RES" == "TODO" ]
