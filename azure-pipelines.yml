@@ -87,6 +87,8 @@ stages:
       - job: Build_Docker_Containers
         steps:
           - script: |
+              TARGET_DIR="/home/$(whoami)/.ssl"
+              ls -al "$TARGET_DIR"
               #bash .github/actions/runDockerE2E.sh
               export CERT_PATH="$HOME/.ssl/example"
               bash .github/actions/run_docker_e2e.sh "" "https"
