@@ -3,8 +3,10 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-trigger:
-- master
+pr:
+  branches:
+    include:
+    - '*'  # must quote since "*" is a YAML reserved character; we want a string
 
 pool:
   vmImage: ubuntu-latest
@@ -44,5 +46,6 @@ steps:
     displayName: 'Prepare SSL key and cert'
 
   - script: |
-      bash .github/actions/runDockerE2E.sh
+      #bash .github/actions/runDockerE2E.sh
+      bash .github/actions/run_docker_e2e.sh "" "https"
     displayName: 'Run E2E'
