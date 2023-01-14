@@ -47,6 +47,7 @@ export class ApiService {
                     addHeaders?: {[key: string]: string}): Observable<any> {
 
     // const headers: any = this._headers;
+    console.log("POST: " + url);
 
     if(typeof data === 'object' && !(data instanceof FormData)) {
       data = JSON.stringify(data);
