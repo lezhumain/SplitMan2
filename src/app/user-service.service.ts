@@ -27,35 +27,64 @@ export class UserServiceService extends BaseService {
   // }
   // private _connectedUser: User | null = null;
 
-  private _connectedUser: BehaviorSubject<User | null> = new BehaviorSubject<User | null>(null);
+  public _connectedUser: BehaviorSubject<User | null> = new BehaviorSubject<User | null>(null);
+
+  private _connectedUserID: number = -1;
+  get connectedUserID(): number {
+    return this._connectedUserID;
+  }
 
   constructor(http: HttpClient, private readonly _apiService: ApiService) {
     super(http);
     // const sessionIDName = localStorage.getItem("")
 
     const data = this.getSessionData();
-    if(data !== null && data !== undefined && Number(data) > -1) {
-      BaseService.USER_ID_INIT = Number(data);
-      this.getUsers().pipe(
-        filter(u => u.length > 0),
-        first(),
-        map(all => {
-          const r = all.find(a => a.id === Number(data));
-          return r;
-        })
-      ).subscribe((u: User | undefined) => {
-        this._connectedUser.next(u || null);
-      });
+    console.log("[UserServiceService] sessionData: %o", data);
+    const dataNumber = data !== null ? Number(data) : -1;
+    this._connectedUserID = isNaN(dataNumber) || dataNumber < -1 ? -1 : dataNumber;
+    console.log("[UserServiceService] connectedUserID: %o", this._connectedUserID);
+
+    if(this._connectedUserID === -1) {
+      // this._connectedUser.next(null);
+      this._updateConnectedUser(null);
+    }
+    else {
+        BaseService.USER_ID_INIT = Number(data);
+        this.getUsers().pipe(
+          filter(u => u.length > 0),
+          first(),
+          map(all => {
+            const r = all.find(a => a.id === Number(data));
+            return r;
+          })
+        ).subscribe((u: User | undefined) => {
+          console.log("[UserServiceService] init user: %o", u);
+          this._updateConnectedUser(u);
+        });
     }
 
-    this._connectedUser
-      .pipe(
-        distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr))
-        // filter(u => !u || (!!u && u.id >= 0))
-      )
-      .subscribe((u: User | null) => {
-        BaseService.USER_ID = u ? u.id : null;
-      });
+    // if(data !== null && data !== undefined && Number(data) > -1) {
+    //   BaseService.USER_ID_INIT = Number(data);
+    //   this.getUsers().pipe(
+    //     filter(u => u.length > 0),
+    //     first(),
+    //     map(all => {
+    //       const r = all.find(a => a.id === Number(data));
+    //       return r;
+    //     })
+    //   ).subscribe((u: User | undefined) => {
+    //     this._updateConnectedUser(u || null);
+    //   });
+    // }
+    //
+    // this._connectedUser
+    //   .pipe(
+    //     distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr))
+    //     // filter(u => !u || (!!u && u.id >= 0))
+    //   )
+    //   .subscribe((u: User | null) => {
+    //     BaseService.USER_ID = u ? u.id : null;
+    //   });
   }
 
   private setSessionData(user?: User | null): void {
@@ -112,7 +141,7 @@ export class UserServiceService extends BaseService {
     return this._apiService.httpPost(environment.api + "/login", {password: pass, username: username}, "json", "application/json", false, "body").pipe(
       map((u: User | IAPIResult) => {
         // if(u && isLogin) {
-        //   this._connectedUser.next(u);
+        //   this._updateConnectedUser(u);
         // }
         // debugger;
         // return !!u && u.hasOwnProperty("email") ? u as UserModel : null;
@@ -146,13 +175,13 @@ export class UserServiceService extends BaseService {
   setConnectedUser(username?: string, password?: string): Observable<User> {
     // this.getUserByNameAndPass(username, password).subscribe(
     //   (u: User | null) => {
-    //     this._connectedUser.next(u);
+    //     this._updateConnectedUser(u);
     //   }
     // );
 
     return this.getUserByNameAndPass(username, password).pipe(
       flatMap((u: User | null) => {
-        this._connectedUser.next(u);
+        this._updateConnectedUser(u);
 
         return this._connectedUser.pipe(
           filter(cu => {
@@ -183,7 +212,7 @@ export class UserServiceService extends BaseService {
 
     // obs$.subscribe((uu: User | null) => {
     //   this.setSessionData();
-    //   this._connectedUser.next(uu);
+    //   this._updateConnectedUser(uu);
     // });
 
 
@@ -192,14 +221,14 @@ export class UserServiceService extends BaseService {
     //   if(setSeesion) {
     //     this.setSessionData(uu);
     //   }
-    //   this._connectedUser.next(uu);
+    //   this._updateConnectedUser(uu);
     // });
     return obs$.pipe(
       flatMap((uu: User | null) => {
         if(setSeesion) {
           this.setSessionData(uu);
         }
-        this._connectedUser.next(uu);
+        this._updateConnectedUser(uu);
 
         return this._connectedUser.pipe(
           filter(t => {
@@ -235,7 +264,7 @@ export class UserServiceService extends BaseService {
     //     return u;
     //   }),
     //   flatMap((uu: User | null) => {
-    //     this._connectedUser.next(uu);
+    //     this._updateConnectedUser(uu);
     //
     //     return this._connectedUser.pipe(
     //       filter(o => o === uu),
@@ -306,52 +335,88 @@ export class UserServiceService extends BaseService {
       // first(),
       flatMap(([user, currentUser]: [UserModel | null, User | null]) => {
         const userM: User | null = user ? User.from(user) : (currentUser || null);
+        console.log("userM: %o", userM);
         // if(user && userM !== currentUser) {
         // if(currentUser && user && userM?.equals(currentUser)) {
-        if(user && JSON.stringify(userM) !== JSON.stringify(currentUser)) {
-          console.log("Should change user to: %o", user);
-          this._connectedUser.next(userM);
 
-          return this._connectedUser.pipe(
-            first(),
-            map((u: User | null) => u ? u.toModel() : null)
-          )
+        // if(user && JSON.stringify(userM) !== JSON.stringify(currentUser) && !!currentUser?._id && !!userM?._id && !!currentUser?._rev && !!userM?._rev
+        //     && Number(currentUser?._rev.split("_")[0]) < Number(userM?._rev.split("_")[0])) {
+
+        const mongoID = user?._id || currentUser?._id;
+        console.log("mongoid: %o", mongoID);
+        if(!!mongoID && !!userM && !userM._id) {
+          userM._id = mongoID;
         }
+        if(!!mongoID && !!currentUser && !currentUser._id) {
+          currentUser._id = mongoID;
+        }
+
+        if(!!userM && User.isValid(userM) && !!user) {
+          if(currentUser === null || currentUser.revNumber < userM.revNumber) {
+            console.log("Should change user to: %o", userM);
+            this._updateConnectedUser(userM);
+
+            return this._connectedUser.pipe(
+              filter((u: User | null) => (u === null) || (u !== null && !!u._id && !!u._rev)),
+              first(),
+              map((u: User | null) => u ? u.toModel() : null)
+            )
+          }
+        }
+
+        // if(userM && !!currentUser?._id && !!userM?._id && !!currentUser?._rev && !!userM?._rev
+        //     && Number(currentUser?._rev.split("_")[0]) < Number(userM?._rev.split("_")[0])) {
+        //   console.log("Should change user to: %o", userM);
+        //   this._updateConnectedUser(userM);
+        //
+        //   return this._connectedUser.pipe(
+        //     first(),
+        //     map((u: User | null) => u ? u.toModel() : null)
+        //   )
+        // }
 
         return of(currentUser?.toModel() || null);
       }),
-      distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr))
+      distinctUntilChanged((prev, curr) => prev?._rev === curr?._rev),
+      // filter(r => !!r?._id && !!r?._rev),
+      tap((u) => console.warn("got user: %o", u))
     );
   }
 
   addTravelToConnectedUser(travel: Travel): Observable<null> {
 
-    const connectedUser = this._connectedUser.getValue();
-    if(!connectedUser) {
-      console.error("No user connected");
-      return of(null);
-    }
+    // const connectedUser = this._connectedUser.getValue();
+    return this._connectedUser.pipe(
+      filter(c => c == null || !!c._id),
+      first(),
+      flatMap((connectedUser: User | null) => {
+        if(connectedUser == null) {
+          console.error("No user connected");
+          return of(null);
+        }
 
-    const gr: InviteDate = {
-      tripID: travel.id,
-      isAccepted: true
-    }
+        const gr: InviteDate = {
+          tripID: travel.id,
+          isAccepted: true
+        }
 
-    // debugger;
+        // debugger;
 
-    // this._connectedUser.invites.push(gr);
-    if (connectedUser.invites) {
-      connectedUser.invites.push(gr);
-    }
-    return this._apiService.updateItem(connectedUser).pipe(
-      // tap(() => {
-      //   this._connectedUser.next(connectedUser);
-      // })
-      flatMap(() => {
-        // this._connectedUser.next(connectedUser);
-        return this.setConnectedUserByObj(connectedUser);
-      }),
-      map(() => null)
+        // this._connectedUser.invites.push(gr);
+        if (connectedUser.invites) {
+          connectedUser.invites.push(gr);
+        }
+        return this._apiService.updateItem(connectedUser).pipe(
+          // tap(() => {
+          //   this._updateConnectedUser(connectedUser);
+          // })
+          flatMap(() => {
+            // this._updateConnectedUser(connectedUser);
+            return this.setConnectedUserByObj(connectedUser);
+          }),
+          map(() => null)
+        );
+      })
     );
   }
 
@@ -391,7 +456,7 @@ export class UserServiceService extends BaseService {
         let obs$ = this._apiService.updateItem(u);
         if(cu?.id === userlID) {
           obs$ = obs$.pipe(
-            tap(() => this._connectedUser.next(u))
+            tap(() => this._updateConnectedUser(u))
           );
         }
 
@@ -404,7 +469,7 @@ export class UserServiceService extends BaseService {
             if(us) {
               const newUs = all.find(a => a.type === "user" && a.id === us.id);
               const theUs = newUs ? User.fromJson(newUs) : null;
-              this._connectedUser.next(theUs);
+              this._updateConnectedUser(theUs);
             }
 
             return null;
@@ -419,7 +484,7 @@ export class UserServiceService extends BaseService {
       take(1),
       flatMap(() => {
         BaseService.USER_ID_INIT = null;
-        this._connectedUser.next(null);
+        this._updateConnectedUser(null);
         this.setSessionData(null);
         return this._connectedUser.pipe(
           filter(r => r === null),
@@ -428,5 +493,14 @@ export class UserServiceService extends BaseService {
         // return this.setConnected(null)
       })
     );
+  }
+
+  private _updateConnectedUser(userParam: any) {
+    const currentUser = this._connectedUser.getValue();
+    if(!!currentUser?._id && !!userParam && !userParam._id) {
+      userParam._id = currentUser?._id;
+    }
+    console.log("[UserServiceService] updating connected user: %o", userParam);
+    this._connectedUser.next(userParam);
   }
 }
