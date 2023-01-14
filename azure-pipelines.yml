@@ -94,8 +94,6 @@ stages:
               bash .github/actions/run_docker_e2e.sh "" "https"
             displayName: 'Build containers'
 
-  - stage: Run
-    jobs:
       - job: Run_Docker_Containers
         steps:
           - script: |
@@ -107,8 +105,6 @@ stages:
               [ "$RES" == "TODO" ]
             displayName: 'Run containers'
 
-  - stage: Run E2E
-    jobs:
       - job: Run_E2E_Tests
         steps:
           - script: |
