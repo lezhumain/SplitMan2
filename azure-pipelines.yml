@@ -11,42 +11,45 @@ pr:
 pool:
   vmImage: ubuntu-latest
 
-steps:
-  - task: DownloadSecureFile@1
-    name: sslCert
-    displayName: 'Download cert'
-    inputs:
-      secureFile: 'example.crt'
+stages:
+  - stage: Build
+    jobs:
+      - job: CIWork
+        steps:
+          - task: DownloadSecureFile@1
+            name: sslCert
+            displayName: 'Download cert'
+            inputs:
+              secureFile: 'example.crt'
 
-  - task: DownloadSecureFile@1
-    name: sslKey
-    displayName: 'Download key'
-    inputs:
-      secureFile: 'example.key'
+          - task: DownloadSecureFile@1
+            name: sslKey
+            displayName: 'Download key'
+            inputs:
+              secureFile: 'example.key'
 
-  - script: |
-      echo "$(whoami)"
-      sudo chown "$(whoami)":root $(sslCert.secureFilePath)
-      sudo chmod 600 $(sslCert.secureFilePath)
-      sudo chown "$(whoami)":root $(sslKey.secureFilePath)
-      sudo chmod 600 $(sslKey.secureFilePath)
+          - script: |
+              echo "$(whoami)"
+              sudo chown "$(whoami)":root $(sslCert.secureFilePath)
+              sudo chmod 600 $(sslCert.secureFilePath)
+              sudo chown "$(whoami)":root $(sslKey.secureFilePath)
+              sudo chmod 600 $(sslKey.secureFilePath)
 
-      TARGET_DIR="/home/$(whoami)/.ssl"
-      echo "TARGET_DIR: $TARGET_DIR"
-      mkdir -p "$TARGET_DIR"
-      sudo ln -s $(sslCert.secureFilePath) "$TARGET_DIR/example.crt"
-      sudo ln -s $(sslKey.secureFilePath) "$TARGET_DIR/example.key"
-      echo "files:"
-      ls -al "$TARGET_DIR"
-      #sudo chown "$(whoami)" "$TARGET_DIR"/*
-      #sudo chmod 600 "$TARGET_DIR"/*
-      #ls -al "$TARGET_DIR"
-      sudo chown -R "$(whoami)" "$TARGET_DIR"
+              TARGET_DIR="/home/$(whoami)/.ssl"
+              echo "TARGET_DIR: $TARGET_DIR"
+              mkdir -p "$TARGET_DIR"
+              sudo ln -s $(sslCert.secureFilePath) "$TARGET_DIR/example.crt"
+              sudo ln -s $(sslKey.secureFilePath) "$TARGET_DIR/example.key"
+              echo "files:"
+              ls -al "$TARGET_DIR"
+              #sudo chown "$(whoami)" "$TARGET_DIR"/*
+              #sudo chmod 600 "$TARGET_DIR"/*
+              #ls -al "$TARGET_DIR"
+              sudo chown -R "$(whoami)" "$TARGET_DIR"
+            displayName: 'Prepare SSL key and cert'
 
-    displayName: 'Prepare SSL key and cert'
-
-  - script: |
-      #bash .github/actions/runDockerE2E.sh
-      export CERT_PATH="$HOME/.ssl/example"
-      bash .github/actions/run_docker_e2e.sh "" "https"
-    displayName: 'Run E2E'
+          - script: |
+              #bash .github/actions/runDockerE2E.sh
+              export CERT_PATH="$HOME/.ssl/example"
+              bash .github/actions/run_docker_e2e.sh "" "https"
+            displayName: 'Build containers'
