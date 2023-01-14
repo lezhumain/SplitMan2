@@ -6,6 +6,7 @@ RUN apk add vim
 WORKDIR /app
 COPY . /app
 
+RUN ["npm", "install", "-g", "npm@9.3.0"]
 RUN cd /app && npm i && npm run cp-libs
 
 ARG IP
