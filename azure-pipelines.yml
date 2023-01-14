@@ -14,7 +14,7 @@ pool:
 stages:
   - stage: Prepare
     jobs:
-      - job: Prepare SSL files
+      - job: Prepare_SSL_files
         steps:
           - task: DownloadSecureFile@1
             name: sslCert
@@ -50,7 +50,7 @@ stages:
 
   - stage: Build
     jobs:
-      - job: Build docker containers
+      - job: Build_Docker_Containers
         steps:
           - script: |
               #bash .github/actions/runDockerE2E.sh
@@ -60,7 +60,7 @@ stages:
 
   - stage: Run
     jobs:
-      - job: Run docker containers
+      - job: Run_Docker_Containers
         steps:
           - script: |
               docker-compose up -d
