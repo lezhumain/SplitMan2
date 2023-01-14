@@ -10,6 +10,8 @@ import {filter, first, timeout} from "rxjs/operators";
 import {flatMap} from "rxjs/internal/operators";
 import {Expense} from "../src/app/models/expense";
 import {CreateBrowsers, honor10} from "./e2e_utils";
+import * as fs from "fs";
+import * as https from "https";
 
 const userData = {
   email: "a",
@@ -289,7 +291,8 @@ async function checkRepartition(thePage: Page, repart: string) {
 }
 
 // TODO cmd line arg to switch
-const host = "http://127.0.0.1:4200";
+const hparam = process.argv.find(a => a.startsWith("--host="))?.replace("--host=", "");
+const host = hparam ? `https://${hparam}` : "http://127.0.0.1:4200";
 // const host = "https://127.0.0.1:8081";
 // const host = "https://79.137.33.77:8081"
 
