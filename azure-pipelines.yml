@@ -47,5 +47,6 @@ steps:
 
   - script: |
       #bash .github/actions/runDockerE2E.sh
+      export CERT_PATH="$HOME/.ssl/example"
       bash .github/actions/run_docker_e2e.sh "" "https"
     displayName: 'Run E2E'
