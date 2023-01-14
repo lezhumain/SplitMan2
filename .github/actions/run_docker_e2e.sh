@@ -59,11 +59,11 @@ update_dir ".." "SplitMan2-nginx" "main"
 #cd ../SplitMan2-nginx
 bash doBuild.sh "http://$HOST_IP" # nginx
 
-update_dir ".." "SplitMan2-API" "mongo_backup_to_archive"
+update_dir ".." "SplitMan2-API" "master"
 #cd ../SplitMan2-API
 bash doBuild.sh "https://$HOST_IP:8081" # api
 
-update_dir ".." "SplitMan2" "jnm/handle_mongo_bckup"
+update_dir ".." "SplitMan2" "master"
 #cd ../SplitMan2
 bash doBuild.sh "https://$HOST_IP:8081" "/api" # web
 
