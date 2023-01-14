@@ -93,9 +93,6 @@ stages:
               export CERT_PATH="$HOME/.ssl/example"
               bash .github/actions/run_docker_e2e.sh "" "https"
             displayName: 'Build containers'
-
-      - job: Run_Docker_Containers
-        steps:
           - script: |
               docker-compose up -d
               sleep 30
@@ -104,9 +101,6 @@ stages:
               echo "RES: $RES"
               [ "$RES" == "TODO" ]
             displayName: 'Run containers'
-
-      - job: Run_E2E_Tests
-        steps:
           - script: |
               npm run e2e -- --headless=false
             displayName: 'Run E2E Tests'
