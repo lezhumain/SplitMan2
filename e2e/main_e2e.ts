@@ -78,6 +78,7 @@ async function handleSecrutiyStuff(page: Page) {
     const proceedBtn = await page.waitForSelector("#proceed-link", {visible: true});
     await waitForMS(200);
     await proceedBtn.click();
+    await page.waitForNavigation({waitUntil: "networkidle2", timeout: 2000});
   }
 }
 
@@ -274,8 +275,8 @@ async function checkRepartition(thePage: Page, repart: string) {
 }
 
 // const host = `https://86.18.16.122:8083`; // TODO cmd line arg to switch
-const host = `http://127.0.0.1:4200`;
-// const host = "https://192.168.0.19:8081";
+// const host = `http://127.0.0.1:4200`;
+const host = "https://127.0.0.1:8081";
 // const host = "https://79.137.33.77:8081"
 
 const url = `${host}/login`;
@@ -1008,7 +1009,7 @@ async function MainTest(params: any[]) {
     // login
     await Promise.all(
       [
-        handleLogin(page, userData),
+        waitForMS(500).then(() => handleLogin(page, userData)),
         waitForMS(3000).then(() => handleLogin(page1, userData1))
       ]
     );
@@ -1046,12 +1047,12 @@ async function MainTest(params: any[]) {
     if (!inviteOnly) {
       const expenses = targetExepense;
 
-      //debugger;
+      // debugger;
       await AddExpenses(page, expenses); // 5 items
 
       // edit last expense
       await EditLast(page, expenses);
-      debugger;
+      // debugger;
 
       // await waitForTimeout(10000);
 
@@ -1090,6 +1091,7 @@ async function MainTest(params: any[]) {
 
     // send invite
     await DoInvite(page, userData1.email);
+    // debugger;
 
     // await Promise.all(
     //   pages.map(page => page.waitForTimeout(2000))
