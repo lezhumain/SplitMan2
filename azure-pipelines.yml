@@ -12,9 +12,9 @@ pool:
   vmImage: ubuntu-latest
 
 stages:
-  - stage: Build
+  - stage: Prepare
     jobs:
-      - job: CIWork
+      - job: Prepare SSL files
         steps:
           - task: DownloadSecureFile@1
             name: sslCert
@@ -48,8 +48,25 @@ stages:
               sudo chown -R "$(whoami)" "$TARGET_DIR"
             displayName: 'Prepare SSL key and cert'
 
+  - stage: Build
+    jobs:
+      - job: Build docker containers
+        steps:
           - script: |
               #bash .github/actions/runDockerE2E.sh
               export CERT_PATH="$HOME/.ssl/example"
               bash .github/actions/run_docker_e2e.sh "" "https"
             displayName: 'Build containers'
+
+  - stage: Run
+    jobs:
+      - job: Run docker containers
+        steps:
+          - script: |
+              docker-compose up -d
+              sleep 30
+              HOST_IP="$(ip addr show eth0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)"
+              RES="$(curl -s "https://$HOST_IP:8081/api/version")"
+              echo "RES: $RES"
+              [ "$RES" == "TODO" ]
+            displayName: 'Run containers'
