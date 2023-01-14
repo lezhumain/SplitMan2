@@ -61,6 +61,7 @@ export class ExpenseService extends BaseService {
           return this.getNewId().pipe(
             flatMap((newId: number) => {
               data.id = newId;
+              expense.id = data.id;
               return this._apiService.saveInDb(data);
             })
           );
