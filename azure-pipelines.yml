@@ -95,6 +95,7 @@ stages:
             displayName: 'Build containers'
           - script: |
               docker-compose up -d
+              docker ps
               sleep 60
               HOST_IP="$(ip addr show eth0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)"
               echo "HOST_IP: $HOST_IP
