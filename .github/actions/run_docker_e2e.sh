@@ -48,9 +48,15 @@ function update_dir()
         fi
 }
 
-#export CERT_PATH="/c/Users/djuuu/example"
-export MONGO_USER="SECRET_TODO"
-export MONGO_PASS="SECRET_TODO"
+export CERT_PATH="$HOME/.ssl/example" # HIDE this?
+#export MONGO_USER="SECRET_TODO"
+#export MONGO_PASS="SECRET_TODO"
+
+echo "MONGO CREDS: $MONGO_USER - $MONGO_PASS"
+if [ -z "$MONGO_USER" ] || [ -z "$MONGO_PASS" ]; then
+  echo "Need to export MONGO creds."
+  exit 1
+fi
 
 sed -i.bak -E "s|MONGO_INITDB_ROOT_USERNAME=.+$|MONGO_INITDB_ROOT_USERNAME=$MONGO_USER|" docker-compose.yml
 sed -i.bak -E "s|MONGO_INITDB_ROOT_PASSWORD=.+$|MONGO_INITDB_ROOT_PASSWORD=$MONGO_PASS|" docker-compose.yml
