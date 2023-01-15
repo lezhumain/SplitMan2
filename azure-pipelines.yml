@@ -109,12 +109,20 @@ stages:
               bash .github/actions/waitForServer.sh "127.0.0.1:4200"
               sleep 30
               curl -s --insecure "http://127.0.0.1:4200/login"
-              curl -s --insecure  "http://127.0.0.1:8080/version"
-              curl -s --insecure  "https://127.0.0.1:8081/api/version"
+              #curl -s --insecure  "http://127.0.0.1:8080/version"
+              curl -s --insecure "https://127.0.0.1:8081/login"
+              #curl -s --insecure  "https://127.0.0.1:8081/api/version"
               RES="$(curl -s --insecure "https://$HOST_IP:8081/api/version")"
               echo "RES: $RES"
               [ "$RES" == "TODO" ]
             displayName: 'Run containers'
+
+          - script: |
+              cd ../SplitMan2-API
+              #HOST_IP="127.0.0.1"
+              mvn test -Dtest=MongoTests#mainSetup -f pom.xml
+            displayName: 'Setup E2E Tests'
+
           - script: |
               #HOST_IP="$(ip addr show eth0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)"
               HOST_IP="127.0.0.1"
