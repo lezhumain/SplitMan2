@@ -96,15 +96,18 @@ stages:
           - script: |
               docker-compose up -d
               docker ps
-              sleep 60
+              sleep 30
               #HOST_IP="$(ip addr show eth0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)"
               HOST_IP="127.0.0.1"
               echo "HOST_IP: $HOST_IP"
 
               echo "Waiting for web server"
               bash .github/actions/waitForServer.sh "127.0.0.1:4200"
-
-              RES="$(curl -s "https://$HOST_IP:8081/api/version")"
+              sleep 30
+              curl -s --insecure "http://127.0.0.1:4200/login"
+              curl -s --insecure  "http://127.0.0.1:8080/version"
+              curl -s --insecure  "https://127.0.0.1:8081/api/version"
+              RES="$(curl -s --insecure "https://$HOST_IP:8081/api/version")"
               echo "RES: $RES"
               [ "$RES" == "TODO" ]
             displayName: 'Run containers'
