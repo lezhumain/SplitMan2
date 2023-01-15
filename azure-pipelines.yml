@@ -126,6 +126,8 @@ stages:
           - script: |
               #HOST_IP="$(ip addr show eth0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)"
               HOST_IP="127.0.0.1"
+              npm install -g npm@9.3.0
+              npm ci
               npm run e2e -- --headless=false --host="$HOST_IP:8081"
             displayName: 'Run E2E Tests'
 
@@ -176,11 +178,6 @@ stages:
                 chmod +x ./*.sh
                 ./run_docker_e2e.sh "" "https"
               EOF
-              #TARGET_DIR="/home/$(whoami)/.ssl"
-              #ls -al "$TARGET_DIR"
-              #bash .github/actions/runDockerE2E.sh
-              #export CERT_PATH="$HOME/.ssl/example"
-              bash .github/actions/run_docker_e2e.sh "127.0.0.1" "https"
             displayName: 'Build containers 1'
 
           - script: |
