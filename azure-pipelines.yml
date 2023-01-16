@@ -216,6 +216,7 @@ stages:
           - script: |
               bash .github/actions/remote/setup_db.sh
             env:
+              DEBIAN_IP: $(DEBIAN_IP)
               DEBIAN_PATH: $(DEBIAN_PATH)
             displayName: 'Setup DB'
 
