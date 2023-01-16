@@ -143,14 +143,14 @@ stages:
 
           - script: |
               echo "$(whoami)"
-              sudo chown "$(whoami)":root $(id_releaseUser.secureFilePath)
-              sudo chmod 600 $(id_releaseUser.secureFilePath)
+              sudo chown "$(whoami)":root "$(sshKey.secureFilePath)"
+              sudo chmod 600 "$(sshKey.secureFilePath)"
 
               TARGET_DIR="/home/$(whoami)/.ssh"
               echo "TARGET_DIR: $TARGET_DIR"
               mkdir -p "$TARGET_DIR"
               #sudo ln -s $(sslCert.secureFilePath) "$TARGET_DIR/example.crt"
-              sudo cp $(id_releaseUser.secureFilePath) "$TARGET_DIR/id_releaseUser"
+              sudo cp "$(sshKey.secureFilePath)" "$TARGET_DIR/id_releaseUser"
               sudo chmod 600 "$TARGET_DIR/id_releaseUser"
               echo "files:"
               ls -al "$TARGET_DIR"
