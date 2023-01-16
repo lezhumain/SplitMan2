@@ -205,6 +205,7 @@ stages:
             env:
               DEBIAN_USER: $(DEBIAN_USER)
               DEBIAN_IP: $(DEBIAN_IP)
+              DEBIAN_PATH: $(DEBIAN_PATH)
             displayName: 'Build containers'
 
           - script: |
@@ -212,12 +213,8 @@ stages:
             env:
               DEBIAN_USER: $(DEBIAN_USER)
               DEBIAN_IP: $(DEBIAN_IP)
+              DEBIAN_PATH: $(DEBIAN_PATH)
             displayName: 'Run containers'
-
-          - script: |
-              HOST_IP="${DEBIAN_IP}"
-              npm run e2e -- --headless=false --host="$HOST_IP:8081"
-            displayName: 'Run E2E Tests'
 
   - stage: Run_E2E
     jobs:
