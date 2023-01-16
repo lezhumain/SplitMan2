@@ -1388,14 +1388,14 @@ async function runAll() {
         "Dju doit a 8.56€ Suzie Max doit a 8.56€ Suzie Elyan doit a 8.56€ Suzie"
       ]
     },
-    // {
-    //   fn: MainTest,
-    //   msg: "E2E with all expenses",
-    //   params: [
-    //     allExpenses.slice(),
-    //     "Elyan doit a 17.30€ Dju"
-    //   ]
-    // }
+    {
+      fn: MainTest,
+      msg: "E2E with all expenses",
+      params: [
+        allExpenses.slice(),
+        "Elyan doit a 17.30€ Dju"
+      ]
+    }
   ];
 
   const allRes: {msg: string, errorMsg?: string, hasError: boolean, links?: string[]}[] = [];
