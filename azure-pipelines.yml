@@ -161,6 +161,25 @@ stages:
             displayName: 'Prepare SSH key'
 
           - script: |
+              # add ssh in config
+              FILE="$HOME/.ssh/config"
+              tee -a "$FILE" > /dev/null <<EOT
+              Host ovhVM_rel
+                HostName "$(DEBIAN_IP)"
+                User "$(DEBIAN_USER)"
+                IdentityFile "$HOME/.ssh/id_releaseUser"
+                Port 22
+                PreferredAuthentications publickey
+              EOT
+
+              # add key to agent ?
+              eval "$(ssh-agent -s)" && ssh-add "$HOME/.ssh/id_releaseUser"
+            env:
+              DEBIAN_USER: $(DEBIAN_USER)
+              DEBIAN_IP: $(DEBIAN_IP)
+            displayName: 'Setup SSH access'
+
+          - script: |
               chmod +x .github/actions/remote/*.sh
               chmod +x .github/actions/*.sh
               bash .github/actions/remote/backup_current.sh
