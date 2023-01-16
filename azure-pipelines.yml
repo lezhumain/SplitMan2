@@ -227,7 +227,7 @@ stages:
           - script: |
               HOST_IP="${DEBIAN_IP}"
               npm install -g npm@9.3.0
-              npm ci
+              npm i
               npm run e2e -- --headless=false --host="$HOST_IP:8081"
             env:
               DEBIAN_IP: $(DEBIAN_IP)
