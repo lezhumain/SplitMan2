@@ -131,94 +131,87 @@ stages:
 #              npm run e2e -- --headless=false --host="$HOST_IP:8081"
 #            displayName: 'Run E2E Tests'
 
-#  - stage: Deploy
-#    jobs:
-#      - job: Deploy_Docker_Containers
-#        steps:
-#          - task: DownloadSecureFile@1
-#            name: sshKey
-#            displayName: 'Download SSH key'
-#            inputs:
-#              secureFile: 'id_releaseUser'
-#
-#          - script: |
-#              echo "$(whoami)"
-#              sudo chown "$(whoami)":root "$(sshKey.secureFilePath)"
-#              sudo chmod 600 "$(sshKey.secureFilePath)"
-#
-#              TARGET_DIR="/home/$(whoami)/.ssh"
-#              echo "TARGET_DIR: $TARGET_DIR"
-#              mkdir -p "$TARGET_DIR"
-#              #sudo ln -s $(sslCert.secureFilePath) "$TARGET_DIR/example.crt"
-#              sudo cp "$(sshKey.secureFilePath)" "$TARGET_DIR/id_releaseUser"
-#              sudo chmod 600 "$TARGET_DIR/id_releaseUser"
-#              echo "files:"
-#              ls -al "$TARGET_DIR"
-#              #sudo chown "$(whoami)" "$TARGET_DIR"/*
-#              #sudo chmod 600 "$TARGET_DIR"/*
-#              #ls -al "$TARGET_DIR"
-#              sudo chown -R "$(whoami)" "$TARGET_DIR"
-#            displayName: 'Prepare SSH key'
-#
-#          - script: |
-#              # add ssh in config
-#              FILE="$HOME/.ssh/config"
-#              tee -a "$FILE" > /dev/null <<EOT
-#              Host ovhVM_rel
-#                HostName "$(DEBIAN_IP)"
-#                User "$(DEBIAN_USER)"
-#                IdentityFile "$HOME/.ssh/id_releaseUser"
-#                Port 22
-#                PreferredAuthentications publickey
-#              EOT
-#
-#              # add key to agent ?
-#              eval "$(ssh-agent -s)" && ssh-add "$HOME/.ssh/id_releaseUser"
-#              echo "Added key to agent"
-#
-#              if [ ! -f "$HOME/.ssh/known_hosts" ]; then
-#                touch "$HOME/.ssh/known_hosts"
-#              fi
-#              ssh-keyscan -t rsa 79.137.33.77 >> "$HOME/.ssh/known_hosts"
-#              cat "$HOME/.ssh/known_hosts"
-#            env:
-#              DEBIAN_USER: $(DEBIAN_USER)
-#              DEBIAN_IP: $(DEBIAN_IP)
-#            displayName: 'Setup SSH access'
-#
-#          - script: |
-#              chmod +x .github/actions/remote/*.sh
-#              chmod +x .github/actions/*.sh
-#              ls -al "$HOME/.ssh"
-#              cat "$HOME/.ssh/config"
-#              bash .github/actions/remote/backup_current.sh
-#            env:
-#              DEBIAN_PATH: $(DEBIAN_PATH)
-#            displayName: 'Backup current'
-#
-#          - script: |
-#              #chmod +x .github/actions/remote/*.sh
-#              #chmod +x .github/actions/*.sh
-#              bash .github/actions/remote/build_containers.sh
-#            env:
-#              DEBIAN_PATH: $(DEBIAN_PATH)
-#              DEBIAN_IP: $(DEBIAN_IP)
-#              MONGO_USER: $(MONGO_USER)
-#              MONGO_PASS: $(MONGO_PASS)
-#            displayName: 'Build containers'
-#
-#          - script: |
-#              bash .github/actions/remote/run_containers.sh
-#            env:
-#              DEBIAN_PATH: $(DEBIAN_PATH)
-#            displayName: 'Run containers'
-#
-#          - script: |
-#              bash .github/actions/remote/setup_db.sh
-#            env:
-#              DEBIAN_IP: $(DEBIAN_IP)
-#              DEBIAN_PATH: $(DEBIAN_PATH)
-#            displayName: 'Setup DB'
+  - stage: Deploy
+    jobs:
+      - job: Deploy_Docker_Containers
+        steps:
+          - task: DownloadSecureFile@1
+            name: sshKey
+            displayName: 'Download SSH key'
+            inputs:
+              secureFile: 'id_releaseUser'
+
+          - script: |
+              echo "$(whoami)"
+              #sudo chown "$(whoami)":root "$(sshKey.secureFilePath)"
+              #sudo chmod 600 "$(sshKey.secureFilePath)"
+              TARGET_DIR="/home/$(whoami)/.ssh"
+              echo "TARGET_DIR: $TARGET_DIR"
+              mkdir -p "$TARGET_DIR"
+              sudo cp "$(sshKey.secureFilePath)" "$TARGET_DIR/id_releaseUser"
+              sudo chmod 600 "$TARGET_DIR/id_releaseUser"
+              sudo chown -R "$(whoami)" "$TARGET_DIR"
+            displayName: 'Prepare SSH key'
+
+          - script: |
+              # add ssh in config
+              FILE="$HOME/.ssh/config"
+              tee -a "$FILE" > /dev/null <<EOT
+              Host ovhVM_rel
+                HostName "$(DEBIAN_IP)"
+                User "$(DEBIAN_USER)"
+                IdentityFile "$HOME/.ssh/id_releaseUser"
+                Port 22
+                PreferredAuthentications publickey
+              EOT
+
+              # add key to agent ?
+              eval "$(ssh-agent -s)" && ssh-add "$HOME/.ssh/id_releaseUser"
+              echo "Added key to agent"
+
+              if [ ! -f "$HOME/.ssh/known_hosts" ]; then
+                touch "$HOME/.ssh/known_hosts"
+              fi
+              ssh-keyscan -t rsa 79.137.33.77 >> "$HOME/.ssh/known_hosts"
+              cat "$HOME/.ssh/known_hosts"
+            env:
+              DEBIAN_USER: $(DEBIAN_USER)
+              DEBIAN_IP: $(DEBIAN_IP)
+            displayName: 'Setup SSH access'
+
+          - script: |
+              chmod +x .github/actions/remote/*.sh
+              chmod +x .github/actions/*.sh
+              ls -al "$HOME/.ssh"
+              cat "$HOME/.ssh/config"
+              bash .github/actions/remote/backup_current.sh
+            env:
+              DEBIAN_PATH: $(DEBIAN_PATH)
+            displayName: 'Backup current'
+
+          - script: |
+              #chmod +x .github/actions/remote/*.sh
+              #chmod +x .github/actions/*.sh
+              bash .github/actions/remote/build_containers.sh
+            env:
+              DEBIAN_PATH: $(DEBIAN_PATH)
+              DEBIAN_IP: $(DEBIAN_IP)
+              MONGO_USER: $(MONGO_USER)
+              MONGO_PASS: $(MONGO_PASS)
+            displayName: 'Build containers'
+
+          - script: |
+              bash .github/actions/remote/run_containers.sh
+            env:
+              DEBIAN_PATH: $(DEBIAN_PATH)
+            displayName: 'Run containers'
+
+          - script: |
+              bash .github/actions/remote/setup_db.sh
+            env:
+              DEBIAN_IP: $(DEBIAN_IP)
+              DEBIAN_PATH: $(DEBIAN_PATH)
+            displayName: 'Setup DB'
 
   - stage: Run_E2E
     jobs:
