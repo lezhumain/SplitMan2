@@ -12,7 +12,8 @@ ssh -oBatchMode=yes "ovhVM_rel" bash << EOF
   docker-compose up -d
 
   echo "Waiting for web server"
-  bash .github/actions/waitForServer.sh "127.0.0.1:4200"
+  bash waitForServer.sh "127.0.0.1:8080"
+  bash waitForServer.sh "127.0.0.1:4200"
 
   echo "Setting up DB"
   cd ../SplitMan2-API

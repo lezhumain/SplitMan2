@@ -213,6 +213,12 @@ stages:
               DEBIAN_PATH: $(DEBIAN_PATH)
             displayName: 'Run containers'
 
+          - script: |
+              bash .github/actions/remote/setup_db.sh
+            env:
+              DEBIAN_PATH: $(DEBIAN_PATH)
+            displayName: 'Setup DB'
+
   - stage: Run_E2E
     jobs:
       - job: Run_E2E_Tests
