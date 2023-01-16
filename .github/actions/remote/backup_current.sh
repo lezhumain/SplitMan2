@@ -1,12 +1,16 @@
 #! /bin/bash
 
+set -e
+
 if [ -z "$DEBIAN_USER" ] || [ -z "$DEBIAN_IP" ]; then
   echo "Need to export DEBIAN creds"
 fi
 
 #ssh -oBatchMode=yes "${DEBIAN_USER}@${DEBIAN_IP}" bash << EOF
 ssh -oBatchMode=yes ovhVM_rel bash << EOF
+  pwd
   cd "${DEBIAN_PATH}"
+  pwd
   chmod +x ./*.sh
   cd ../SplitMan2
   zip -r "../SplitMan2_$(date +%s).zip"

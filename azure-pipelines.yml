@@ -195,6 +195,7 @@ stages:
             env:
               DEBIAN_USER: $(DEBIAN_USER)
               DEBIAN_IP: $(DEBIAN_IP)
+              DEBIAN_PATH: $(DEBIAN_PATH)
             displayName: 'Backup current'
 
           - script: |
