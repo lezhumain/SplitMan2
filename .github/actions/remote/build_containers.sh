@@ -14,5 +14,7 @@ scp docker-compose.yml "ovhVM_rel:${DEBIAN_PATH}/"
 ssh -oBatchMode=yes "ovhVM_rel" bash << EOF
   cd "${DEBIAN_PATH}"
   chmod +x ./*.sh
+  export MONGO_USER="$(MONGO_USER)"
+  export MONGO_PASS="$(MONGO_PASS)"
   ./run_docker_e2e.sh "$DEBIAN_IP" "https"
 EOF

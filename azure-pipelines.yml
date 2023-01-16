@@ -203,6 +203,8 @@ stages:
             env:
               DEBIAN_PATH: $(DEBIAN_PATH)
               DEBIAN_IP: $(DEBIAN_IP)
+              MONGO_USER: $(MONGO_USER)
+              MONGO_PASS: $(MONGO_PASS)
             displayName: 'Build containers'
 
           - script: |
