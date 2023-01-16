@@ -209,7 +209,7 @@ stages:
               npm run e2e -- --headless=false --host="$HOST_IP:8081"
             displayName: 'Run E2E Tests'
 
-  - stage: Run E2E
+  - stage: Run_E2E
     jobs:
       - job: Run_E2E_Tests
         steps:
