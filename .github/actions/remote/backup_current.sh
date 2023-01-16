@@ -4,7 +4,8 @@ if [ -z "$DEBIAN_USER" ] || [ -z "$DEBIAN_IP" ]; then
   echo "Need to export DEBIAN creds"
 fi
 
-ssh -oBatchMode=yes "${DEBIAN_USER}@${DEBIAN_IP}" bash << EOF
+#ssh -oBatchMode=yes "${DEBIAN_USER}@${DEBIAN_IP}" bash << EOF
+ssh -oBatchMode=yes ovhVM_rel bash << EOF
   cd "${DEBIAN_PATH}"
   chmod +x ./*.sh
   cd ../SplitMan2

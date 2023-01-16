@@ -182,6 +182,8 @@ stages:
           - script: |
               chmod +x .github/actions/remote/*.sh
               chmod +x .github/actions/*.sh
+              ls -al "$HOME/.ssh"
+              cat "$HOME/.ssh/config"
               bash .github/actions/remote/backup_current.sh
             env:
               DEBIAN_USER: $(DEBIAN_USER)
