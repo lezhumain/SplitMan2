@@ -14,5 +14,5 @@ scp docker-compose.yml "ovhVM_rel:${DEBIAN_PATH}/"
 ssh -oBatchMode=yes "ovhVM_rel" bash << EOF
   cd "${DEBIAN_PATH}"
   chmod +x ./*.sh
-  ./run_docker_e2e.sh "" "https"
+  ./run_docker_e2e.sh "$DEBIAN_IP" "https"
 EOF

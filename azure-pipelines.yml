@@ -202,6 +202,7 @@ stages:
               bash .github/actions/remote/build_containers.sh
             env:
               DEBIAN_PATH: $(DEBIAN_PATH)
+              DEBIAN_IP: $(DEBIAN_IP)
             displayName: 'Build containers'
 
           - script: |
