@@ -201,7 +201,7 @@ stages:
           - script: |
               #chmod +x .github/actions/remote/*.sh
               #chmod +x .github/actions/*.sh
-              bash .github/actions/remote/build_container.sh
+              bash .github/actions/remote/build_containers.sh
             env:
               DEBIAN_USER: $(DEBIAN_USER)
               DEBIAN_IP: $(DEBIAN_IP)
@@ -209,7 +209,7 @@ stages:
             displayName: 'Build containers'
 
           - script: |
-              bash .github/actions/remote/run_container.sh
+              bash .github/actions/remote/run_containers.sh
             env:
               DEBIAN_USER: $(DEBIAN_USER)
               DEBIAN_IP: $(DEBIAN_IP)
