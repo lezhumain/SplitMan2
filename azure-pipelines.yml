@@ -193,8 +193,6 @@ stages:
               cat "$HOME/.ssh/config"
               bash .github/actions/remote/backup_current.sh
             env:
-              DEBIAN_USER: $(DEBIAN_USER)
-              DEBIAN_IP: $(DEBIAN_IP)
               DEBIAN_PATH: $(DEBIAN_PATH)
             displayName: 'Backup current'
 
@@ -203,16 +201,12 @@ stages:
               #chmod +x .github/actions/*.sh
               bash .github/actions/remote/build_containers.sh
             env:
-              DEBIAN_USER: $(DEBIAN_USER)
-              DEBIAN_IP: $(DEBIAN_IP)
               DEBIAN_PATH: $(DEBIAN_PATH)
             displayName: 'Build containers'
 
           - script: |
               bash .github/actions/remote/run_containers.sh
             env:
-              DEBIAN_USER: $(DEBIAN_USER)
-              DEBIAN_IP: $(DEBIAN_IP)
               DEBIAN_PATH: $(DEBIAN_PATH)
             displayName: 'Run containers'
 
@@ -222,6 +216,8 @@ stages:
         steps:
           - script: |
               HOST_IP="${DEBIAN_IP}"
+              npm install -g npm@9.3.0
+              npm ci
               npm run e2e -- --headless=false --host="$HOST_IP:8081"
             env:
               DEBIAN_IP: $(DEBIAN_IP)

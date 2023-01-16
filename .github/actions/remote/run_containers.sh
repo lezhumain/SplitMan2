@@ -1,12 +1,12 @@
 #! /bin/bash
 
-if [ -z "$DEBIAN_USER" ] || [ -z "$DEBIAN_IP" ]; then
-  echo "Need to export DEBIAN creds"
+if [ -z "$DEBIAN_PATH" ]; then
+  echo "Need to export DEBIAN path"
 fi
 
-scp .github/actions/waitForServer.sh "${DEBIAN_USER}@${DEBIAN_IP}:${DEBIAN_PATH}"
+scp .github/actions/waitForServer.sh "ovhVM_rel:${DEBIAN_PATH}"
 
-ssh -oBatchMode=yes "${DEBIAN_USER}@${DEBIAN_IP}:${DEBIAN_PATH}" bash << EOF
+ssh -oBatchMode=yes "ovhVM_rel" bash << EOF
   cd "${DEBIAN_PATH}"
   chmod +x ./*.sh
   docker-compose up -d

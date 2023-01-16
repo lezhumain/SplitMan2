@@ -2,8 +2,8 @@
 
 set -e
 
-if [ -z "$DEBIAN_USER" ] || [ -z "$DEBIAN_IP" ] || [ -z "$DEBIAN_PATH" ]; then
-  echo "Need to export DEBIAN creds"
+if [ -z "$DEBIAN_PATH" ]; then
+  echo "Need to export DEBIAN path"
 fi
 
 #ssh -oBatchMode=yes "${DEBIAN_USER}@${DEBIAN_IP}" bash << EOF
