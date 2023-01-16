@@ -15,7 +15,6 @@ ssh -oBatchMode=yes "ovhVM_rel" bash << EOF
   bash waitForServer.sh "127.0.0.1:8080"
   bash waitForServer.sh "127.0.0.1:4200"
 
-  echo "Setting up DB"
-  cd ../SplitMan2-API
-  mvn test -Dtest=MongoTests#mainSetup -f pom.xml
+  sleep 60
+  docker ps
 EOF
