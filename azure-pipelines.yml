@@ -52,7 +52,7 @@ stages:
 
           - script: |
               export CERT_PATH="$HOME/.ssl/example"
-              bash .github/actions/run_docker_e2e.sh "$DEBIAN_IP" "https"
+              bash .github/actions/run_docker_e2e.sh "$DEBIAN_IP" "https" "SplitMan2"
 
               IMAGE="splitman2"
               docker image save "$IMAGE" -o "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
