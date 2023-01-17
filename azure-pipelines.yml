@@ -98,6 +98,7 @@ stages:
 
           - script: |
               bash SplitMan2-run/setup_azure_ssh.sh
+              cat "$HOME/.ssh/config"
             env:
               DEBIAN_USER: $(DEBIAN_USER)
               DEBIAN_IP: $(DEBIAN_IP)
