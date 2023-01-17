@@ -71,7 +71,9 @@ stages:
               docker image save "$IMAGE" -o "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
 
               echo "$(Build.ArtifactStagingDirectory)"
-              echo "$(Build.ArtifactStagingDirectory) | wc"
+              echo "$(Build.ArtifactStagingDirectory)" | wc
+              ls -d "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
+              ls -al "$(Build.ArtifactStagingDirectory)"
             env:
               MONGO_USER: $(MONGO_USER)
               MONGO_PASS: $(MONGO_PASS)
