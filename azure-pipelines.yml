@@ -99,6 +99,8 @@ stages:
             displayName: 'Prepare SSH key'
 
           - script: |
+              export DEBIAN_IP="$DEBIAN_IP"
+              export DEBIAN_USER="$DEBIAN_USER"
               bash SplitMan2-run/setup_azure_ssh.sh
               cat "$HOME/.ssh/config"
             env:
