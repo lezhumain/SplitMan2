@@ -11,11 +11,21 @@ pr:
 pool:
   vmImage: ubuntu-latest
 
+resources:
+  repositories:
+    - repository: MyGitHub_splitman2run # The name used to reference this repository in the checkout step
+      type: github
+      endpoint: lezhumain
+      name: lezhumain/SplitMan2-run
+
 stages:
   - stage: Build
     jobs:
       - job: Build_Docker_Containers
         steps:
+          - checkout: self
+          - checkout: MyGitHub_splitman2run
+
           - task: DownloadSecureFile@1
             name: sslCert
             displayName: 'Download cert'
@@ -29,6 +39,7 @@ stages:
               secureFile: 'example.key'
 
           - script: |
+              cd SplitMan2
               echo "$(whoami)"
               sudo chown "$(whoami)":root $(sslCert.secureFilePath)
               sudo chmod 600 $(sslCert.secureFilePath)
@@ -51,6 +62,8 @@ stages:
             displayName: 'Prepare SSL key and cert'
 
           - script: |
+              cd SplitMan2
+
               export CERT_PATH="$HOME/.ssl/example"
               bash .github/actions/run_docker_e2e.sh "$DEBIAN_IP" "https" "SplitMan2"
 
@@ -65,6 +78,54 @@ stages:
               DEBIAN_IP: $(DEBIAN_IP)
             displayName: 'Build containers'
 
+      - job: Run_Docker_Containers
+        steps:
+          - checkout: self
+          - checkout: MyGitHub_splitman2run
+
+          - task: DownloadSecureFile@1
+            name: sshKey
+            displayName: 'Download SSH key'
+            inputs:
+              secureFile: 'id_releaseUser'
+
+          - script: |
+              chmod +x SplitMan2-run/*.sh
+              bash SplitMan2-run/prepare_azure_ssh.sh "$(sshKey.secureFilePath)"
+            displayName: 'Prepare SSH key'
+
+          - script: |
+              bash SplitMan2-run/setup_azure_ssh.sh
+            env:
+              DEBIAN_USER: $(DEBIAN_USER)
+              DEBIAN_IP: $(DEBIAN_IP)
+            displayName: 'Setup SSH access'
+
+          - script: |
+              bash SplitMan2-run/backup_current.sh
+            env:
+              DEBIAN_PATH: $(DEBIAN_PATH)
+            displayName: 'Backup current'
+
+          - script: |
+              # upload artifact to VM
+              IMAGE="splitman2"
+              scp "$(Build.ArtifactStagingDirectory)/$IMAGE.tar" "ovhVM_rel:${DEBIAN_PATH}"
+
+              # ssh into VM
+              ssh -oBatchMode=yes "ovhVM_rel" bash << EOF
+                cd "$DEBIAN_PATH"
+                docker image import "$IMAGE.tar" "$IMAGE"
+              EOF
+
+              #    run containers
+              bash SplitMan2-run/run_containers.sh
+            env:
+              MONGO_USER: $(MONGO_USER)
+              MONGO_PASS: $(MONGO_PASS)
+              DEBIAN_IP: $(DEBIAN_IP)
+              DEBIAN_PATH: $(DEBIAN_PATH)
+            displayName: 'Build containers'
 
 #  - stage: Prepare
 #    jobs:
