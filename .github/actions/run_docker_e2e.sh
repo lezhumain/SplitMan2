@@ -5,6 +5,7 @@ set -e
 WORKING_DIR="$(pwd)"
 HOST_IP="$1"
 USE_HTTPS="$2"
+TARGET_REPOS="$3"
 
 if [ -z "$HOST_IP" ]; then
        # EXT ip
@@ -13,7 +14,7 @@ if [ -z "$HOST_IP" ]; then
        HOST_IP="$(ip addr show eth0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)"
 fi
 
-docker system prune -af
+#docker system prune -af
 
 function update_dir()
 {
@@ -61,16 +62,25 @@ fi
 sed -i.bak -E "s|MONGO_INITDB_ROOT_USERNAME=.+$|MONGO_INITDB_ROOT_USERNAME=$MONGO_USER|" docker-compose.yml
 sed -i.bak -E "s|MONGO_INITDB_ROOT_PASSWORD=.+$|MONGO_INITDB_ROOT_PASSWORD=$MONGO_PASS|" docker-compose.yml
 
-update_dir ".." "SplitMan2-nginx" "main"
-#cd ../SplitMan2-nginx
-bash doBuild.sh "http://$HOST_IP" # nginx
+for REPO in $TARGET_REPOS
+do
+  echo "$REPO"
 
-update_dir ".." "SplitMan2-API" "master"
-#cd ../SplitMan2-API
-bash doBuild.sh "https://$HOST_IP:8081" # api
-
-update_dir ".." "SplitMan2" "master"
-#cd ../SplitMan2
-bash doBuild.sh "https://$HOST_IP:8081" "/api" # web
+  if [ "$REPO" == "SplitMan2-nginx" ]; then
+    update_dir ".." "SplitMan2-nginx" "main"
+    #cd ../SplitMan2-nginx
+    bash doBuild.sh "http://$HOST_IP" # nginx
+  elif [ "$REPO" == "SplitMan2-API" ]; then
+    update_dir ".." "SplitMan2-API" "master"
+    #cd ../SplitMan2-API
+    bash doBuild.sh "https://$HOST_IP:8081" # api
+  elif [ "$REPO" == "SplitMan2" ]; then
+    update_dir ".." "SplitMan2" "master"
+    #cd ../SplitMan2
+    bash doBuild.sh "https://$HOST_IP:8081" "/api" # web
+  else
+    echo "Unknown repo $REPO"
+  fi
+done
 
 docker images
