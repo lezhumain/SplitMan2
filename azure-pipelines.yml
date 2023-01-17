@@ -78,7 +78,9 @@ stages:
               DEBIAN_IP: $(DEBIAN_IP)
             displayName: 'Build containers'
 
-      - job: Run_Docker_Containers
+  - stage: Deploy
+    jobs:
+      - job: Deploy_Docker_Containers
         steps:
           - checkout: self
           - checkout: MyGitHub_splitman2run
@@ -125,7 +127,7 @@ stages:
               MONGO_PASS: $(MONGO_PASS)
               DEBIAN_IP: $(DEBIAN_IP)
               DEBIAN_PATH: $(DEBIAN_PATH)
-            displayName: 'Build containers'
+            displayName: 'Run containers'
 
 #  - stage: Prepare
 #    jobs:
