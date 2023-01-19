@@ -3,10 +3,12 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-pr:
-  branches:
-    include:
-    - '*'  # must quote since "*" is a YAML reserved character; we want a string
+#pr:
+#  branches:
+#    include:
+#    - '*'  # must quote since "*" is a YAML reserved character; we want a string
+trigger:
+- main
 
 pool:
   vmImage: ubuntu-latest
@@ -17,6 +19,12 @@ resources:
       type: github
       endpoint: lezhumain
       name: lezhumain/SplitMan2-run
+
+variables:
+- name: IMAGE
+  value: splitman2
+- name: SREPO
+  value: SplitMan2
 
 stages:
   - stage: Build
@@ -39,7 +47,13 @@ stages:
               secureFile: 'example.key'
 
           - script: |
-              cd SplitMan2
+              if [ -z "$IMAGE" ]; then
+                exit 1
+              fi
+            displayName: 'Test variables'
+
+          - script: |
+              cd "$SREPO"
               echo "$(whoami)"
               sudo chown "$(whoami)":root $(sslCert.secureFilePath)
               sudo chmod 600 $(sslCert.secureFilePath)
@@ -62,13 +76,14 @@ stages:
             displayName: 'Prepare SSL key and cert'
 
           - script: |
-              cd SplitMan2
+              cd "$SREPO"
 
               export CERT_PATH="$HOME/.ssl/example"
-              bash .github/actions/run_docker_e2e.sh "$DEBIAN_IP" "https" "SplitMan2"
+              bash ../SplitMan2-run/run_docker_e2e.sh "$DEBIAN_IP" "https" "$SREPO"
 
-              IMAGE="splitman2"
-              docker image save "$IMAGE" -o "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
+              #IMAGE="splitman2nginx"
+              #docker image save "$IMAGE" -o "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
+              docker save "$IMAGE" -o "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
 
               echo "$(Build.ArtifactStagingDirectory)"
               echo "$(Build.ArtifactStagingDirectory)" | wc
@@ -79,6 +94,35 @@ stages:
               MONGO_PASS: $(MONGO_PASS)
               DEBIAN_IP: $(DEBIAN_IP)
             displayName: 'Build containers'
+
+          - task: DownloadSecureFile@1
+            name: sshKey
+            displayName: 'Download SSH key'
+            inputs:
+              secureFile: 'id_releaseUser'
+
+          - script: |
+              chmod +x SplitMan2-run/*.sh
+              bash SplitMan2-run/prepare_azure_ssh.sh "$(sshKey.secureFilePath)"
+            displayName: 'Prepare SSH key'
+
+          - script: |
+              #cat SplitMan2-run/setup_azure_ssh.sh
+              . SplitMan2-run/setup_azure_ssh.sh
+              cat "$HOME/.ssh/config"
+            env:
+              DEBIAN_USER: $(DEBIAN_USER)
+              DEBIAN_IP: $(DEBIAN_IP)
+            displayName: 'Setup SSH access'
+
+          - script: |
+              # upload artifact to VM
+              #IMAGE="splitman2nginx"
+              scp "$(Build.ArtifactStagingDirectory)/$IMAGE.tar" "ovhVM_rel:${DEBIAN_PATH}"
+            env:
+              DEBIAN_PATH: $(DEBIAN_PATH)
+            displayName: 'Save containers'
+
 
   - stage: Deploy
     jobs:
@@ -99,9 +143,8 @@ stages:
             displayName: 'Prepare SSH key'
 
           - script: |
-              export DEBIAN_IP="$DEBIAN_IP"
-              export DEBIAN_USER="$DEBIAN_USER"
-              bash SplitMan2-run/setup_azure_ssh.sh
+              cat SplitMan2-run/setup_azure_ssh.sh
+              . SplitMan2-run/setup_azure_ssh.sh
               cat "$HOME/.ssh/config"
             env:
               DEBIAN_USER: $(DEBIAN_USER)
@@ -115,222 +158,25 @@ stages:
             displayName: 'Backup current'
 
           - script: |
-              # upload artifact to VM
-              IMAGE="splitman2"
-              scp "$(Build.ArtifactStagingDirectory)/$IMAGE.tar" "ovhVM_rel:${DEBIAN_PATH}"
-
               # ssh into VM
               ssh -oBatchMode=yes "ovhVM_rel" bash << EOF
                 cd "$DEBIAN_PATH"
-                docker image import "$IMAGE.tar" "$IMAGE"
+                docker ps
+                docker images
+                #docker system prune -af
+                #docker image import "$IMAGE.tar" "$IMAGE"
+                docker load -i "$IMAGE.tar"
+                docker images
+                docker ps
               EOF
-
-              #    run containers
-              bash SplitMan2-run/run_containers.sh
             env:
-              MONGO_USER: $(MONGO_USER)
-              MONGO_PASS: $(MONGO_PASS)
-              DEBIAN_IP: $(DEBIAN_IP)
+              DEBIAN_PATH: $(DEBIAN_PATH)
+            displayName: 'Update containers'
+
+          - script: |
+              #    run containers
+              cd SplitMan2-run
+              bash run_containers.sh
+            env:
               DEBIAN_PATH: $(DEBIAN_PATH)
             displayName: 'Run containers'
-
-#  - stage: Prepare
-#    jobs:
-#      - job: Prepare_SSL_files
-#        steps:
-#          - task: DownloadSecureFile@1
-#            name: sslCert
-#            displayName: 'Download cert'
-#            inputs:
-#              secureFile: 'example.crt'
-#
-#          - task: DownloadSecureFile@1
-#            name: sslKey
-#            displayName: 'Download key'
-#            inputs:
-#              secureFile: 'example.key'
-#
-#          - script: |
-#              echo "$(whoami)"
-#              sudo chown "$(whoami)":root $(sslCert.secureFilePath)
-#              sudo chmod 600 $(sslCert.secureFilePath)
-#              sudo chown "$(whoami)":root $(sslKey.secureFilePath)
-#              sudo chmod 600 $(sslKey.secureFilePath)
-#
-#              TARGET_DIR="/home/$(whoami)/.ssl"
-#              echo "TARGET_DIR: $TARGET_DIR"
-#              mkdir -p "$TARGET_DIR"
-#              sudo ln -s $(sslCert.secureFilePath) "$TARGET_DIR/example.crt"
-#              sudo ln -s $(sslKey.secureFilePath) "$TARGET_DIR/example.key"
-#              echo "files:"
-#              ls -al "$TARGET_DIR"
-#              #sudo chown "$(whoami)" "$TARGET_DIR"/*
-#              #sudo chmod 600 "$TARGET_DIR"/*
-#              #ls -al "$TARGET_DIR"
-#              sudo chown -R "$(whoami)" "$TARGET_DIR"
-#            displayName: 'Prepare SSL key and cert'
-
-#  - stage: Build
-#    jobs:
-#      - job: Build_Docker_Containers
-#        steps:
-#          - task: DownloadSecureFile@1
-#            name: sslCert
-#            displayName: 'Download cert'
-#            inputs:
-#              secureFile: 'example.crt'
-#
-#          - task: DownloadSecureFile@1
-#            name: sslKey
-#            displayName: 'Download key'
-#            inputs:
-#              secureFile: 'example.key'
-#
-#          - script: |
-#              echo "$(whoami)"
-#              sudo chown "$(whoami)":root $(sslCert.secureFilePath)
-#              sudo chmod 600 $(sslCert.secureFilePath)
-#              sudo chown "$(whoami)":root $(sslKey.secureFilePath)
-#              sudo chmod 600 $(sslKey.secureFilePath)
-#
-#              TARGET_DIR="/home/$(whoami)/.ssl"
-#              echo "TARGET_DIR: $TARGET_DIR"
-#              mkdir -p "$TARGET_DIR"
-#              sudo ln -s $(sslCert.secureFilePath) "$TARGET_DIR/example.crt"
-#              sudo ln -s $(sslKey.secureFilePath) "$TARGET_DIR/example.key"
-#              #sudo cp $(sslCert.secureFilePath) "$TARGET_DIR/example.crt"
-#              #sudo cp $(sslKey.secureFilePath) "$TARGET_DIR/example.key"
-#              echo "files:"
-#              ls -al "$TARGET_DIR"
-#              #sudo chown "$(whoami)" "$TARGET_DIR"/*
-#              #sudo chmod 600 "$TARGET_DIR"/*
-#              #ls -al "$TARGET_DIR"
-#              sudo chown -R "$(whoami)" "$TARGET_DIR"
-#            displayName: 'Prepare SSL key and cert'
-#
-#          - script: |
-#              #TARGET_DIR="/home/$(whoami)/.ssl"
-#              #ls -al "$TARGET_DIR"
-#              #bash .github/actions/runDockerE2E.sh
-#              export CERT_PATH="$HOME/.ssl/example"
-#              bash .github/actions/run_docker_e2e.sh "127.0.0.1" "https"
-#            env:
-#              MONGO_USER: $(MONGO_USER)
-#              MONGO_PASS: $(MONGO_PASS)
-#            displayName: 'Build containers'
-#
-#          - script: |
-#              docker-compose up -d
-#              docker ps
-#              sleep 30
-#              #HOST_IP="$(ip addr show eth0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)"
-#              HOST_IP="127.0.0.1"
-#              echo "HOST_IP: $HOST_IP"
-#
-#              echo "Waiting for web server"
-#              bash .github/actions/waitForServer.sh "127.0.0.1:4200"
-#              sleep 30
-#              curl -s --insecure "http://127.0.0.1:4200/login"
-#              #curl -s --insecure  "http://127.0.0.1:8080/version"
-#              curl -s --insecure "https://127.0.0.1:8081/login"
-#              #curl -s --insecure  "https://127.0.0.1:8081/api/version"
-#              RES="$(curl -s --insecure "https://$HOST_IP:8081/api/version")"
-#              echo "RES: $RES"
-#              [ "$RES" == "TODO" ]
-#            displayName: 'Run containers'
-#
-#          - script: |
-#              cd ../SplitMan2-API
-#              #HOST_IP="127.0.0.1"
-#              mvn test -Dtest=MongoTests#mainSetup -f pom.xml
-#            displayName: 'Setup E2E Tests'
-#
-#          - script: |
-#              #HOST_IP="$(ip addr show eth0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)"
-#              HOST_IP="127.0.0.1"
-#              npm install -g npm@9.3.0
-#              npm ci
-#              npm run e2e -- --headless=false --host="$HOST_IP:8081"
-#            displayName: 'Run E2E Tests'
-
-#  - stage: Deploy
-#    jobs:
-#      - job: Deploy_Docker_Containers
-#        steps:
-#          - task: DownloadSecureFile@1
-#            name: sshKey
-#            displayName: 'Download SSH key'
-#            inputs:
-#              secureFile: 'id_releaseUser'
-#
-#          - script: |
-#              echo "$(whoami)"
-#              #sudo chown "$(whoami)":root "$(sshKey.secureFilePath)"
-#              #sudo chmod 600 "$(sshKey.secureFilePath)"
-#              TARGET_DIR="/home/$(whoami)/.ssh"
-#              echo "TARGET_DIR: $TARGET_DIR"
-#              mkdir -p "$TARGET_DIR"
-#              sudo cp "$(sshKey.secureFilePath)" "$TARGET_DIR/id_releaseUser"
-#              sudo chmod 600 "$TARGET_DIR/id_releaseUser"
-#              sudo chown -R "$(whoami)" "$TARGET_DIR"
-#            displayName: 'Prepare SSH key'
-#
-#          - script: |
-#              # add ssh in config
-#              FILE="$HOME/.ssh/config"
-#              tee -a "$FILE" > /dev/null <<EOT
-#              Host ovhVM_rel
-#                HostName "$(DEBIAN_IP)"
-#                User "$(DEBIAN_USER)"
-#                IdentityFile "$HOME/.ssh/id_releaseUser"
-#                Port 22
-#                PreferredAuthentications publickey
-#              EOT
-#
-#              # add key to agent ?
-#              eval "$(ssh-agent -s)" && ssh-add "$HOME/.ssh/id_releaseUser"
-#              echo "Added key to agent"
-#
-#              if [ ! -f "$HOME/.ssh/known_hosts" ]; then
-#                touch "$HOME/.ssh/known_hosts"
-#              fi
-#              ssh-keyscan -t rsa 79.137.33.77 >> "$HOME/.ssh/known_hosts"
-#              cat "$HOME/.ssh/known_hosts"
-#            env:
-#              DEBIAN_USER: $(DEBIAN_USER)
-#              DEBIAN_IP: $(DEBIAN_IP)
-#            displayName: 'Setup SSH access'
-#
-#          - script: |
-#              chmod +x .github/actions/remote/*.sh
-#              chmod +x .github/actions/*.sh
-#              ls -al "$HOME/.ssh"
-#              cat "$HOME/.ssh/config"
-#              bash .github/actions/remote/backup_current.sh
-#            env:
-#              DEBIAN_PATH: $(DEBIAN_PATH)
-#            displayName: 'Backup current'
-#
-#          - script: |
-#              #chmod +x .github/actions/remote/*.sh
-#              #chmod +x .github/actions/*.sh
-#              bash .github/actions/remote/build_containers.sh "SplitMan2"
-#            env:
-#              DEBIAN_PATH: $(DEBIAN_PATH)
-#              DEBIAN_IP: $(DEBIAN_IP)
-#              MONGO_USER: $(MONGO_USER)
-#              MONGO_PASS: $(MONGO_PASS)
-#            displayName: 'Build containers'
-#
-#          - script: |
-#              bash .github/actions/remote/run_containers.sh
-#            env:
-#              DEBIAN_PATH: $(DEBIAN_PATH)
-#            displayName: 'Run containers'
-#
-#          - script: |
-#              bash .github/actions/remote/setup_db.sh
-#            env:
-#              DEBIAN_IP: $(DEBIAN_IP)
-#              DEBIAN_PATH: $(DEBIAN_PATH)
-#            displayName: 'Setup DB'
