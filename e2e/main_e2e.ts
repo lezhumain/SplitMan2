@@ -10,6 +10,8 @@ import {filter, first, timeout} from "rxjs/operators";
 import {flatMap} from "rxjs/internal/operators";
 import {Expense} from "../src/app/models/expense";
 import {CreateBrowsers, honor10} from "./e2e_utils";
+import * as fs from "fs";
+import * as https from "https";
 
 const userData = {
   email: "a",
@@ -66,9 +68,12 @@ async function clearAndType(e: ElementHandle, s: string) {
   // return e.clea
 }
 
-async function handleSecrutiyStuff(page: Page) {
+async function handleSecrutiyStuff(page: Page, doThrow = false) {
+  await page.waitForTimeout(500);
+  const hasErrorXpath = "#details-button";
   await waitForMS(300);
-  const hasError = await page.waitForSelector("#details-button", {visible: true})
+  await waitForMS(300);
+  const hasError = await page.waitForSelector(hasErrorXpath, {visible: true})
     .then((e: ElementHandle) => e, () => null);
 
   if (hasError) {
@@ -188,25 +193,37 @@ async function handleLogin(pag: Page, userData: { pass: string; email: string; u
     await pag.waitForSelector("#password", {visible: true})
       .then((e: ElementHandle) => e ? e.type(userData.pass) : null);
   } catch (e) {
-    debugger;
+    console.log("login pass error:");
+    console.log(e);
+
+    // take screenshot
+    // await takeScreenshot(pag, true);
+
+    // upload screenshot to filebin
+
+    throw new Error("login pass error:");
   }
 
   await waitForTimeout(500);
 
   await pag.waitForXPath("//button[contains(text(), 'Login')]", {visible: true})
-    .then((e: ElementHandle) => e ? Promise.all([e.click(), pag.waitForNavigation({timeout: 10000}).then(() => waitForTimeout(1000))]) : null);
+    .then((e: ElementHandle) => {
+      return e ? Promise.all([e.click(), pag.waitForNavigation({timeout: 40000, waitUntil: "networkidle2"}).then(() => waitForTimeout(1000)).then(() => waitForTimeout(1000))]) : null
+    });
 
   // await pag.waitForNavigation();
 
-  await waitForTimeout(500);
+  // await waitForTimeout(500);
 
   // const toastSel = "#toast";
   const toastSel = "#toast.toast_0";
-  const elm = await pag.waitForSelector(toastSel, {visible: true, timeout: 10000});
+  const elm = await pag.waitForSelector(toastSel, {visible: true, timeout: 10010});
   const classfg = await elm.getProperty("className").then((e: JSHandle) => e.remoteObject().value);
   console.log("\t" + classfg);
 
+  console.log("a1")
   await pag.waitForSelector(toastSel, {hidden: true, timeout: 10000});
+  console.log("a2")
 }
 
 let browser: Browser, browser1: Browser;
@@ -274,9 +291,10 @@ async function checkRepartition(thePage: Page, repart: string) {
   }
 }
 
-// const host = `https://86.18.16.122:8083`; // TODO cmd line arg to switch
-// const host = `http://127.0.0.1:4200`;
-const host = "https://127.0.0.1:8081";
+// TODO cmd line arg to switch
+const hparam = process.argv.find(a => a.startsWith("--host="))?.replace("--host=", "");
+const host = hparam ? `https://${hparam}` : "http://127.0.0.1:4200";
+// const host = "https://127.0.0.1:8081";
 // const host = "https://79.137.33.77:8081"
 
 const url = `${host}/login`;
@@ -1198,36 +1216,134 @@ async function takeScreenshot(page: Page, doPrivNote = true) {
   const brow = page.browser();
   const pa = await brow.newPage();
 
-  const data: string = await page.screenshot({path: "./screen.jpeg", type: "jpeg", encoding: "base64", quality: 33})
+  const fileName = "./screen.jpeg";
+  const data: string = await page.screenshot({path: fileName, type: "jpeg", encoding: "base64", quality: 33})
     .then((e: Buffer) => e.toString());
 
+  console.log(`Data:\n${data}\n`);
+
   if (doPrivNote) {
-    await pa.goto("https://privnote.com/#");
-
-    const el = await pa.waitForSelector("#note_raw", {visible: true, timeout: 10000});
-
-    const result = data;
-
-    // faster than .type(data)
-    await pa.evaluate((pData: string, pEl: HTMLInputElement) => {
-      pEl.value = pData;
-    }, data, el);
-
-    await pa.waitForSelector("#encrypt_note").then((e: ElementHandle) => e.click());
-
-    await pa.waitForResponse("https://privnote.com/legacy/");
-
-    await pa.waitForTimeout(500);
-    const v = await pa.waitForSelector("#note_link_input")
-      .then((e: ElementHandle) => e.getProperty("value"))
-      .then((e: ElementHandle) => {
-        return e.remoteObject().value;
-      });
-
-    return pa.close().then(() => v);
+    return doPrivNoteFn(pa, data);
+    // await uploadToFilebin(data, fileName);
   } else {
     return Promise.resolve("");
   }
+}
+
+async function httpPOSTFile(url: string, data: string, fileName: string) {
+  const u = new URL(url);
+  const filecomtet = fs.readFileSync(fileName);
+  const bytes = new TextEncoder().encode(fileName);
+  // debugger;
+  return new Promise((resolve, reject) => {
+    const options = {
+      hostname: u.hostname,
+      port: 443,
+      path: u.pathname,
+      method: 'POST',
+      headers: {
+        'X-Custom': 'xxx',
+        'Content-Length': filecomtet.length,
+        'Content-Type': "image/png"
+      }
+    };
+
+    const req = https.request(options, (res) => {
+      console.log('statusCode:', res.statusCode);
+      console.log('headers:', res.headers);
+
+      res.on('data', (d) => {
+        // process.stdout.write(d);
+        resolve(d.toString());
+      });
+    });
+
+    req.on('error', (e) => {
+      // console.error(e);
+      reject(e);
+    });
+    // req.write(bytes);
+    req.write(filecomtet);
+    req.end();
+  });
+}
+
+async function httpGET(url: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    https.get(url, (res) => {
+      console.log('statusCode:', res.statusCode);
+      console.log('headers:', res.headers);
+      let resu = "";
+
+      res.on('data', (d) => {
+        resu += d.toString();
+        resolve(resu);
+      });
+
+      res.on('response', (resp) => {
+        debugger;
+        resolve("resp");
+      });
+
+      res.on('finish', (resp) => {
+        debugger;
+        resolve("resp");
+      });
+
+    }).on('error', (e) => {
+      console.error(e);
+      reject(e);
+    });
+  });
+}
+
+async function getBinID(): Promise<string> {
+  // const binID: string = await httpGET("https://filebin.net");
+  // const match = /filebin.net\/([^"]+)"/.exec(binID);
+  // return Promise.resolve(match && match.length >= 2 ? match[1] : null);
+
+  return httpGET("https://filebin.net").then((binID) => {
+    const match = /filebin.net\/([^"]+)"/.exec(binID);
+    return match && match.length >= 2 ? match[1] : null;
+  });
+}
+
+async function uploadToFilebin(data: string, filePath: string) {
+  const binID: string = await getBinID();
+  console.log("Using bin " + binID);
+  const bits = filePath.replace(/\\|\//g, "===").split("===");
+  const fileName = bits[bits.length - 1];
+  const postURL = "https://filebin.net/" + binID + "/" + fileName;
+  console.log("postURL: " + postURL);
+  return httpPOSTFile(postURL, data, filePath);
+}
+
+async function doPrivNoteFn(pa, data: string) {
+  await pa.goto("https://privnote.com/#");
+
+  const el = await pa.waitForSelector("#note_raw", {visible: true, timeout: 10000});
+
+  const result = data;
+
+  // faster than .type(data)
+  await pa.evaluate((pData: string, pEl: HTMLInputElement) => {
+    pEl.value = pData;
+  }, data, el);
+
+  await pa.waitForSelector("#encrypt_note").then((e: ElementHandle) => e.click());
+
+  await pa.waitForResponse("https://privnote.com/legacy/");
+
+
+
+  await pa.waitForTimeout(500);
+  const v = await pa.waitForSelector("#note_link_input")
+    .then((e: ElementHandle) => e.getProperty("value"))
+    .then((e: ElementHandle) => {
+      return e.remoteObject().value;
+    });
+
+  return pa.close().then(() => v);
 }
 
 async function runPrivNote(_: string[]) { //: Promise<string> {
@@ -1272,14 +1388,14 @@ async function runAll() {
         "Dju doit a 8.56€ Suzie Max doit a 8.56€ Suzie Elyan doit a 8.56€ Suzie"
       ]
     },
-    // {
-    //   fn: MainTest,
-    //   msg: "E2E with all expenses",
-    //   params: [
-    //     allExpenses.slice(),
-    //     "Elyan doit a 17.30€ Dju"
-    //   ]
-    // }
+    {
+      fn: MainTest,
+      msg: "E2E with all expenses",
+      params: [
+        allExpenses.slice(),
+        "Elyan doit a 17.30€ Dju"
+      ]
+    }
   ];
 
   const allRes: {msg: string, errorMsg?: string, hasError: boolean, links?: string[]}[] = [];
@@ -1301,7 +1417,7 @@ async function runAll() {
       const pages = await getPagse();
 
       resOO.links = await Promise.all(
-        pages.map((thePage: Page, index: number) => takeScreenshot(thePage, false)
+        pages.map((thePage: Page, index: number) => takeScreenshot(thePage, true)
           // .then((link: string) => console.log(`Screenshot link ${index} : ${link}`))
         )
       );
@@ -1340,8 +1456,11 @@ async function runAll() {
 }
 
 
-runAll().then((e: any) => {
-  console.log("Done.");
+
+runAll()
+// uploadToFilebin("", "C:\\Users\\djuuu\\OneDrive\\Pictures\\MerionGenea.png")
+  .then((e: any) => {
+    console.log("Done.");
 }, (e) => {
   console.error(e);
   throw e;

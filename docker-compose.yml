@@ -1,0 +1,49 @@
+version: "3.3"
+services:
+  mongodb:
+    image: "mongo"
+    ports:
+      - "27017:27017"
+    networks:
+      main:
+        aliases:
+          - mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=""
+      - MONGO_INITDB_ROOT_PASSWORD=""
+  web:
+    image: "splitman2"
+    ports:
+      - "4200:4200"
+    networks:
+      main:
+        aliases:
+          - web
+  api:
+    image: "splitman2api"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
+    networks:
+      main:
+        aliases:
+          - api
+  nginx:
+    image: "splitman2nginx"
+    ports:
+      - "8081:443"
+    links:
+      - web:web
+      - api:api
+      - mongodb:mongodb
+    depends_on:
+      - web
+      - api
+      - mongodb
+    networks:
+      main:
+        aliases:
+          - nginx
+networks:
+  main:
