@@ -72,6 +72,7 @@ async function handleSecrutiyStuff(page: Page, doThrow = false) {
   await page.waitForTimeout(500);
   const hasErrorXpath = "#details-button";
   await waitForMS(300);
+  await waitForMS(300);
   const hasError = await page.waitForSelector(hasErrorXpath, {visible: true})
     .then((e: ElementHandle) => e, () => null);
 
@@ -207,7 +208,7 @@ async function handleLogin(pag: Page, userData: { pass: string; email: string; u
 
   await pag.waitForXPath("//button[contains(text(), 'Login')]", {visible: true})
     .then((e: ElementHandle) => {
-      return e ? Promise.all([e.click(), pag.waitForNavigation({timeout: 40000, waitUntil: "networkidle2"}).then(() => waitForTimeout(1000))]) : null
+      return e ? Promise.all([e.click(), pag.waitForNavigation({timeout: 40000, waitUntil: "networkidle2"}).then(() => waitForTimeout(1000)).then(() => waitForTimeout(1000))]) : null
     });
 
   // await pag.waitForNavigation();
@@ -1329,7 +1330,6 @@ async function doPrivNoteFn(pa, data: string) {
     pEl.value = pData;
   }, data, el);
 
-
   await pa.waitForSelector("#encrypt_note").then((e: ElementHandle) => e.click());
 
   await pa.waitForResponse("https://privnote.com/legacy/");
@@ -1461,7 +1461,6 @@ runAll()
 // uploadToFilebin("", "C:\\Users\\djuuu\\OneDrive\\Pictures\\MerionGenea.png")
   .then((e: any) => {
     console.log("Done.");
-
 }, (e) => {
   console.error(e);
   throw e;
