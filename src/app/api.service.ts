@@ -143,8 +143,9 @@ export class ApiService {
             if (!obj.id) {
               obj.id = fullObj.id;
             }
+            
+            newValues.push(obj);
           }
-          newValues.push(obj);
         }
         else if(targetIndex > -1) {
           // if (obj["_id"] === undefined) {
