@@ -131,16 +131,21 @@ export class ApiService {
         const newValues = currentAll.slice();
 
         const targetIndex = newValues.findIndex(t => t.id === obj.id && t.type === obj.type);
-        obj._rev = fullObj._rev;
+        if(!isRegister) {
+          obj._rev = fullObj._rev;
+        }
         if(targetIndex === -1) {
           console.log("No target index, inserting");
-          if (obj["_id"] === undefined) {
-            obj["_id"] = fullObj._id;
+          if(!isRegister) {
+            if (obj["_id"] === undefined) {
+              obj["_id"] = fullObj._id;
+            }
+            if (!obj.id) {
+              obj.id = fullObj.id;
+            }
+            
+            newValues.push(obj);
           }
-          if (!obj.id) {
-            obj.id = fullObj.id;
-          }
-          newValues.push(obj);
         }
         else if(targetIndex > -1) {
           // if (obj["_id"] === undefined) {

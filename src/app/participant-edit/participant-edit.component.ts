@@ -30,7 +30,8 @@ export class ParticipantEditComponent implements OnInit {
     const paramIDex: string | null = routeParams.get('participantID');
 
     if(travelID === null) {
-      alert("No travel id specified");
+      // alert("No travel id specified");
+      console.warn("No travel id specified");
       return;
     }
 
