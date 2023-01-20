@@ -7,8 +7,13 @@
 #  branches:
 #    include:
 #    - '*'  # must quote since "*" is a YAML reserved character; we want a string
+
+pr: none
+
 trigger:
-- main
+  branches:
+    include:
+      - master
 
 pool:
   vmImage: ubuntu-latest
