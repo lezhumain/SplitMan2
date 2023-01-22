@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import "bootstrap";
+// import "bootstrap/dist/css/bootstrap.min.css";
+// import "font-awesome/css/font-awesome.min.css";
 
 // import "../../node_modules/bootstrap/dist/css/bootstrap.min.css";
 // import "../../node_modules/font-awesome/css/font-awesome.min.css";
