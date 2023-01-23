@@ -41,9 +41,11 @@ export class RegisterComponent implements OnInit {
       // debugger;
       this.router.navigate(['login']);
       ToastComponent.toastdata$.next({type: ToastType.SUCCESS, message: "Register success"} as ToastMessage);
+      console.log("login success");
     }, (err: Error) => {
       console.warn(err.message);
       ToastComponent.toastdata$.next({type: ToastType.ERROR, message: "Register error: " + err.message} as ToastMessage);
+      console.log("login failed");
     });
   }
 

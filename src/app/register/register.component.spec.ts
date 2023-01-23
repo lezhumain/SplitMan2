@@ -5,6 +5,8 @@ import {getBaseTestStuff} from "../../../e2e/baseTestStuff";
 import {of} from "rxjs";
 import {ApiService} from "../api.service";
 import {Router} from "@angular/router";
+import {ToastComponent} from "../toast/toast.component";
+import {BaseItem} from "../models/baseItem";
 
 
 describe('RegisterComponent', () => {
@@ -19,6 +21,7 @@ describe('RegisterComponent', () => {
 
     routerSpy = {navigate: jasmine.createSpy('navigate')};
     baseStuff[1].providers.push({ provide: Router, useValue: routerSpy });
+    baseStuff[1].declarations.push(ToastComponent);
 
     // baseStuff[1].providers.push("ApiService");
 
@@ -34,7 +37,8 @@ describe('RegisterComponent', () => {
     const service = component["userServiceService"]["_apiService"] as ApiService;
     service["httpPost"] = (...args: any[]) => {
       return of(null);
-    }
+    };
+    service["_allItems$"].next([{} as BaseItem]);
   });
 
   it('should navigate after register', () => {
@@ -44,5 +48,15 @@ describe('RegisterComponent', () => {
     component.doRegister();
 
     expect (routerSpy.navigate).toHaveBeenCalledWith(['login']);
-  });
+
+    // ToastComponent.toastdata$.pipe(
+    //   filter(r => !!r),
+    //   first()
+    // ).subscribe((res) => {
+    //   debugger;
+    //   // ToastComponent.toastdata$.
+    //
+    //   expect (routerSpy.navigate).toHaveBeenCalledWith(['login']);
+    // });
+  }, 10000);
 });

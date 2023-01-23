@@ -6,9 +6,7 @@ import {catchError, distinctUntilChanged, filter, first, map, take, tap} from "r
 import {BaseService} from "./base-service.service";
 import {Travel} from "./models/travel";
 import {flatMap} from "rxjs/internal/operators";
-import {TravelModel} from "./models/travel-model";
 import {environment} from "../environments/environment";
-import {AjaxResponse} from "rxjs/ajax";
 import {HttpClient, HttpResponse} from "@angular/common/http";
 import {IAPIResult} from "./models/iapiresult";
 import {combineLatest} from "rxjs";
