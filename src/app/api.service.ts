@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
-import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
-import {BehaviorSubject, combineLatest, Observable, of} from "rxjs";
+import {Injectable} from '@angular/core';
+import {HttpClient, HttpHeaders} from "@angular/common/http";
+import {BehaviorSubject, Observable, of} from "rxjs";
 import {BaseItem} from "./models/baseItem";
 import {catchError, debounceTime, filter, first, map, tap} from "rxjs/operators";
 import {flatMap} from "rxjs/internal/operators";
@@ -143,7 +143,7 @@ export class ApiService {
             if (!obj.id) {
               obj.id = fullObj.id;
             }
-            
+
             newValues.push(obj);
           }
         }
@@ -159,9 +159,11 @@ export class ApiService {
         return this._allItems$.pipe(
           tap((e) => console.log("savedb 0: %o", e)),
           // filter(t => JSON.stringify(t) !== currentAllStr),
-          filter(t => !!t && Array.isArray(t) && t.length > 0 && t.includes(obj)
-            && t.find(tobj => JSON.stringify(tobj._id) === JSON.stringify(obj._id)) !== undefined
-            && t.find(tobj => tobj._rev === obj._rev) !== undefined),
+          filter(t => {
+            return !!t && Array.isArray(t) && t.length > 0 && (isRegister || t.includes(obj))
+              && t.find(tobj => JSON.stringify(tobj._id) === JSON.stringify(obj._id)) !== undefined
+              && t.find(tobj => tobj._rev === obj._rev) !== undefined;
+          }),
           tap((e) => console.log("savedb 1: %o", e)),
           first(),
           map(() => null)
