@@ -1,8 +1,7 @@
-FROM nginx:stable-alpine
+FROM node:16-alpine
 
 RUN apk update
-RUN apk add nodejs
-RUN apk add npm
+RUN apk add vim
 
 WORKDIR /app
 COPY . /app
@@ -17,10 +16,8 @@ RUN cd /app \
     && cat src/environments/environment.prod.ts \
     && sed -i.bak -e "s|PROD_IP|$IP|g" src/environments/environment.prod.ts \
 #    && sed -i.bak -e "s|/api|$API|g" src/environments/environment.prod.ts
-    && sed -i.bak -e "s|/api|$(cat /app/api.tmp)|g" src/environments/environment.prod.ts \
-    && chmod +x ./*.sh
+    && sed -i.bak -e "s|/api|$(cat /app/api.tmp)|g" src/environments/environment.prod.ts
 
-RUN ["npm", "run", "build:prod"]
-RUN ["rm", "-rf", "/app/*"]
+CMD ["npx", "ng", "serve", "--host", "0.0.0.0", "--configuration", "production", "--live-reload", "false", "--watch", "false"]
 
-RUN cd /app && ls && ls dist && cp -r /app/dist/SplitMan21/* /usr/share/nginx/html/
+EXPOSE 4200/tcp
