@@ -1,24 +1,23 @@
 FROM node:16-alpine
 
 RUN apk update
-RUN apk add vim nginx
+RUN apk add vim
 
 WORKDIR /app
 COPY . /app
 
+RUN ["npm", "install", "-g", "npm@9.3.0"]
 RUN cd /app && npm i && npm run cp-libs
 
 ARG IP
 ARG API
 RUN cd /app \
+    && echo "API: $IP $API $(cat /app/api.tmp)" \
+    && cat src/environments/environment.prod.ts \
     && sed -i.bak -e "s|PROD_IP|$IP|g" src/environments/environment.prod.ts \
-    && sed -i.bak -e "s|/api|$API|g" src/environments/environment.prod.ts \
-    && cd /app && npx ng build --prod \
-    && mkdir -p /etc/nginx/conf.d && mkdir -p /usr/share/nginx/html \
-    && cp -r /app/dist/SplitMan21/* /usr/share/nginx/html/
+#    && sed -i.bak -e "s|/api|$API|g" src/environments/environment.prod.ts
+    && sed -i.bak -e "s|/api|$(cat /app/api.tmp)|g" src/environments/environment.prod.ts
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
+CMD ["npx", "ng", "serve", "--host", "0.0.0.0", "--configuration", "production", "--live-reload", "false", "--watch", "false"]
 
 EXPOSE 4200/tcp

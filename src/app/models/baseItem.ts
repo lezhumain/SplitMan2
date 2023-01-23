@@ -1,4 +1,8 @@
+import {IMongoID} from "./imongoid";
+
 export class BaseItem {
+  _id?: String | IMongoID;
+  _rev?: String;
   id: number = -1;
   readonly type: string;
 

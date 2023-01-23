@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import {UserModel} from "../models/user-model";
 import {UserServiceService} from "../user-service.service";
 import {Router} from "@angular/router";
+import {ToastComponent} from "../toast/toast.component";
+import {ToastMessage, ToastType} from "../toast/toast.shared";
 
 @Component({
   selector: 'app-register',
@@ -38,8 +40,12 @@ export class RegisterComponent implements OnInit {
       console.log("User saved");
       // debugger;
       this.router.navigate(['login']);
+      ToastComponent.toastdata$.next({type: ToastType.SUCCESS, message: "Register success"} as ToastMessage);
+      console.log("login success");
     }, (err: Error) => {
-      alert(err.message);
+      console.warn(err.message);
+      ToastComponent.toastdata$.next({type: ToastType.ERROR, message: "Register error: " + err.message} as ToastMessage);
+      console.log("login failed");
     });
   }
 

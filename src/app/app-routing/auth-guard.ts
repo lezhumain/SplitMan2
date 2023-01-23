@@ -2,9 +2,8 @@ import { Injectable } from '@angular/core';
 import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import {UserServiceService} from "../user-service.service";
 import {UserModel} from "../models/user-model";
-import {BehaviorSubject, combineLatest, Observable, of} from "rxjs";
-import {debounceTime, distinctUntilChanged, first, map, tap} from "rxjs/operators";
-import {flatMap} from "rxjs/internal/operators";
+import {Observable} from "rxjs";
+import {debounceTime, distinctUntilChanged, filter, first, map, tap} from "rxjs/operators";
 import {User} from "../models/user";
 
 @Injectable()
@@ -20,10 +19,11 @@ export class AuthGuard implements CanActivate {
 
   constructor(private router: Router,
               private readonly userServiceService: UserServiceService) {
-    const sessionData = userServiceService.getSessionData();
+    // const sessionData = userServiceService.getSessionData();
 
     // const user$ = this.userServiceService.getConnectedUser(Number(sessionData));
-    console.log("[AuthGuard] constructo");
+    console.log("[AuthGuard] constructor");
+
 
     // const user$: Observable<UserModel | null> = this.userServiceService.getConnectedUser(Number(sessionData)).pipe(
     //   debounceTime(200),
@@ -40,35 +40,45 @@ export class AuthGuard implements CanActivate {
     // const user$: Observable<UserModel | null> = this.getConnectedUser(Number(sessionData)).pipe(
     // const user$: Observable<UserModel | null> = this.userServiceService.getConnectedUser().pipe(
 
-    const user$: Observable<UserModel | null> = this.userServiceService.getConnectedUser().pipe(
-      flatMap((us: UserModel | null) => {
-        // return this.userServiceService.getConnectedUser(us ? undefined : Number(sessionData))
-        return us ? of(us) : this.userServiceService.getConnectedUser(Number(sessionData))
-      }),
+    // const user$: Observable<UserModel | null> = this.userServiceService.getConnectedUser().pipe(
+    //   flatMap((us: UserModel | null) => {
+    //     // return this.userServiceService.getConnectedUser(us ? undefined : Number(sessionData))
+    //     return us ? of(us) : this.userServiceService.getConnectedUser(Number(sessionData))
+    //   }),
+    //   debounceTime(200),
+    //   distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)),
+    //   // flatMap((cUser: UserModel | null) => {
+    //   //   return cUser
+    //   //     ? of(cUser)
+    //   //     : this.userServiceService.getUserByPass("", "");
+    //   // }),
+    //   // distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)),
+    //   tap((r) => console.log("[AuthGuard] getConnectedUser: %o", r))
+    // );
+    const user$: Observable<UserModel | null> = this.userServiceService._connectedUser.pipe(
       debounceTime(200),
-      distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)),
-      // flatMap((cUser: UserModel | null) => {
-      //   return cUser
-      //     ? of(cUser)
-      //     : this.userServiceService.getUserByPass("", "");
-      // }),
-      // distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)),
+      distinctUntilChanged((prev, curr) => prev?._rev === curr?._rev),
+      map((user: User | null) => {
+        return (user !== null ? user.toModel() : null) as UserModel;
+      }),
       tap((r) => console.log("[AuthGuard] getConnectedUser: %o", r))
     );
 
-    this.authorizedTravelIDs$ = user$.pipe(
-      map((um: UserModel | null) => {
-        // this.isConnected = !!um;
-        // this.isConnected = !!um || !!sessionData || sessionData == "0";
-        return um ? um.invites.map(i => i.tripID).filter(t => t !== null) : null;
-      })
-    );
+    // const setAllObs = () => {
+      this.authorizedTravelIDs$ = user$.pipe(
+        map((um: UserModel | null) => {
+          // this.isConnected = !!um;
+          // this.isConnected = !!um || !!sessionData || sessionData == "0";
+          return um ? um.invites.map(i => i.tripID).filter(t => t !== null) : null;
+        })
+      );
 
-    this.isConnected$ = user$.pipe(
-      map((um: UserModel | null) => {
-        return !!um;
-      })
-    );
+      this.isConnected$ = user$.pipe(
+        map((um: UserModel | null) => {
+          return !!um;
+        })
+      );
+    // };
 
 
 
@@ -124,7 +134,22 @@ export class AuthGuard implements CanActivate {
     //     return of(false);
     //   })
     // );
+
+
+    // const authURLs = ["/travels"];
+    // if(authURLs.some(a => state.url.includes(a))) {
+    //   return this.isConnected$.pipe(first());
+    // }
+
+
+
+    // if(this.userServiceService.connectedUserID === -1) {
+    //   // this._connectedUser.next(null);
+    //   this._updateConnectedUser(null);
+    // }
+
     return this.authorizedTravelIDs$.pipe(
+      filter(l => this.userServiceService.connectedUserID === -1 || l !== null),
       first(),
       map((auth: number[] | null) => {
         if(auth === null) {

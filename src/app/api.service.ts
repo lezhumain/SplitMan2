@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
-import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
-import {BehaviorSubject, combineLatest, Observable, of} from "rxjs";
+import {Injectable} from '@angular/core';
+import {HttpClient, HttpHeaders} from "@angular/common/http";
+import {BehaviorSubject, Observable, of} from "rxjs";
 import {BaseItem} from "./models/baseItem";
 import {catchError, debounceTime, filter, first, map, tap} from "rxjs/operators";
 import {flatMap} from "rxjs/internal/operators";
@@ -47,6 +47,7 @@ export class ApiService {
                     addHeaders?: {[key: string]: string}): Observable<any> {
 
     // const headers: any = this._headers;
+    console.log("POST: " + url);
 
     if(typeof data === 'object' && !(data instanceof FormData)) {
       data = JSON.stringify(data);
@@ -124,16 +125,33 @@ export class ApiService {
 
   saveInDb(obj: any, isRegister = false): Observable<null> {
     return this.httpPost(environment.api + (isRegister ? "/register" : "/saveOne"), obj,"json", "application/json", !isRegister).pipe(
-      flatMap(() => {
+      flatMap((fullObj: any) => {
         const currentAll = this._allItems$.getValue() || [];
         const currentAllStr = JSON.stringify(currentAll);
         const newValues = currentAll.slice();
 
         const targetIndex = newValues.findIndex(t => t.id === obj.id && t.type === obj.type);
+        if(!isRegister) {
+          obj._rev = fullObj._rev;
+        }
         if(targetIndex === -1) {
-          newValues.push(obj);
+          console.log("No target index, inserting");
+          if(!isRegister) {
+            if (obj["_id"] === undefined) {
+              obj["_id"] = fullObj._id;
+            }
+            if (!obj.id) {
+              obj.id = fullObj.id;
+            }
+
+            newValues.push(obj);
+          }
         }
         else if(targetIndex > -1) {
+          // if (obj["_id"] === undefined) {
+          //   obj["_id"] = autoID;
+          // }
+          console.log("Updated obj: %o", obj);
           newValues.splice(targetIndex, 1, obj);
         }
         this._allItems$.next(newValues);
@@ -141,7 +159,11 @@ export class ApiService {
         return this._allItems$.pipe(
           tap((e) => console.log("savedb 0: %o", e)),
           // filter(t => JSON.stringify(t) !== currentAllStr),
-          filter(t => !!t && t.includes(obj)),
+          filter(t => {
+            return !!t && Array.isArray(t) && t.length > 0 && (isRegister || t.includes(obj))
+              && t.find(tobj => JSON.stringify(tobj._id) === JSON.stringify(obj._id)) !== undefined
+              && t.find(tobj => tobj._rev === obj._rev) !== undefined;
+          }),
           tap((e) => console.log("savedb 1: %o", e)),
           first(),
           map(() => null)
@@ -176,6 +198,7 @@ export class ApiService {
     //   })
     // );
 
+    model["updating"] = true;
     return this.saveInDb(model, isRegister);
   }
 

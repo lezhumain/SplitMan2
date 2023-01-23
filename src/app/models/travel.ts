@@ -5,6 +5,8 @@ import {Participant} from "./participants";
 export class Travel extends BaseItem {
   static from(model: TravelModel): Travel {
     const t = new Travel();
+    t._id = model._id;
+    t._rev = model._rev;
     t.id = model.id;
     t.name = model.name
     t.description = model.description;

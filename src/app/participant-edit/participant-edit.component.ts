@@ -1,12 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
-import {ExpenseModel} from "../models/expense-model";
 import {TravelService} from "../travel.service";
 import {ParticipantModel} from "../models/participants";
 import {TravelModel} from "../models/travel-model";
 import {Travel} from "../models/travel";
-import {needsLinking} from "@angular/compiler-cli/linker";
-import {catchError} from "rxjs/operators";
 import {ToastComponent} from "../toast/toast.component";
 import {ToastType} from "../toast/toast.shared";
 
@@ -33,7 +30,8 @@ export class ParticipantEditComponent implements OnInit {
     const paramIDex: string | null = routeParams.get('participantID');
 
     if(travelID === null) {
-      alert("No travel id specified");
+      // alert("No travel id specified");
+      console.warn("No travel id specified");
       return;
     }
 

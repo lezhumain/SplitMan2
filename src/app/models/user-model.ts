@@ -1,3 +1,5 @@
+import {IMongoID} from "./imongoid";
+
 export interface InviteDate {
   tripName?: string;
   isAccepted: boolean;
@@ -6,6 +8,8 @@ export interface InviteDate {
 }
 
 export class UserModel {
+  _id?: String | IMongoID;
+  _rev?: String;
   id: number = -1;
   email: string = "";
   username: string = "";

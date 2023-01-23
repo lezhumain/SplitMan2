@@ -1,0 +1,187 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+#pr:
+#  branches:
+#    include:
+#    - '*'  # must quote since "*" is a YAML reserved character; we want a string
+
+pr: none
+
+trigger:
+  branches:
+    include:
+      - master
+
+pool:
+  vmImage: ubuntu-latest
+
+resources:
+  repositories:
+    - repository: MyGitHub_splitman2run # The name used to reference this repository in the checkout step
+      type: github
+      endpoint: lezhumain
+      name: lezhumain/SplitMan2-run
+
+variables:
+- name: IMAGE
+  value: splitman2
+- name: SREPO
+  value: SplitMan2
+
+stages:
+  - stage: Build
+    jobs:
+      - job: Build_Docker_Containers
+        steps:
+          - checkout: self
+          - checkout: MyGitHub_splitman2run
+
+          - task: DownloadSecureFile@1
+            name: sslCert
+            displayName: 'Download cert'
+            inputs:
+              secureFile: 'example.crt'
+
+          - task: DownloadSecureFile@1
+            name: sslKey
+            displayName: 'Download key'
+            inputs:
+              secureFile: 'example.key'
+
+          - script: |
+              if [ -z "$IMAGE" ]; then
+                exit 1
+              fi
+            displayName: 'Test variables'
+
+          - script: |
+              cd "$SREPO"
+              echo "$(whoami)"
+              sudo chown "$(whoami)":root $(sslCert.secureFilePath)
+              sudo chmod 600 $(sslCert.secureFilePath)
+              sudo chown "$(whoami)":root $(sslKey.secureFilePath)
+              sudo chmod 600 $(sslKey.secureFilePath)
+
+              TARGET_DIR="/home/$(whoami)/.ssl"
+              echo "TARGET_DIR: $TARGET_DIR"
+              mkdir -p "$TARGET_DIR"
+              sudo ln -s $(sslCert.secureFilePath) "$TARGET_DIR/example.crt"
+              sudo ln -s $(sslKey.secureFilePath) "$TARGET_DIR/example.key"
+              #sudo cp $(sslCert.secureFilePath) "$TARGET_DIR/example.crt"
+              #sudo cp $(sslKey.secureFilePath) "$TARGET_DIR/example.key"
+              echo "files:"
+              ls -al "$TARGET_DIR"
+              #sudo chown "$(whoami)" "$TARGET_DIR"/*
+              #sudo chmod 600 "$TARGET_DIR"/*
+              #ls -al "$TARGET_DIR"
+              sudo chown -R "$(whoami)" "$TARGET_DIR"
+            displayName: 'Prepare SSL key and cert'
+
+          - script: |
+              cd "$SREPO"
+
+              export CERT_PATH="$HOME/.ssl/example"
+              bash ../SplitMan2-run/run_docker_e2e.sh "$DEBIAN_IP" "https" "$SREPO"
+
+              #IMAGE="splitman2nginx"
+              #docker image save "$IMAGE" -o "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
+              docker save "$IMAGE" -o "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
+
+              echo "$(Build.ArtifactStagingDirectory)"
+              echo "$(Build.ArtifactStagingDirectory)" | wc
+              ls -d "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
+              ls -al "$(Build.ArtifactStagingDirectory)"
+            env:
+              MONGO_USER: $(MONGO_USER)
+              MONGO_PASS: $(MONGO_PASS)
+              DEBIAN_IP: $(DEBIAN_IP)
+            displayName: 'Build containers'
+
+          - task: DownloadSecureFile@1
+            name: sshKey
+            displayName: 'Download SSH key'
+            inputs:
+              secureFile: 'id_releaseUser'
+
+          - script: |
+              chmod +x SplitMan2-run/*.sh
+              bash SplitMan2-run/prepare_azure_ssh.sh "$(sshKey.secureFilePath)"
+            displayName: 'Prepare SSH key'
+
+          - script: |
+              #cat SplitMan2-run/setup_azure_ssh.sh
+              . SplitMan2-run/setup_azure_ssh.sh
+              cat "$HOME/.ssh/config"
+            env:
+              DEBIAN_USER: $(DEBIAN_USER)
+              DEBIAN_IP: $(DEBIAN_IP)
+            displayName: 'Setup SSH access'
+
+          - script: |
+              # upload artifact to VM
+              #IMAGE="splitman2nginx"
+              scp "$(Build.ArtifactStagingDirectory)/$IMAGE.tar" "ovhVM_rel:${DEBIAN_PATH}"
+            env:
+              DEBIAN_PATH: $(DEBIAN_PATH)
+            displayName: 'Save containers'
+
+
+  - stage: Deploy
+    jobs:
+      - job: Deploy_Docker_Containers
+        steps:
+          - checkout: self
+          - checkout: MyGitHub_splitman2run
+
+          - task: DownloadSecureFile@1
+            name: sshKey
+            displayName: 'Download SSH key'
+            inputs:
+              secureFile: 'id_releaseUser'
+
+          - script: |
+              chmod +x SplitMan2-run/*.sh
+              bash SplitMan2-run/prepare_azure_ssh.sh "$(sshKey.secureFilePath)"
+            displayName: 'Prepare SSH key'
+
+          - script: |
+              cat SplitMan2-run/setup_azure_ssh.sh
+              . SplitMan2-run/setup_azure_ssh.sh
+              cat "$HOME/.ssh/config"
+            env:
+              DEBIAN_USER: $(DEBIAN_USER)
+              DEBIAN_IP: $(DEBIAN_IP)
+            displayName: 'Setup SSH access'
+
+          - script: |
+              bash SplitMan2-run/backup_current.sh
+            env:
+              DEBIAN_PATH: $(DEBIAN_PATH)
+            displayName: 'Backup current'
+
+          - script: |
+              # ssh into VM
+              ssh -oBatchMode=yes "ovhVM_rel" bash << EOF
+                cd "$DEBIAN_PATH"
+                docker ps
+                docker images
+                #docker system prune -af
+                #docker image import "$IMAGE.tar" "$IMAGE"
+                docker load -i "$IMAGE.tar"
+                docker images
+                docker ps
+              EOF
+            env:
+              DEBIAN_PATH: $(DEBIAN_PATH)
+            displayName: 'Update containers'
+
+          - script: |
+              #    run containers
+              cd SplitMan2-run
+              bash run_containers.sh
+            env:
+              DEBIAN_PATH: $(DEBIAN_PATH)
+            displayName: 'Run containers'
