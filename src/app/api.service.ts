@@ -36,6 +36,9 @@ export class ApiService {
   };
 
   httpGet(url: string): Observable<any> {
+    // TODO find out why port is duplicated
+    url = url.replace(/(\:\d+)+/, "$1");
+
     // @ts-ignore
     const hasCordova = !!window.cordova;
 
@@ -63,6 +66,9 @@ export class ApiService {
   httpPost(url: string, data: any | string | FormData, respType: "json" | "text" | "blob" | "arraybuffer" = "json",
                      accept = 'application/json', withCred = true, obs: "body" | "response" = "body",
                     addHeaders?: {[key: string]: string}): Observable<any> {
+
+    // TODO find out why port is duplicated
+    url = url.replace(/(\:\d+)+/, "$1")
 
     // const headers: any = this._headers;
     console.log("POST: " + url);
