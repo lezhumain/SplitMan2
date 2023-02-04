@@ -73,15 +73,7 @@ stages:
 
               export CERT_PATH="$HOME/.ssl/example"
               bash ../SplitMan2-run/run_docker_e2e.sh "$DEBIAN_IP" "https" "$SREPO"
-
-              #IMAGE="splitman2nginx"
-              #docker image save "$IMAGE" -o "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
               docker save "$IMAGE" -o "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
-
-              #echo "$(Build.ArtifactStagingDirectory)"
-              #echo "$(Build.ArtifactStagingDirectory)" | wc
-              #ls -d "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
-              #ls -al "$(Build.ArtifactStagingDirectory)"
             env:
               MONGO_USER: $(MONGO_USER)
               MONGO_PASS: $(MONGO_PASS)
@@ -108,8 +100,6 @@ stages:
             displayName: 'Setup SSH access'
 
           - script: |
-              # upload artifact to VM
-              #IMAGE="splitman2nginx"
               scp "$(Build.ArtifactStagingDirectory)/$IMAGE.tar" "ovhVM_rel:${DEBIAN_PATH}"
             env:
               DEBIAN_PATH: $(DEBIAN_PATH)
@@ -150,13 +140,10 @@ stages:
             displayName: 'Backup current'
 
           - script: |
-              # ssh into VM
               ssh -oBatchMode=yes "ovhVM_rel" bash << EOF
                 cd "$DEBIAN_PATH"
                 docker ps
                 docker images
-                #docker system prune -af
-                #docker image import "$IMAGE.tar" "$IMAGE"
                 docker load -i "$IMAGE.tar"
                 docker images
                 docker ps
@@ -166,7 +153,6 @@ stages:
             displayName: 'Update containers'
 
           - script: |
-              #    run containers
               cd SplitMan2-run
               bash run_containers.sh
             env:
