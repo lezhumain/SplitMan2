@@ -26,6 +26,7 @@ resources:
       name: lezhumain/SplitMan2-run
 
 variables:
+- group: var_groupe
 - name: IMAGE
   value: splitman2
 - name: SREPO
