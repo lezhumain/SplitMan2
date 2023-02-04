@@ -60,41 +60,19 @@ stages:
 
           - script: |
               cd "$SREPO"
-              echo "$(whoami)"
-              sudo chown "$(whoami)":root $(sslCert.secureFilePath)
-              sudo chmod 600 $(sslCert.secureFilePath)
-              sudo chown "$(whoami)":root $(sslKey.secureFilePath)
-              sudo chmod 600 $(sslKey.secureFilePath)
-
               TARGET_DIR="/home/$(whoami)/.ssl"
               echo "TARGET_DIR: $TARGET_DIR"
               mkdir -p "$TARGET_DIR"
-              sudo ln -s $(sslCert.secureFilePath) "$TARGET_DIR/example.crt"
-              sudo ln -s $(sslKey.secureFilePath) "$TARGET_DIR/example.key"
-              #sudo cp $(sslCert.secureFilePath) "$TARGET_DIR/example.crt"
-              #sudo cp $(sslKey.secureFilePath) "$TARGET_DIR/example.key"
-              echo "files:"
-              ls -al "$TARGET_DIR"
-              #sudo chown "$(whoami)" "$TARGET_DIR"/*
-              #sudo chmod 600 "$TARGET_DIR"/*
-              #ls -al "$TARGET_DIR"
+              sudo cp $(sslCert.secureFilePath) "$TARGET_DIR/example.crt"
+              sudo cp $(sslKey.secureFilePath) "$TARGET_DIR/example.key"
               sudo chown -R "$(whoami)" "$TARGET_DIR"
+              chmod 600 "$TARGET_DIR"/*
             displayName: 'Prepare SSL key and cert'
 
           - script: |
               cd "$SREPO"
-
-              export CERT_PATH="$HOME/.ssl/example"
               bash ../SplitMan2-run/run_docker_e2e.sh "$DEBIAN_IP" "https" "$SREPO"
-
-              #IMAGE="splitman2nginx"
-              #docker image save "$IMAGE" -o "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
               docker save "$IMAGE" -o "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
-
-              echo "$(Build.ArtifactStagingDirectory)"
-              echo "$(Build.ArtifactStagingDirectory)" | wc
-              ls -d "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
-              ls -al "$(Build.ArtifactStagingDirectory)"
             env:
               MONGO_USER: $(MONGO_USER)
               MONGO_PASS: $(MONGO_PASS)
@@ -113,17 +91,14 @@ stages:
             displayName: 'Prepare SSH key'
 
           - script: |
-              #cat SplitMan2-run/setup_azure_ssh.sh
               . SplitMan2-run/setup_azure_ssh.sh
               cat "$HOME/.ssh/config"
             env:
               DEBIAN_USER: $(DEBIAN_USER)
-              DEBIAN_IP: $(DEBIAN_IP)
+              DEBIAN_IP: $(DEBIAN_IP_REAL)
             displayName: 'Setup SSH access'
 
           - script: |
-              # upload artifact to VM
-              #IMAGE="splitman2nginx"
               scp "$(Build.ArtifactStagingDirectory)/$IMAGE.tar" "ovhVM_rel:${DEBIAN_PATH}"
             env:
               DEBIAN_PATH: $(DEBIAN_PATH)
@@ -154,7 +129,7 @@ stages:
               cat "$HOME/.ssh/config"
             env:
               DEBIAN_USER: $(DEBIAN_USER)
-              DEBIAN_IP: $(DEBIAN_IP)
+              DEBIAN_IP: $(DEBIAN_IP_REAL)
             displayName: 'Setup SSH access'
 
           - script: |
@@ -164,13 +139,10 @@ stages:
             displayName: 'Backup current'
 
           - script: |
-              # ssh into VM
               ssh -oBatchMode=yes "ovhVM_rel" bash << EOF
                 cd "$DEBIAN_PATH"
                 docker ps
                 docker images
-                #docker system prune -af
-                #docker image import "$IMAGE.tar" "$IMAGE"
                 docker load -i "$IMAGE.tar"
                 docker images
                 docker ps
@@ -180,7 +152,6 @@ stages:
             displayName: 'Update containers'
 
           - script: |
-              #    run containers
               cd SplitMan2-run
               bash run_containers.sh
             env:
