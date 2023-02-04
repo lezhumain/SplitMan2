@@ -183,5 +183,7 @@ stages:
               cd SplitMan2-run
               bash run_containers.sh
             env:
+              MONGO_USER: $(MONGO_USER)
+              MONGO_PASS: $(MONGO_PASS)
               DEBIAN_PATH: $(DEBIAN_PATH)
             displayName: 'Run containers'
