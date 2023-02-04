@@ -14,6 +14,7 @@ import {ToastMessage, ToastType} from "../toast/toast.shared";
 export class LoginComponent implements OnInit {
   password: string = "";
   username: string = "";
+  loggingIn = false;
 
   constructor(private readonly userServiceService: UserServiceService,
               private readonly router: Router,
@@ -38,6 +39,10 @@ export class LoginComponent implements OnInit {
   }
 
   doLogin() {
+    if(this.loggingIn) {
+      return;
+    }
+    this.loggingIn = true;
     this.userServiceService.getUserByPass(this.username, this.password, true).subscribe((user: any) => {
       if(user) {
         this.loginOK(user);
@@ -45,6 +50,7 @@ export class LoginComponent implements OnInit {
       else {
         this.loginNOK();
       }
+      this.loggingIn = false;
     })
   }
 

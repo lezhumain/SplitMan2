@@ -115,8 +115,11 @@ export class UserServiceService extends BaseService {
 
   addOrUpdateUser(model: UserModel, isUpdate = false, isRegister = false): Observable<any> {
     const data: User = User.from(model);
-    // const newID$ = isUpdate && !isRegister ? of(data.id) : this.getLastID().pipe(map(id => id + 1));
-    const newID$ = !isUpdate && !isRegister ? this.getLastID().pipe(map(id => id + 1)) : of(data.id);
+
+    const shouldNotGetLastID = isUpdate || isRegister;
+    console.log("shouldNotGetLastID: " + shouldNotGetLastID);
+
+    const newID$ = of(data?.id || -2);
 
     return newID$.pipe(
       flatMap((lastID: number) => {
@@ -146,13 +149,15 @@ export class UserServiceService extends BaseService {
 
         const hasErrorProp = u && u.hasOwnProperty("hasError");
 
-        if(hasErrorProp) {
+        const userRes = !!u && u.hasOwnProperty("email") ? User.fromJson(u).toModel() : null;
+
+        if(hasErrorProp || !userRes) {
           console.warn("Maybe login error");
           console.warn(u);
           return null;
         }
 
-        return !!u && u.hasOwnProperty("email") ? User.fromJson(u).toModel() : null;
+        return userRes;
       }),
       flatMap((u: UserModel | null) => {
         if(!u) {
@@ -292,7 +297,7 @@ export class UserServiceService extends BaseService {
     return this._apiService.httpPost(environment.api + "/invite", {tripID: travelID, email: email},
       "json", "application/json", true, "response").pipe(
       map((e: HttpResponse<void>) => {
-        console.log("invite response: ");
+        console.log("invite  response: ");
         console.log(e);
         const noError = /20\d/.test(e.status.toString());
         if(!noError) {

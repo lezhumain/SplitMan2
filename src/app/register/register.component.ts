@@ -21,6 +21,7 @@ export class RegisterComponent implements OnInit {
   private _email: string = "";
 
   user: UserModel = new UserModel();
+  registering = false;
 
 
   constructor(private readonly userServiceService: UserServiceService,
@@ -36,16 +37,24 @@ export class RegisterComponent implements OnInit {
   }
 
   doRegister() {
+    if(this.registering) {
+      return;
+    }
+    this.registering = true;
     this.userServiceService.addOrUpdateUser(this.user, false, true).subscribe(() => {
       console.log("User saved");
       // debugger;
       this.router.navigate(['login']);
       ToastComponent.toastdata$.next({type: ToastType.SUCCESS, message: "Register success"} as ToastMessage);
-      console.log("login success");
+      console.log("register success");
+      this.registering = false;
     }, (err: Error) => {
-      console.warn(err.message);
-      ToastComponent.toastdata$.next({type: ToastType.ERROR, message: "Register error: " + err.message} as ToastMessage);
-      console.log("login failed");
+      console.warn("doRegister:");
+      console.warn(JSON.stringify(err));
+      console.warn(err?.message);
+      ToastComponent.toastdata$.next({type: ToastType.ERROR, message: "Register error: " + err?.message} as ToastMessage);
+      console.log("register failed");
+      this.registering = false;
     });
   }
 
