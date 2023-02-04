@@ -104,7 +104,7 @@ stages:
               cat "$HOME/.ssh/config"
             env:
               DEBIAN_USER: $(DEBIAN_USER)
-              DEBIAN_IP: $(DEBIAN_IP)
+              DEBIAN_IP: $(DEBIAN_IP_REAL)
             displayName: 'Setup SSH access'
 
           - script: |
@@ -140,7 +140,7 @@ stages:
               cat "$HOME/.ssh/config"
             env:
               DEBIAN_USER: $(DEBIAN_USER)
-              DEBIAN_IP: $(DEBIAN_IP)
+              DEBIAN_IP: $(DEBIAN_IP_REAL)
             displayName: 'Setup SSH access'
 
           - script: |
