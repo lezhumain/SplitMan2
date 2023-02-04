@@ -1,10 +1,19 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from "@angular/common/http";
-import {BehaviorSubject, Observable, of} from "rxjs";
+import {BehaviorSubject, from, Observable, of} from "rxjs";
 import {BaseItem} from "./models/baseItem";
 import {catchError, debounceTime, filter, first, map, tap} from "rxjs/operators";
 import {flatMap} from "rxjs/internal/operators";
 import {environment} from "../environments/environment";
+import {ToastComponent} from "./toast/toast.component";
+import {ToastType} from "./toast/toast.shared";
+
+interface CordovaResponse {
+  status: number;
+  data: string;
+  url: string;
+  headers: {[key: string]: string}
+}
 
 @Injectable({
   providedIn: 'root'
@@ -27,9 +36,17 @@ export class ApiService {
   };
 
   httpGet(url: string): Observable<any> {
-    const headers: any = this._headers;
+    // @ts-ignore
+    const hasCordova = !!window.cordova;
 
-    return this.http.get<any>(url, {withCredentials: true}).pipe(
+    const getObs$ = hasCordova
+      ? this.cordovaGet(url).pipe(map((d: CordovaResponse) => {
+        console.log(d.data);
+        return JSON.parse(d.data);
+      }))
+      : this.regularGet(url, {withCredentials: true});
+
+    return getObs$.pipe(
       // map(userResponse => console.log('users: ', userResponse)),
       map((userResponse: any) => {
         // debugger;
@@ -37,6 +54,7 @@ export class ApiService {
       }),
       catchError(error => {
         console.log('error: ', error);
+        console.log(JSON.stringify(error, null, 2));
         return of(null);
       })
     );
@@ -49,23 +67,41 @@ export class ApiService {
     // const headers: any = this._headers;
     console.log("POST: " + url);
 
-    if(typeof data === 'object' && !(data instanceof FormData)) {
-      data = JSON.stringify(data);
-    }
+    const strData: string = typeof data === 'object' && !(data instanceof FormData)
+      ? JSON.stringify(data)
+      : data;
 
     let headers = addHeaders || {};
     headers["Accept"] = accept;
 
-    return this.http.post(url, data, {withCredentials: withCred, responseType: respType as "json" | undefined,
-      headers : new HttpHeaders({ 'Content-Type': 'application/json', 'Accept': accept }), observe: obs as "body" | undefined})
+    // @ts-ignore
+    const hasCordova = !!window.cordova;
+
+    console.log("has cordova: " + hasCordova.toString())
+
+    const postObs$ = hasCordova
+      ? this.cordovaPost(url, data, withCred, respType, accept, obs).pipe(map((d: CordovaResponse) => {
+        console.log("[cordovaPost] post response:")
+        console.log(d.data);
+        return !!d.data ? JSON.parse(d.data) : null;
+      }))
+      : this.regularPost(url, strData, withCred, respType, accept, obs);
+
+    return postObs$
         // headers : new HttpHeaders(headers), observe: obs as "body" | undefined})
       .pipe(
         map(userResponse => {
-          console.log('http post result: ', userResponse);
+          console.log('http post result: %o', userResponse);
+          console.log(JSON.stringify(userResponse, null, 2));
+          console.log(typeof(userResponse));
           return userResponse;
         }),
         catchError(error => {
-          console.warn('http post error: ', error);
+          console.warn('http post error for : ' + url);
+          console.warn(error);
+          console.log(error);
+          console.warn(JSON.stringify(error, null, 2));
+          ToastComponent.toastdata$.next({type: ToastType.ERROR, message: error.message});
           return of(null);
         })
       );
@@ -159,7 +195,10 @@ export class ApiService {
         return this._allItems$.pipe(
           tap((e) => console.log("savedb 0: %o", e)),
           // filter(t => JSON.stringify(t) !== currentAllStr),
-          filter(t => {
+          filter((t: BaseItem[] | null) => {
+            if(isRegister) {
+              return true;
+            }
             return !!t && Array.isArray(t) && t.length > 0 && (isRegister || t.includes(obj))
               && t.find(tobj => JSON.stringify(tobj._id) === JSON.stringify(obj._id)) !== undefined
               && t.find(tobj => tobj._rev === obj._rev) !== undefined;
@@ -269,5 +308,60 @@ export class ApiService {
 
   resetData() {
     this._allItems$.next(null);
+  }
+
+  private cordovaPost(url: string, data: any, withCred: boolean, respType: string,
+                      accept: string, obs: string): Observable<CordovaResponse> {
+    this.initCordovaHTTP();
+    console.log("[cordovaPost] post data:");
+    console.log(JSON.stringify(data, null, 2));
+    return from(new Promise<any>((resolve, reject) => {
+      // @ts-ignore
+      window.cordova.plugin.http.post(url, data, {
+        'Content-Type': 'application/json',
+        Accept: accept
+      }, function(response: CordovaResponse) {
+        resolve(response);
+      }, function(response: any) {
+        reject(response);
+      });
+    }));
+  }
+
+  private regularPost(url: string, data: string, withCred: boolean, respType: string,
+                      accept: string, obs: string): Observable<any> {
+    return this.http.post(url, data, {withCredentials: withCred, responseType: respType as "json" | undefined,
+      headers : new HttpHeaders({ 'Content-Type': 'application/json', 'Accept': accept }), observe: obs as "body" | undefined})
+  }
+
+  private initCordovaHTTP() {
+    console.log("initCordovaHTTP");
+    // @ts-ignore
+    const windowCordova = window.cordova;
+
+    if (!windowCordova || !windowCordova.plugin) {
+      return;
+    }
+
+    windowCordova.plugin.http.setDataSerializer('json');
+    for(const key in this._headers) {
+      windowCordova.plugin.http.setHeader('splitman2.fr', key, this._headers[key]);
+    }
+  }
+
+  private regularGet(url: string, options: any) {
+    return this.http.get<any>(url, options);
+  }
+
+  private cordovaGet(url: string): Observable<CordovaResponse> {
+    this.initCordovaHTTP();
+    return from(new Promise<any>((resolve, reject) => {
+      // @ts-ignore
+      window.cordova.plugin.http.get(url, {}, {}, function(response: CordovaResponse) {
+        resolve(response);
+      }, function(response: any) {
+        reject(response);
+      });
+    }));
   }
 }

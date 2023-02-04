@@ -14,7 +14,12 @@
   <br>
   <br>
   <div class="col-auto">
-    <button type="button" class="btn btn-primary mb-3" (click)="doLogin()">Login</button>
+    <button type="button" class="btn btn-primary mb-3" (click)="doLogin()">
+      Login
+      <ng-container *ngIf="loggingIn">
+        <i id="logging_in" class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+      </ng-container>
+    </button>
     <button id="regBtn" type="button" class="btn btn-success mb-3" (click)="goRegister()">Register</button>
   </div>
 </div>

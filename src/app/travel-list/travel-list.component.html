@@ -1,6 +1,9 @@
 <div>
-  <h3>Travels</h3>
-  <br>
+    <h3>Travels</h3>
+    <ng-container *ngIf="updating">
+        <i id="travel_list_updating" class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+    </ng-container>
+    <br>
 <!--  LIST-->
 <!--  <div *ngFor="let t of allTravels"><a routerLink="/travels/{{t.id}}" routerLinkActive="active">{{t}}</a></div>-->
   <ng-container *ngIf="allTravels && allTravels.length > 0; else noTravels">

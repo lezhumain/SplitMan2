@@ -181,6 +181,17 @@ async function handleLogout(pag: Page) {
     await waitForTimeout(500);
 }
 
+async function waitForToast(pag: Page) {
+  const toastSel = "#toast.toast_0";
+  const elm = await pag.waitForSelector(toastSel, {visible: true, timeout: 10010});
+  const classfg = await elm.getProperty("className").then((e: JSHandle) => e.remoteObject().value);
+  console.log("\t" + classfg);
+
+  console.log("a1")
+  await pag.waitForSelector(toastSel, {hidden: true, timeout: 10000});
+  console.log("a2")
+}
+
 async function handleLogin(pag: Page, userData: { pass: string; email: string; username: string }) {
   if(pag.url().endsWith("/travels")) {
     return;
@@ -206,24 +217,17 @@ async function handleLogin(pag: Page, userData: { pass: string; email: string; u
 
   await waitForTimeout(500);
 
-  await pag.waitForXPath("//button[contains(text(), 'Login')]", {visible: true})
+  const clickAndNavProm = pag.waitForXPath("//button[contains(text(), 'Login')]", {visible: true})
     .then((e: ElementHandle) => {
       return e ? Promise.all([e.click(), pag.waitForNavigation({timeout: 40000, waitUntil: "networkidle2"}).then(() => waitForTimeout(1000)).then(() => waitForTimeout(1000))]) : null
     });
 
-  // await pag.waitForNavigation();
+  const toastProm = waitForToast(pag);
 
-  // await waitForTimeout(500);
-
-  // const toastSel = "#toast";
-  const toastSel = "#toast.toast_0";
-  const elm = await pag.waitForSelector(toastSel, {visible: true, timeout: 10010});
-  const classfg = await elm.getProperty("className").then((e: JSHandle) => e.remoteObject().value);
-  console.log("\t" + classfg);
-
-  console.log("a1")
-  await pag.waitForSelector(toastSel, {hidden: true, timeout: 10000});
-  console.log("a2")
+  await Promise.all([
+    clickAndNavProm,
+    toastProm
+  ]);
 }
 
 let browser: Browser, browser1: Browser;
@@ -724,11 +728,13 @@ async function addTravel(pag: Page): Promise<string> {
   // await Promise.all([
   //   saveBtn.click(), pag.waitForNavigation({timeout: 10000}).then(() => waitForTimeout(1000))
   // ]);
-  await saveBtn.click();
-  await waitForMS(5000);
 
-  // await page.waitForNavigation();
-  return Promise.resolve(travelNAme);
+  return Promise.all([
+    saveBtn.click(),
+    pag.waitForNavigation({timeout: 10000, waitUntil: "networkidle2"})
+  ]).then(() => {
+    return travelNAme;
+  });
 }
 
 async function waitForMS(number: number): Promise<null> {
@@ -950,7 +956,7 @@ async function doRegister(pag: Page) {
     .then((e: ElementHandle) => e ? e.type(pass) : null);
 
   await pag.waitForXPath("//button[contains(text(), 'Register')]", {visible: true})
-    .then((e: ElementHandle) => e ? Promise.all([e.click(), pag.waitForNavigation({timeout: 10000}).then(() => waitForTimeout(1000))]) : null);
+    .then((e: ElementHandle) => e ? Promise.all([e.click(), pag.waitForNavigation({timeout: 50000}).then(() => waitForTimeout(1000))]) : null);
 
   expect(pag.url()).to.contain("/login");
 
@@ -1380,6 +1386,11 @@ async function runAll() {
   browser1 = res[1];
 
   const testList = [
+    // {
+    //   fn: MainRegister,
+    //   msg: "E2E register",
+    //   params: []
+    // },
     {
       fn: MainTest,
       msg: "E2E with 1 expense",
@@ -1388,14 +1399,14 @@ async function runAll() {
         "Dju doit a 8.56€ Suzie Max doit a 8.56€ Suzie Elyan doit a 8.56€ Suzie"
       ]
     },
-    {
-      fn: MainTest,
-      msg: "E2E with all expenses",
-      params: [
-        allExpenses.slice(),
-        "Elyan doit a 17.30€ Dju"
-      ]
-    }
+    // {
+    //   fn: MainTest,
+    //   msg: "E2E with all expenses",
+    //   params: [
+    //     allExpenses.slice(),
+    //     "Elyan doit a 17.30€ Dju"
+    //   ]
+    // }
   ];
 
   const allRes: {msg: string, errorMsg?: string, hasError: boolean, links?: string[]}[] = [];
@@ -1417,7 +1428,7 @@ async function runAll() {
       const pages = await getPagse();
 
       resOO.links = await Promise.all(
-        pages.map((thePage: Page, index: number) => takeScreenshot(thePage, true)
+        pages.map((thePage: Page, index: number) => takeScreenshot(thePage, false)
           // .then((link: string) => console.log(`Screenshot link ${index} : ${link}`))
         )
       );

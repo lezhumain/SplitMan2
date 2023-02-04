@@ -8,5 +8,17 @@ if (environment.production) {
   enableProdMode();
 }
 
-platformBrowserDynamic().bootstrapModule(AppModule)
-  .catch(err => console.error(err));
+const bootstrapAngular = () => {
+  platformBrowserDynamic().bootstrapModule(AppModule)
+    .catch(err => console.error(err));
+}
+
+// @ts-ignore
+if(window.cordova) {
+  document.addEventListener("deviceready", () => {
+    bootstrapAngular();
+  });
+}
+else {
+  bootstrapAngular();
+}
