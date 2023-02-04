@@ -59,25 +59,13 @@ stages:
 
           - script: |
               cd "$SREPO"
-              echo "$(whoami)"
-              sudo chown "$(whoami)":root $(sslCert.secureFilePath)
-              sudo chmod 600 $(sslCert.secureFilePath)
-              sudo chown "$(whoami)":root $(sslKey.secureFilePath)
-              sudo chmod 600 $(sslKey.secureFilePath)
-
               TARGET_DIR="/home/$(whoami)/.ssl"
               echo "TARGET_DIR: $TARGET_DIR"
               mkdir -p "$TARGET_DIR"
-              sudo ln -s $(sslCert.secureFilePath) "$TARGET_DIR/example.crt"
-              sudo ln -s $(sslKey.secureFilePath) "$TARGET_DIR/example.key"
-              #sudo cp $(sslCert.secureFilePath) "$TARGET_DIR/example.crt"
-              #sudo cp $(sslKey.secureFilePath) "$TARGET_DIR/example.key"
-              echo "files:"
-              ls -al "$TARGET_DIR"
-              #sudo chown "$(whoami)" "$TARGET_DIR"/*
-              #sudo chmod 600 "$TARGET_DIR"/*
-              #ls -al "$TARGET_DIR"
+              sudo cp $(sslCert.secureFilePath) "$TARGET_DIR/example.crt"
+              sudo cp $(sslKey.secureFilePath) "$TARGET_DIR/example.key"
               sudo chown -R "$(whoami)" "$TARGET_DIR"
+              chmod 600 "$TARGET_DIR"/*
             displayName: 'Prepare SSL key and cert'
 
           - script: |
@@ -90,10 +78,10 @@ stages:
               #docker image save "$IMAGE" -o "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
               docker save "$IMAGE" -o "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
 
-              echo "$(Build.ArtifactStagingDirectory)"
-              echo "$(Build.ArtifactStagingDirectory)" | wc
-              ls -d "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
-              ls -al "$(Build.ArtifactStagingDirectory)"
+              #echo "$(Build.ArtifactStagingDirectory)"
+              #echo "$(Build.ArtifactStagingDirectory)" | wc
+              #ls -d "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
+              #ls -al "$(Build.ArtifactStagingDirectory)"
             env:
               MONGO_USER: $(MONGO_USER)
               MONGO_PASS: $(MONGO_PASS)
@@ -112,7 +100,6 @@ stages:
             displayName: 'Prepare SSH key'
 
           - script: |
-              #cat SplitMan2-run/setup_azure_ssh.sh
               . SplitMan2-run/setup_azure_ssh.sh
               cat "$HOME/.ssh/config"
             env:
