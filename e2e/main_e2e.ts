@@ -982,10 +982,10 @@ async function MainTestGoogle(params: any[]) {
   const urlPage = page.url();
   console.log("URL: " + urlPage);
 
-  const data: string = await page.screenshot({path: "file.jpg", type: "jpeg", encoding: "base64", quality: 25})
-    .then((e: Buffer) => e.toString());
-  console.log("Screenshot:");
-  console.log(data);
+  // const data: string = await page.screenshot({path: "file.jpg", type: "jpeg", encoding: "base64", quality: 25})
+  //   .then((e: Buffer) => e.toString());
+  // console.log("Screenshot:");
+  // console.log(data);
 }
 
 async function MainRegister(params: any[]) {
@@ -1058,12 +1058,12 @@ async function MainTest(params: any[]) {
     const urlPage = page.url();
     console.log("URL: " + urlPage);
     if(!urlPage.includes("splitman2")) {
-      await page.goto("https://splitman2.fr:8081/login", {timeout: 20000, waitUntil: "networkidle2"});
+      await page.goto(url, {timeout: 20000, waitUntil: "networkidle2"});
       await waitForMS(2000);
       console.log("URL 1: " + page.url());
     }
 
-    const data: string = await page.screenshot({path: "file.jpg", type: "jpeg", encoding: "base64", quality: 25})
+    let data: string = await page.screenshot({path: "file.jpg", type: "jpeg", encoding: "base64", quality: 25})
       .then((e: Buffer) => e.toString());
     console.log("Screenshot:");
     console.log(data);
