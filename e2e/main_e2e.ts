@@ -971,6 +971,18 @@ async function doRegister(pag: Page) {
 }
 
 
+async function MainTestGoogle(params: any[]) {
+  let isError = null;
+
+  // Wait for creating the new page.
+  const page = await browser.pages().then((e: Page[]) => e[0])
+
+  // await page.goto(url).then(() => {}, () => {});
+  await page.goto("https://angular.io/");
+debugger;
+  await page.$("#intro .hero-logo");
+}
+
 async function MainRegister(params: any[]) {
   let isError = null;
 
@@ -1393,19 +1405,24 @@ async function runAll() {
   browser1 = res[1];
 
   const testList = [
+    {
+      fn: MainTestGoogle,
+      msg: "Test Google",
+      params: []
+    },
     // {
     //   fn: MainRegister,
     //   msg: "E2E register",
     //   params: []
     // },
-    {
-      fn: MainTest,
-      msg: "E2E with 1 expense",
-      params: [
-        allExpenses.slice(0, 1),
-        "Dju doit a 8.56€ Suzie Max doit a 8.56€ Suzie Elyan doit a 8.56€ Suzie"
-      ]
-    },
+    // {
+    //   fn: MainTest,
+    //   msg: "E2E with 1 expense",
+    //   params: [
+    //     allExpenses.slice(0, 1),
+    //     "Dju doit a 8.56€ Suzie Max doit a 8.56€ Suzie Elyan doit a 8.56€ Suzie"
+    //   ]
+    // },
     // {
     //   fn: MainTest,
     //   msg: "E2E with all expenses",
