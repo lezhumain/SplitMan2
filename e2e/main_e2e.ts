@@ -196,6 +196,12 @@ async function handleLogin(pag: Page, userData: { pass: string; email: string; u
   }
 
   try {
+    await pag.waitForSelector("#username", {visible: true, timeout: 10000});
+  } catch (e) {
+    await pag.waitForSelector("#username", {visible: true, timeout: 10000});
+  }
+
+  try {
     // await pag.waitForSelector("#username", {visible: true, timeout: 20000})
     //   .then((e: ElementHandle) => e ? e.type(userData.username) : null);
     const usernameElm = await pag.waitForSelector("#username", {visible: true, timeout: 20000});
