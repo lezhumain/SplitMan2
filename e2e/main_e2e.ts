@@ -69,10 +69,8 @@ async function clearAndType(e: ElementHandle, s: string) {
 }
 
 async function handleSecrutiyStuff(page: Page, doThrow = false) {
-  await page.waitForTimeout(500);
   const hasErrorXpath = "#details-button";
-  await waitForMS(300);
-  await waitForMS(300);
+  await waitForMS(1100);
   const hasError = await page.waitForSelector(hasErrorXpath, {visible: true})
     .then((e: ElementHandle) => e, () => null);
 
@@ -1048,6 +1046,9 @@ async function MainTest(params: any[]) {
     } catch (e) {
       console.log("Log out failed");
     }
+
+    await waitForMS(2000);
+    console.log("URL: " + page.url())
 
     // login
     await Promise.all(
