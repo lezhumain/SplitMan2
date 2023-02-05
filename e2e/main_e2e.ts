@@ -181,8 +181,8 @@ async function handleLogout(pag: Page) {
     await waitForTimeout(500);
 }
 
-async function waitForToast(pag: Page) {
-  const toastSel = "#toast.toast_0";
+async function waitForToast(pag: Page, additionnalClasses = ".toast_0") {
+  const toastSel = "#toast" + additionnalClasses;
   const elm = await pag.waitForSelector(toastSel, {visible: true, timeout: 10010});
   const classfg = await elm.getProperty("className").then((e: JSHandle) => e.remoteObject().value);
   console.log("\t" + classfg);
@@ -217,10 +217,11 @@ async function handleLogin(pag: Page, userData: { pass: string; email: string; u
 
   await waitForTimeout(500);
 
-  const clickAndNavProm = pag.waitForXPath("//button[contains(text(), 'Login')]", {visible: true})
-    .then((e: ElementHandle) => {
-      return e ? Promise.all([e.click(), pag.waitForNavigation({timeout: 40000, waitUntil: "networkidle2"}).then(() => waitForTimeout(1000)).then(() => waitForTimeout(1000))]) : null
-    });
+  const elm: ElementHandle = await pag.waitForXPath("//button[contains(text(), 'Login')]", {visible: true}) as ElementHandle;
+  const clickAndNavProm = Promise.all([
+      elm.click(),
+      pag.waitForNavigation({timeout: 40000, waitUntil: "networkidle2"})
+  ]);
 
   const toastProm = waitForToast(pag);
 
@@ -941,7 +942,7 @@ async function doRegister(pag: Page) {
     .then((e: ElementHandle) => e ? Promise.all([e.click(), pag.waitForNavigation({timeout: 10000}).then(() => waitForTimeout(1000))]) : null);
 
   const tstamp = (new Date()).getTime();
-  const name = `Dju_${tstamp}`, email = `dju_${tstamp}@lol.com`, pass ="secretPASS";
+  const name = `Dju${tstamp}`, email = `dju_${tstamp}@lol.com`, pass ="secretPASS";
 
   await pag.waitForSelector("#email", {visible: true, timeout: 20000})
     .then((e: ElementHandle) => e ? e.type(email) : null);
@@ -956,13 +957,17 @@ async function doRegister(pag: Page) {
     .then((e: ElementHandle) => e ? e.type(pass) : null);
 
   await pag.waitForXPath("//button[contains(text(), 'Register')]", {visible: true})
-    .then((e: ElementHandle) => e ? Promise.all([e.click(), pag.waitForNavigation({timeout: 50000}).then(() => waitForTimeout(1000))]) : null);
+    .then((e: ElementHandle) => e ? Promise.all([
+      e.click(),
+      pag.waitForNavigation({timeout: 50000, waitUntil: "networkidle2"}),
+      waitForToast(pag, "")
+    ]) : null);
 
   expect(pag.url()).to.contain("/login");
 
   await handleLogin(pag, {pass: pass, email: email, username: name})
 
-  debugger;
+  // debugger;
 }
 
 
@@ -981,14 +986,16 @@ async function MainRegister(params: any[]) {
 
     // await page.goto(url).then(() => {}, () => {});
     await goToAndSecurity(pages/*, "/register"*/);
+    if (!url.includes("splitman2.fr") && url.includes("https")) {
+      // await goToAndSecurity(pages/*, "/register"*/);
 
-    // logout
-    await Promise.all(
-      pages.map((pagee: Page) => handleLogout(pagee))
-    );
+      // logout
+      await Promise.all(
+        pages.map((pagee: Page) => handleLogout(pagee))
+      );
+    }
 
     await doRegister(page);
-    debugger;
   } catch (e) {
     console.error(e);
     isError = e;
