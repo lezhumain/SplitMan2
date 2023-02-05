@@ -1050,6 +1050,11 @@ async function MainTest(params: any[]) {
     await waitForMS(2000);
     console.log("URL: " + page.url())
 
+    const data: string = await page.screenshot({path: "file.jpg", type: "jpeg", encoding: "base64", quality: 25})
+      .then((e: Buffer) => e.toString());
+    console.log("Screenshot:");
+    console.log(data);
+
     // login
     await Promise.all(
       [
