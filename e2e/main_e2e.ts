@@ -196,8 +196,11 @@ async function handleLogin(pag: Page, userData: { pass: string; email: string; u
   }
 
   try {
-    await pag.waitForSelector("#username", {visible: true, timeout: 20000})
-      .then((e: ElementHandle) => e ? e.type(userData.username) : null);
+    // await pag.waitForSelector("#username", {visible: true, timeout: 20000})
+    //   .then((e: ElementHandle) => e ? e.type(userData.username) : null);
+    const usernameElm = await pag.waitForSelector("#username", {visible: true, timeout: 20000});
+    await waitForMS(1000);
+    await usernameElm.type(userData.username);
 
     await pag.waitForSelector("#password", {visible: true})
       .then((e: ElementHandle) => e ? e.type(userData.pass) : null);
@@ -210,7 +213,7 @@ async function handleLogin(pag: Page, userData: { pass: string; email: string; u
 
     // upload screenshot to filebin
 
-    throw new Error("login pass error:");
+    throw new Error(e);
   }
 
   await waitForTimeout(500);
