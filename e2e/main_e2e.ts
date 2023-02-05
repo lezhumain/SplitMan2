@@ -1048,7 +1048,12 @@ async function MainTest(params: any[]) {
     }
 
     await waitForMS(2000);
-    console.log("URL: " + page.url())
+    console.log("URL: " + page.url());
+
+    if(!url.includes("splitman2")) {
+      await page.goto("https://splitman2.fr:8081/login", {timeout: 20000, waitUntil: "networkidle2"});
+      await waitForMS(2000);
+    }
 
     const data: string = await page.screenshot({path: "file.jpg", type: "jpeg", encoding: "base64", quality: 25})
       .then((e: Buffer) => e.toString());
