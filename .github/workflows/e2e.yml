@@ -1,10 +1,10 @@
 name: E2E Tests
 
-on:
-  push:
-    branches: [ master ]
+#on:
+#  push:
+#    branches: [ master ]
 
-#on: [pull_request]
+on: [pull_request]
 
 jobs:
   build:
@@ -52,9 +52,5 @@ jobs:
 
       - name: Run E2E
         run: |
-          #pwd
-          #ls -al
-          #ls -al .github/actions
-          #chmod +x .github/actions/run_local_e2e.sh
-          .github/actions/run_local_e2e.sh
-          .github/actions/stopServers.sh
+            docker build --build-arg IP="splitman2.fr:8081" -t splitman2_e2e -f Dockerfile_e2e .
+            docker run splitman2_e2e
