@@ -46,11 +46,10 @@ jobs:
         with:
           java-version: ${{ matrix.java-version }}
 
-#      - name: Prepare
-#          run: |
-#          npm ci
+      - name: Build E2E
+        run: |
+            docker build --build-arg IP="splitman2.fr:8081" -t splitman2_e2e -f Dockerfile_e2e .
 
       - name: Run E2E
         run: |
-            docker build --build-arg IP="splitman2.fr:8081" -t splitman2_e2e -f Dockerfile_e2e .
             docker run splitman2_e2e
