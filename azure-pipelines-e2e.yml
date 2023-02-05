@@ -21,10 +21,10 @@ variables:
   tag: '$(Build.BuildId)'
 
 stages:
-  - stage: Run E2E
+  - stage: Run_E2E
     displayName: Build E2E image
     jobs:
-      - job: Run E2E
+      - job: Run_E2E
         displayName: Build
         pool:
           vmImage: ubuntu-latest
