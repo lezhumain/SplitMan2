@@ -179,9 +179,9 @@ async function handleLogout(pag: Page) {
     await waitForTimeout(500);
 }
 
-async function waitForToast(pag: Page, additionnalClasses = ".toast_0") {
+async function waitForToast(pag: Page, additionnalClasses = ".toast_0", timeout = 10010) {
   const toastSel = "#toast" + additionnalClasses;
-  const elm = await pag.waitForSelector(toastSel, {visible: true, timeout: 10010});
+  const elm = await pag.waitForSelector(toastSel, {visible: true, timeout: timeout});
   const classfg = await elm.getProperty("className").then((e: JSHandle) => e.remoteObject().value);
   console.log("\t" + classfg);
 
@@ -225,12 +225,13 @@ async function handleLogin(pag: Page, userData: { pass: string; email: string; u
   await waitForTimeout(500);
 
   const elm: ElementHandle = await pag.waitForXPath("//button[contains(text(), 'Login')]", {visible: true}) as ElementHandle;
+  const timeout = 40000;
   const clickAndNavProm = Promise.all([
       elm.click(),
-      pag.waitForNavigation({timeout: 40000, waitUntil: "networkidle2"})
+      pag.waitForNavigation({timeout: timeout, waitUntil: "networkidle2"})
   ]);
 
-  const toastProm = waitForToast(pag);
+  const toastProm = waitForToast(pag, ".toast_0", timeout);
 
   await Promise.all([
     clickAndNavProm,
