@@ -1433,24 +1433,24 @@ async function runAll() {
   browser1 = res[1];
 
   const testList = [
-    {
-      fn: MainTestGoogle,
-      msg: "Test Google",
-      params: []
-    },
     // {
-    //   fn: MainRegister,
-    //   msg: "E2E register",
+    //   fn: MainTestGoogle,
+    //   msg: "Test Google",
     //   params: []
     // },
     {
-      fn: MainTest,
-      msg: "E2E with 1 expense",
-      params: [
-        allExpenses.slice(0, 1),
-        "Dju doit a 8.56€ Suzie Max doit a 8.56€ Suzie Elyan doit a 8.56€ Suzie"
-      ]
+      fn: MainRegister,
+      msg: "E2E register",
+      params: []
     },
+    // {
+    //   fn: MainTest,
+    //   msg: "E2E with 1 expense",
+    //   params: [
+    //     allExpenses.slice(0, 1),
+    //     "Dju doit a 8.56€ Suzie Max doit a 8.56€ Suzie Elyan doit a 8.56€ Suzie"
+    //   ]
+    // },
     // {
     //   fn: MainTest,
     //   msg: "E2E with all expenses",
