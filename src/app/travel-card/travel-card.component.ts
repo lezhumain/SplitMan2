@@ -31,6 +31,8 @@ export class TravelCardComponent implements OnInit {
   }
 
   getParticipantList(): string {
-    return this.travel?.participants?.slice(0, 3)?.map(p => p.name).join(", ") || "";
+    return this.travel?.participants
+      // ?.slice(0, 3)
+      ?.map(p => p.name).join(", ") || "";
   }
 }
