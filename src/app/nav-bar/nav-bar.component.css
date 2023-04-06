@@ -65,8 +65,17 @@
   color: green;
 }
 
+/* The animation code */
+@keyframes example {
+  from {color: red;}
+  to {color: yellow;}
+}
+
 .user-wrapper.connected > i.notif {
   color: orange;
+  animation-name: example;
+  animation-duration: 5s;
+  animation-iteration-count: 10;
 }
 
 
