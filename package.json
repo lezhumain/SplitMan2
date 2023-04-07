@@ -44,16 +44,16 @@
     "chai": "^4.3.4",
     "cp-cli": "^2.0.0",
     "jasmine-core": "~3.8.0",
-    "karma": "~6.3.0",
+    "karma": "~6.4.1",
     "karma-chrome-launcher": "~3.1.0",
     "karma-coverage": "~2.0.3",
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "~1.7.0",
     "log-timestamp": "^0.3.0",
     "make-dir-cli": "^3.0.0",
-    "puppeteer": "^19.2.2",
+    "puppeteer": "^19.8.5",
     "ts-node": "^10.4.0",
-    "typescript": "~4.3.5"
+    "typescript": "~4.6.4"
   },
   "engineStrict": true,
   "engines": {
