@@ -62,7 +62,7 @@ async function scrollAndClick(elm: ElementHandle, pag: Page) {
 async function clearAndType(e: ElementHandle, s: string) {
   await waitForMS(200);
   return clickAndDelay(e, { clickCount: 3 }).then(() => {
-    return e.type(s);
+    return e.type(s, {delay: 100});
   });
 
   // return e.clea
@@ -762,10 +762,10 @@ async function AddPeople(pag: Page) {
     await pag.waitForSelector("#profile-tab1", {visible: true, timeout: 10000})
       .then((e: ElementHandle) => e ? e.click() : null);
 
-    await waitForTimeout(200);
-
-    await pag.waitForXPath("//button[contains(text(), 'Add people')]", {visible: true})
-      .then((e: ElementHandle) => e ? e.click() : null);
+    const btn = await pag.waitForXPath(
+      "//button[contains(text(), 'Add people')]", {visible: true}) as ElementHandle;
+    await waitForTimeout(300);
+    await btn.click();
 
     await pag.waitForNavigation({waitUntil: "networkidle2"}).then(() => waitForTimeout(1000));
 
@@ -848,7 +848,7 @@ async function AddExpenses(pag: Page, expenses: Expense[]) {
     await waitForTimeout(800);
 
     await pag.waitForSelector("#amount", {visible: true})
-      .then((e: ElementHandle) => e ? clearAndType(e, expense.amount.toString()) : null);
+      .then((e: ElementHandle) => e ? clearAndType(e, expense.amount.toLocaleString()) : null);
 
     await pag.waitForSelector("#payer", {visible: true})
       .then((e: ElementHandle) => e ? e.type(expense.payer, {delay: 30}) : null);
@@ -870,7 +870,7 @@ async function AddExpenses(pag: Page, expenses: Expense[]) {
   }
 }
 
-async function EditLast(pag: Page, expenses: Expense[]) {
+async function EditLast(pag: Page, expenses: Expense[], newVal = 34.23) {
   // debugger;
   const lastTitle = expenses[expenses.length - 1].name;
   await pag.waitForXPath(`//div[contains(@class, 'expense-card')]//h6[contains(text(), '${lastTitle}')]`, {visible: true})
@@ -893,7 +893,7 @@ async function EditLast(pag: Page, expenses: Expense[]) {
   await waitForTimeout(300);
 
   await pag.waitForSelector("#amount", {visible: true})
-    .then((e: ElementHandle) => e ? clearAndType(e, 34.23.toString()) : null);
+    .then((e: ElementHandle) => e ? clearAndType(e, newVal.toLocaleString()) : null);
 
   // debugger;
 
@@ -1272,7 +1272,7 @@ async function takeScreenshot(page: Page, doPrivNote = true) {
 
   const fileName = "./screen.jpeg";
   const data: string = await page.screenshot({path: fileName, type: "jpeg", encoding: "base64", quality: 33})
-    .then((e: Buffer) => e.toString());
+    .then((e: string) => e);
 
   console.log(`Data:\n${data}\n`);
 
