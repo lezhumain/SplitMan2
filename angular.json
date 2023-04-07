@@ -102,5 +102,8 @@
       }
     }
   },
-  "defaultProject": "SplitMan21"
+  "defaultProject": "SplitMan21",
+  "cli": {
+    "analytics": false
+  }
 }

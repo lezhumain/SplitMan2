@@ -1231,7 +1231,7 @@ async function takeScreenshot(page: Page, doPrivNote = true) {
 
   const fileName = "./screen.jpeg";
   const data: string = await page.screenshot({path: fileName, type: "jpeg", encoding: "base64", quality: 33})
-    .then((e: Buffer) => e.toString());
+    .then((e: string) => e);
 
   console.log(`Data:\n${data}\n`);
 
