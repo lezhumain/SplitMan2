@@ -1,3 +1,4 @@
+/.angular/cache
 ## see https://github.com/angular/angular/blob/master/.gitignore
 .DS_STORE
 
