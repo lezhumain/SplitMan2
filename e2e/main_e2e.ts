@@ -1073,8 +1073,7 @@ async function MainTest(params: any[]) {
       console.log("URL 1: " + page.url());
     }
 
-    let data: string = await page.screenshot({path: "file.jpg", type: "jpeg", encoding: "base64", quality: 25})
-      .then((e: Buffer) => e.toString());
+    let data: string = await page.screenshot({path: "file.jpg", type: "jpeg", encoding: "base64", quality: 25});
     console.log("Screenshot:");
     console.log(data);
 
