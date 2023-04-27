@@ -8,18 +8,18 @@ import {ActivatedRoute} from "@angular/router";
 import {Observable, of} from "rxjs";
 
 describe('BaseServiceService', () => {
-  // let httpClientSpy: jasmine.SpyObj<HttpClient>;
-  // let baseService: BaseService;
-  //
-  // beforeEach(() => {
-  //   // TODO: spy on other methods too
-  //   httpClientSpy = jasmine.createSpyObj('HttpClient', ['get']);
-  //   baseService = new BaseService(httpClientSpy);
-  // });
-  //
-  // it('should be created', () => {
-  //   expect(baseService).toBeTruthy();
-  // });
+  let httpClientSpy: jasmine.SpyObj<HttpClient>;
+  let baseService: BaseService;
+
+  beforeEach(() => {
+    // TODO: spy on other methods too
+    httpClientSpy = jasmine.createSpyObj('HttpClient', ['get']);
+    baseService = new BaseService(httpClientSpy);
+  });
+
+  it('should be created', () => {
+    expect(baseService).toBeTruthy();
+  });
   //
   // it('should return expected basees (HttpClient called once)', (done: DoneFn) => {
   //   const expectedBasees: any[] =
