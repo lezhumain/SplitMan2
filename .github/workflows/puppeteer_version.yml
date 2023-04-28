@@ -20,7 +20,7 @@ jobs:
 
       - name: Get current version
         run: |
-          LAST_VERSION="$(curl -s https://api.github.com/repos/puppeteer/puppeteer/tags  | grep -Eo "\"v[^\"]+\"" | sed 's|"||g' | head -n 1)"
+          LAST_VERSION="$(curl -s https://github.com/puppeteer/puppeteer/releases | grep -Eo "puppeteer: v[0-9]+(\.[0-9]+)+" | head -n 1 | cut -d 'v' -f 2)"
           CURRENT_VERSION="$(cat package.json | grep "puppeteer" | grep -Eo "\^[^\"]+" | sed 's|\^||')"
           echo "$LAST_VERSION"
           echo "$CURRENT_VERSION"
