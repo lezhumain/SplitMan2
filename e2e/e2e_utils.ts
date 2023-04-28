@@ -26,6 +26,16 @@ function getHeadlessParam(): boolean {
     : true;
 }
 
+function getDockerParam(): boolean {
+  const regex = /-+docker[= ](\w+)/;
+  const param = process.argv.find(a => regex.test(a));
+  const target = param?.replace(regex, "$1");
+
+  return target
+    ? target === "true"
+    : false;
+}
+
 export async function CreateBrowsers(): Promise<[Browser, Browser]> {
   const isHeadless: boolean = getHeadlessParam();
 
@@ -47,6 +57,12 @@ export async function CreateBrowsers(): Promise<[Browser, Browser]> {
 
   if(isHeadless) {
     pupArgs.args.push("--headless");
+  }
+
+  const isDocker: boolean = getDockerParam();
+  if(isDocker) {
+    // @ts-ignore
+    pupArgs.executablePath = '/usr/bin/chromium-browser';
   }
 
   const browser = await puppeteer.launch(pupArgs),

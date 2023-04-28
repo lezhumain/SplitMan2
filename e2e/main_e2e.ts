@@ -12,6 +12,7 @@ import {Expense} from "../src/app/models/expense";
 import {CreateBrowsers, honor10} from "./e2e_utils";
 import * as fs from "fs";
 import * as https from "https";
+import {allExpenses1} from "./data/allExpenses1";
 
 const userData = {
   email: "a",
@@ -44,6 +45,28 @@ const xpeopleMarseille = [
   }
 ];
 
+const xpeopleSki2023 = [
+  {
+    name: "dju",
+    dayCount: 7
+  },
+  {
+    name: "aissa",
+    dayCount: 7
+  },
+  {
+    name: "stan",
+    dayCount: 7
+  },
+  {
+    name: "Max",
+    dayCount: 4
+  },
+  {
+    name: "Alexis",
+    dayCount: 5
+  }
+]
 async function clickAndDelay(e: ElementHandle, opt?: ClickOptions, delayMs = 300): Promise<null> {
   return e.click(opt).then(() => {
     return waitForMS(delayMs);
@@ -69,10 +92,8 @@ async function clearAndType(e: ElementHandle, s: string) {
 }
 
 async function handleSecrutiyStuff(page: Page, doThrow = false) {
-  await page.waitForTimeout(500);
   const hasErrorXpath = "#details-button";
-  await waitForMS(300);
-  await waitForMS(300);
+  await waitForMS(1100);
   const hasError = await page.waitForSelector(hasErrorXpath, {visible: true})
     .then((e: ElementHandle) => e, () => null);
 
@@ -181,9 +202,9 @@ async function handleLogout(pag: Page) {
     await waitForTimeout(500);
 }
 
-async function waitForToast(pag: Page, additionnalClasses = ".toast_0") {
+async function waitForToast(pag: Page, additionnalClasses = ".toast_0", timeout = 10010) {
   const toastSel = "#toast" + additionnalClasses;
-  const elm = await pag.waitForSelector(toastSel, {visible: true, timeout: 10010});
+  const elm = await pag.waitForSelector(toastSel, {visible: true, timeout: timeout});
   const classfg = await elm.getProperty("className").then((e: JSHandle) => e.remoteObject().value);
   console.log("\t" + classfg);
 
@@ -198,8 +219,17 @@ async function handleLogin(pag: Page, userData: { pass: string; email: string; u
   }
 
   try {
-    await pag.waitForSelector("#username", {visible: true, timeout: 20000})
-      .then((e: ElementHandle) => e ? e.type(userData.username) : null);
+    await pag.waitForSelector("#username", {visible: true, timeout: 10000});
+  } catch (e) {
+    await pag.waitForSelector("#username", {visible: true, timeout: 10000});
+  }
+
+  try {
+    // await pag.waitForSelector("#username", {visible: true, timeout: 20000})
+    //   .then((e: ElementHandle) => e ? e.type(userData.username) : null);
+    const usernameElm = await pag.waitForSelector("#username", {visible: true, timeout: 20000});
+    await waitForMS(1000);
+    await usernameElm.type(userData.username);
 
     await pag.waitForSelector("#password", {visible: true})
       .then((e: ElementHandle) => e ? e.type(userData.pass) : null);
@@ -212,18 +242,19 @@ async function handleLogin(pag: Page, userData: { pass: string; email: string; u
 
     // upload screenshot to filebin
 
-    throw new Error("login pass error:");
+    throw new Error(e);
   }
 
   await waitForTimeout(500);
 
   const elm: ElementHandle = await pag.waitForXPath("//button[contains(text(), 'Login')]", {visible: true}) as ElementHandle;
+  const timeout = 40000;
   const clickAndNavProm = Promise.all([
       elm.click(),
-      pag.waitForNavigation({timeout: 40000, waitUntil: "networkidle2"})
+      pag.waitForNavigation({timeout: timeout, waitUntil: "networkidle2"})
   ]);
 
-  const toastProm = waitForToast(pag);
+  const toastProm = waitForToast(pag, ".toast_0", timeout);
 
   await Promise.all([
     clickAndNavProm,
@@ -748,8 +779,8 @@ function waitForTimeout(number: number): Promise<null> {
   return waitForMS(number);
 }
 
-async function AddPeople(pag: Page) {
-  const allPeople: { name: string, dayCount: number }[] = xpeopleMarseille.slice();
+async function AddPeople(pag: Page, allPeople?: { name: string, dayCount: number }[]) {
+  allPeople = allPeople || xpeopleMarseille.slice();
   for (const people of allPeople) {
     await pag.waitForSelector("#profile-tab1", {visible: true, timeout: 10000})
       .then((e: ElementHandle) => e ? e.click() : null);
@@ -971,6 +1002,25 @@ async function doRegister(pag: Page) {
 }
 
 
+async function MainTestGoogle(params: any[]) {
+  let isError = null;
+
+  // Wait for creating the new page.
+  const page = await browser.pages().then((e: Page[]) => e[0])
+
+  // await page.goto(url).then(() => {}, () => {});
+  await page.goto("https://angular.io/");
+  await page.$("#intro .hero-logo");
+
+  const urlPage = page.url();
+  console.log("URL: " + urlPage);
+
+  // const data: string = await page.screenshot({path: "file.jpg", type: "jpeg", encoding: "base64", quality: 25})
+  //   .then((e: Buffer) => e.toString());
+  // console.log("Screenshot:");
+  // console.log(data);
+}
+
 async function MainRegister(params: any[]) {
   let isError = null;
 
@@ -1012,7 +1062,7 @@ async function MainRegister(params: any[]) {
 async function MainTest(params: any[]) {
   let isError = null;
 
-  const [targetExepense, targetReparttion, inviteOnly] = params;
+  const [targetExepense, targetReparttion, inviteOnly, participants, editLast] = params;
 
   let pages = [];
 
@@ -1036,6 +1086,19 @@ async function MainTest(params: any[]) {
     } catch (e) {
       console.log("Log out failed");
     }
+
+    await waitForMS(2000);
+    const urlPage = page.url();
+    console.log("URL: " + urlPage);
+    if(!urlPage.includes("splitman2")) {
+      await page.goto(url, {timeout: 20000, waitUntil: "networkidle2"});
+      await waitForMS(2000);
+      console.log("URL 1: " + page.url());
+    }
+
+    let data: string = await page.screenshot({path: "file.jpg", type: "jpeg", encoding: "base64", quality: 25});
+    console.log("Screenshot:");
+    console.log(data);
 
     // login
     await Promise.all(
@@ -1063,7 +1126,7 @@ async function MainTest(params: any[]) {
 
 
     // Add people
-    await AddPeople(page);
+    await AddPeople(page, participants);
 
     //debugger; // 4 items
 
@@ -1081,8 +1144,9 @@ async function MainTest(params: any[]) {
       // debugger;
       await AddExpenses(page, expenses); // 5 items
 
-      // edit last expense
-      await EditLast(page, expenses);
+      if (editLast) { // edit last expense
+        await EditLast(page, expenses);
+      }
       // debugger;
 
       // await waitForTimeout(10000);
@@ -1394,26 +1458,68 @@ async function runAll() {
 
   const testList = [
     // {
+    //   fn: MainTestGoogle,
+    //   msg: "Test Google",
+    //   params: []
+    // },
+    // {
     //   fn: MainRegister,
     //   msg: "E2E register",
     //   params: []
     // },
+    // {
+    //   fn: MainTest,
+    //   msg: "E2E with 1 expense",
+    //   params: [
+    //     allExpenses.slice(0, 1),
+    //     "Dju doit a 8.56€ Suzie Max doit a 8.56€ Suzie Elyan doit a 8.56€ Suzie",
+    //     false,
+    //     xpeopleMarseille,
+    //     true
+    //   ]
+    // },
     {
       fn: MainTest,
-      msg: "E2E with 1 expense",
+      msg: "E2E with all expenses",
       params: [
-        allExpenses.slice(0, 1),
-        "Dju doit a 8.56€ Suzie Max doit a 8.56€ Suzie Elyan doit a 8.56€ Suzie"
+        allExpenses.slice(),
+        "Elyan doit a 17.30€ Dju",
+        false,
+        xpeopleMarseille,
+        true
+      ]
+    },
+    {
+      fn: MainTest,
+      msg: "E2E with 1 expenses ski 2023",
+      params: [
+        allExpenses1.slice(0, 1),
+        "dju doit a 169.25€ stan aissa doit a 169.25€ stan",
+        false,
+        xpeopleSki2023,
+        false
+      ]
+    },
+    {
+      fn: MainTest,
+      msg: "E2E with all expenses ski 2023 no rembours",
+      params: [
+        allExpenses1.slice(0, allExpenses1.length - 2),
+        "dju doit a 201.35€ stan Max doit a 45.23€ stan Alexis doit a 309.81€ aissa dju doit a 43.84€ aissa",
+        false,
+        xpeopleSki2023,
+        false
       ]
     },
     // {
     //   fn: MainTest,
-    //   msg: "E2E with all expenses",
+    //   msg: "E2E with all expenses ski 2023 (bug to fix)",
     //   params: [
-    //     allExpenses.slice(),
-    //     "Elyan doit a 17.30€ Dju"
-    //   ]
-    // }
+    //     allExpenses1.slice(),
+    //     "Max doit a 45.23€ stan Alexis doit a 309.81€ aissa",
+    //     false,
+    //     xpeopleSki2023,
+    //     false
   ];
 
   const allRes: {msg: string, errorMsg?: string, hasError: boolean, links?: string[]}[] = [];
@@ -1474,12 +1580,19 @@ async function runAll() {
 }
 
 
+const logTiming = (start: Date) => {
+  const end = new Date();
+  console.log("Took " + ((end.getTime() - start.getTime() / 1000)) + "s");
+}
 
+const start = new Date();
 runAll()
 // uploadToFilebin("", "C:\\Users\\djuuu\\OneDrive\\Pictures\\MerionGenea.png")
   .then((e: any) => {
+    logTiming(start);
     console.log("Done.");
 }, (e) => {
   console.error(e);
+  logTiming(start);
   throw e;
 });

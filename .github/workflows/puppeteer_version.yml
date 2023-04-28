@@ -13,21 +13,21 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x]
+        node-version: [20.x]
 
     steps:
       - uses: actions/checkout@v2
 
       - name: Get current version
         run: |
-          LAST_VERSION="$(curl -s https://api.github.com/repos/puppeteer/puppeteer/tags  | grep -Eo "\"v[^\"]+\"" | sed 's|"||g' | head -n 1)"
+          LAST_VERSION="$(curl -s https://github.com/puppeteer/puppeteer/releases | grep -Eo "puppeteer: v[0-9]+(\.[0-9]+)+" | head -n 1 | cut -d 'v' -f 2)"
           CURRENT_VERSION="$(cat package.json | grep "puppeteer" | grep -Eo "\^[^\"]+" | sed 's|\^||')"
           echo "$LAST_VERSION"
           echo "$CURRENT_VERSION"
           #export VAR_TEST="exported"
 
           TARGET_STATUS="fail"
-          if [ "$LAST_VERSION" != "v$CURRENT_VERSION" ]; then
+          if [ "$LAST_VERSION" != "$CURRENT_VERSION" ]; then
             exit 1
           fi
           #echo "TARGET_STATUS=$TARGET_STATUS" >> $GITHUB_ENV

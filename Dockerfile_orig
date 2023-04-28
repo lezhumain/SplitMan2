@@ -4,6 +4,7 @@
 # This is needed to build and compile our code
 # while generating the docker image
 FROM node:16.13.1-alpine AS build
+
 # Create a Virtual directory inside the docker image
 WORKDIR /dist/src/app
 #WORKDIR /app
