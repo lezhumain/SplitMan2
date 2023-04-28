@@ -27,7 +27,7 @@ jobs:
           #export VAR_TEST="exported"
 
           TARGET_STATUS="fail"
-          if [ "$LAST_VERSION" != "v$CURRENT_VERSION" ]; then
+          if [ "$LAST_VERSION" != "$CURRENT_VERSION" ]; then
             exit 1
           fi
           #echo "TARGET_STATUS=$TARGET_STATUS" >> $GITHUB_ENV
