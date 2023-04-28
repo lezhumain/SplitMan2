@@ -12,6 +12,7 @@ import {Expense} from "../src/app/models/expense";
 import {CreateBrowsers, honor10} from "./e2e_utils";
 import * as fs from "fs";
 import * as https from "https";
+import {allExpenses1} from "./data/allExpenses1";
 
 const userData = {
   email: "a",
@@ -44,6 +45,28 @@ const xpeopleMarseille = [
   }
 ];
 
+const xpeopleSki2023 = [
+  {
+    name: "dju",
+    dayCount: 7
+  },
+  {
+    name: "aissa",
+    dayCount: 7
+  },
+  {
+    name: "stan",
+    dayCount: 7
+  },
+  {
+    name: "Max",
+    dayCount: 4
+  },
+  {
+    name: "Alexis",
+    dayCount: 5
+  }
+]
 async function clickAndDelay(e: ElementHandle, opt?: ClickOptions, delayMs = 300): Promise<null> {
   return e.click(opt).then(() => {
     return waitForMS(delayMs);
@@ -756,8 +779,8 @@ function waitForTimeout(number: number): Promise<null> {
   return waitForMS(number);
 }
 
-async function AddPeople(pag: Page) {
-  const allPeople: { name: string, dayCount: number }[] = xpeopleMarseille.slice();
+async function AddPeople(pag: Page, allPeople?: { name: string, dayCount: number }[]) {
+  allPeople = allPeople || xpeopleMarseille.slice();
   for (const people of allPeople) {
     await pag.waitForSelector("#profile-tab1", {visible: true, timeout: 10000})
       .then((e: ElementHandle) => e ? e.click() : null);
@@ -1039,7 +1062,7 @@ async function MainRegister(params: any[]) {
 async function MainTest(params: any[]) {
   let isError = null;
 
-  const [targetExepense, targetReparttion, inviteOnly] = params;
+  const [targetExepense, targetReparttion, inviteOnly, participants, editLast] = params;
 
   let pages = [];
 
@@ -1103,7 +1126,7 @@ async function MainTest(params: any[]) {
 
 
     // Add people
-    await AddPeople(page);
+    await AddPeople(page, participants);
 
     //debugger; // 4 items
 
@@ -1121,8 +1144,9 @@ async function MainTest(params: any[]) {
       // debugger;
       await AddExpenses(page, expenses); // 5 items
 
-      // edit last expense
-      await EditLast(page, expenses);
+      if (editLast) { // edit last expense
+        await EditLast(page, expenses);
+      }
       // debugger;
 
       // await waitForTimeout(10000);
@@ -1443,22 +1467,59 @@ async function runAll() {
     //   msg: "E2E register",
     //   params: []
     // },
-    {
-      fn: MainTest,
-      msg: "E2E with 1 expense",
-      params: [
-        allExpenses.slice(0, 1),
-        "Dju doit a 8.56€ Suzie Max doit a 8.56€ Suzie Elyan doit a 8.56€ Suzie"
-      ]
-    },
+    // {
+    //   fn: MainTest,
+    //   msg: "E2E with 1 expense",
+    //   params: [
+    //     allExpenses.slice(0, 1),
+    //     "Dju doit a 8.56€ Suzie Max doit a 8.56€ Suzie Elyan doit a 8.56€ Suzie",
+    //     false,
+    //     xpeopleMarseille,
+    //     true
+    //   ]
+    // },
     {
       fn: MainTest,
       msg: "E2E with all expenses",
       params: [
         allExpenses.slice(),
-        "Elyan doit a 17.30€ Dju"
+        "Elyan doit a 17.30€ Dju",
+        false,
+        xpeopleMarseille,
+        true
       ]
-    }
+    },
+    {
+      fn: MainTest,
+      msg: "E2E with 1 expenses ski 2023",
+      params: [
+        allExpenses1.slice(0, 1),
+        "dju doit a 169.25€ stan aissa doit a 169.25€ stan",
+        false,
+        xpeopleSki2023,
+        false
+      ]
+    },
+    {
+      fn: MainTest,
+      msg: "E2E with all expenses ski 2023 no rembours",
+      params: [
+        allExpenses1.slice(0, allExpenses1.length - 2),
+        "dju doit a 201.35€ stan Max doit a 45.23€ stan Alexis doit a 309.81€ aissa dju doit a 43.84€ aissa",
+        false,
+        xpeopleSki2023,
+        false
+      ]
+    },
+    // {
+    //   fn: MainTest,
+    //   msg: "E2E with all expenses ski 2023 (bug to fix)",
+    //   params: [
+    //     allExpenses1.slice(),
+    //     "Max doit a 45.23€ stan Alexis doit a 309.81€ aissa",
+    //     false,
+    //     xpeopleSki2023,
+    //     false
   ];
 
   const allRes: {msg: string, errorMsg?: string, hasError: boolean, links?: string[]}[] = [];
@@ -1519,12 +1580,19 @@ async function runAll() {
 }
 
 
+const logTiming = (start: Date) => {
+  const end = new Date();
+  console.log("Took " + ((end.getTime() - start.getTime() / 1000)) + "s");
+}
 
+const start = new Date();
 runAll()
 // uploadToFilebin("", "C:\\Users\\djuuu\\OneDrive\\Pictures\\MerionGenea.png")
   .then((e: any) => {
+    logTiming(start);
     console.log("Done.");
 }, (e) => {
   console.error(e);
+  logTiming(start);
   throw e;
 });
