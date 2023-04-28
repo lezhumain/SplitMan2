@@ -59,6 +59,7 @@
   },
   "engineStrict": true,
   "engines": {
-    "node": ">=14.15"
+    "node": ">=18",
+    "npm": ">=8.0.0"
   }
 }
