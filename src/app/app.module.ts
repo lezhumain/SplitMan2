@@ -26,6 +26,7 @@ import {HttpClientModule} from "@angular/common/http";
 import { TestEndpointComponent } from './test-endpoint/test-endpoint.component';
 import { ToastComponent } from './toast/toast.component';
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import { OspMapComponent } from './osp-map/osp-map.component';
 
 @NgModule({
   declarations: [
@@ -48,7 +49,8 @@ import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
     UserProfileComponent,
     UserEditComponent,
     TestEndpointComponent,
-    ToastComponent
+    ToastComponent,
+    OspMapComponent
   ],
   imports: [
     BrowserModule,
