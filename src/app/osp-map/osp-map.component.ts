@@ -166,7 +166,7 @@ export class OspMapComponent implements OnInit, AfterViewInit {
     // 100% -> 0          = 204 - 204
     // 0%   -> 204 ("CC") = 204 - 0
     // X%   -> 204 - (204 * heatPerc)
-    const gNumber = 204 - Math.round(204 * heatPerc);
+    const gNumber = 255 - Math.round(255 * heatPerc);
     const g = gNumber === 0 ? "00" : gNumber.toString(16);
 
     const color = `#${r}${g}${b}`.toUpperCase();
