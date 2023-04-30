@@ -104,7 +104,6 @@ stages:
               DEBIAN_PATH: $(DEBIAN_PATH)
             displayName: 'Save containers'
 
-
   - stage: Deploy
     jobs:
       - job: Deploy_Docker_Containers
@@ -159,3 +158,31 @@ stages:
               MONGO_PASS: $(MONGO_PASS)
               DEBIAN_PATH: $(DEBIAN_PATH)
             displayName: 'Run containers'
+
+  - stage: GenerateAPK
+    jobs:
+      - job: Generate_APK
+        steps:
+          - checkout: self
+          - checkout: MyGitHub_splitman2run
+
+          - task: DownloadSecureFile@1
+            name: sshKey
+            displayName: 'Download SSH key'
+            inputs:
+              secureFile: 'id_releaseUser'
+
+          - script: |
+              chmod +x SplitMan2-run/*.sh
+              bash SplitMan2-run/prepare_azure_ssh.sh "$(sshKey.secureFilePath)"
+            displayName: 'Prepare SSH key'
+
+          - script: |
+              cd SplitMan2
+              mkdir -p apks
+              ./buildCordovaApp.sh SplitMan2
+              scp apks/splitman2.apk "$DEBIAN_USER"@"$DEBIAN_IP:"
+            env:
+              DEBIAN_USER: $(DEBIAN_USER)
+              DEBIAN_IP: $(DEBIAN_IP_REAL)
+            displayName: 'Generate APK'
