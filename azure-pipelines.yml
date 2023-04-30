@@ -79,6 +79,10 @@ stages:
               DEBIAN_IP: $(DEBIAN_IP)
             displayName: 'Build containers'
 
+          - publish: '$(Build.ArtifactStagingDirectory)/$IMAGE.tar'
+            displayName: 'Publish tar image'
+            artifact: splitman2_tar
+
           - task: DownloadSecureFile@1
             name: sshKey
             displayName: 'Download SSH key'
@@ -131,6 +135,12 @@ stages:
               DEBIAN_USER: $(DEBIAN_USER)
               DEBIAN_IP: $(DEBIAN_IP_REAL)
             displayName: 'Setup SSH access'
+
+          - download: current
+            artifact: splitman2_tar
+
+          - script: |
+              ls -ald "$(Pipeline.Workspace)/splitman2_tar/$IMAGE.tar"
 
           - script: |
               bash SplitMan2-run/backup_current.sh
