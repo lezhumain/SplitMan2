@@ -169,3 +169,24 @@ stages:
 #              MONGO_PASS: $(MONGO_PASS)
 #              DEBIAN_PATH: $(DEBIAN_PATH)
 #            displayName: 'Run containers'
+#
+#  - stage: Run_E2E
+#    displayName: Build E2E image
+#    jobs:
+#      - job: Run_E2E
+#        displayName: Build
+#        pool:
+#          vmImage: ubuntu-latest
+#        steps:
+#          - task: Docker@2
+#            inputs:
+#              command: build
+#              dockerfile: '**/Dockerfile_e2e'
+#              tags: |
+#                $(tag)
+#              arguments: '--build-arg IP="splitman2.fr:8081" -t splitman2_e2e'
+#            displayName: Build E2E image
+#
+#          - script: |
+#              docker run splitman2_e2e
+#            displayName: 'Run E2E image'
