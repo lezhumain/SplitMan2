@@ -44,13 +44,13 @@ stages:
             name: sslCert
             displayName: 'Download cert'
             inputs:
-              secureFile: 'example.crt'
+              secureFile: 'letsencrypt.crt'
 
           - task: DownloadSecureFile@1
             name: sslKey
             displayName: 'Download key'
             inputs:
-              secureFile: 'example.key'
+              secureFile: 'letsencrypt.key'
 
           - script: |
               if [ -z "$IMAGE" ]; then
@@ -63,8 +63,8 @@ stages:
               TARGET_DIR="/home/$(whoami)/.ssl"
               echo "TARGET_DIR: $TARGET_DIR"
               mkdir -p "$TARGET_DIR"
-              sudo cp $(sslCert.secureFilePath) "$TARGET_DIR/example.crt"
-              sudo cp $(sslKey.secureFilePath) "$TARGET_DIR/example.key"
+              sudo cp $(sslCert.secureFilePath) "$TARGET_DIR/letsencrypt.crt"
+              sudo cp $(sslKey.secureFilePath) "$TARGET_DIR/letsencrypt.key"
               sudo chown -R "$(whoami)" "$TARGET_DIR"
               chmod 600 "$TARGET_DIR"/*
             displayName: 'Prepare SSL key and cert'
