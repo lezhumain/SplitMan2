@@ -81,69 +81,69 @@ stages:
               DEBIAN_IP: $(DEBIAN_IP)
             displayName: 'Build containers'
 
-          - publish: '$(Build.ArtifactStagingDirectory)/splitman2.tar'
+          - publish: '$(Build.ArtifactStagingDirectory)/$(IMAGE).tar'
             displayName: 'Publish tar image'
             artifact: splitman2_tar
 
-          - task: DownloadSecureFile@1
-            name: sshKey
-            displayName: 'Download SSH key'
-            inputs:
-              secureFile: 'id_releaseUser'
-
-          - script: |
-              chmod +x SplitMan2-run/*.sh
-              bash SplitMan2-run/prepare_azure_ssh.sh "$(sshKey.secureFilePath)"
-            displayName: 'Prepare SSH key'
-
-          - script: |
-              . SplitMan2-run/setup_azure_ssh.sh
-              cat "$HOME/.ssh/config"
-            env:
-              DEBIAN_USER: $(DEBIAN_USER)
-              DEBIAN_IP: $(DEBIAN_IP_REAL)
-            displayName: 'Setup SSH access'
-
-          - script: |
-              scp "$(Build.ArtifactStagingDirectory)/$IMAGE.tar" "ovhVM_rel:${DEBIAN_PATH}"
-            env:
-              DEBIAN_PATH: $(DEBIAN_PATH)
-            displayName: 'Save containers'
-
-
-  - stage: Deploy
-    jobs:
-      - job: Deploy_Docker_Containers
-        steps:
-          - checkout: self
-          - checkout: MyGitHub_splitman2run
-
-          - task: DownloadSecureFile@1
-            name: sshKey
-            displayName: 'Download SSH key'
-            inputs:
-              secureFile: 'id_releaseUser'
-
-          - script: |
-              chmod +x SplitMan2-run/*.sh
-              bash SplitMan2-run/prepare_azure_ssh.sh "$(sshKey.secureFilePath)"
-            displayName: 'Prepare SSH key'
-
-          - script: |
-              cat SplitMan2-run/setup_azure_ssh.sh
-              . SplitMan2-run/setup_azure_ssh.sh
-              cat "$HOME/.ssh/config"
-            env:
-              DEBIAN_USER: $(DEBIAN_USER)
-              DEBIAN_IP: $(DEBIAN_IP_REAL)
-            displayName: 'Setup SSH access'
-
-          - download: current
-            artifact: splitman2_tar
-
-          - script: |
-              ls -ald "$(Pipeline.Workspace)/splitman2_tar/$IMAGE.tar"
-
+#          - task: DownloadSecureFile@1
+#            name: sshKey
+#            displayName: 'Download SSH key'
+#            inputs:
+#              secureFile: 'id_releaseUser'
+#
+#          - script: |
+#              chmod +x SplitMan2-run/*.sh
+#              bash SplitMan2-run/prepare_azure_ssh.sh "$(sshKey.secureFilePath)"
+#            displayName: 'Prepare SSH key'
+#
+#          - script: |
+#              . SplitMan2-run/setup_azure_ssh.sh
+#              cat "$HOME/.ssh/config"
+#            env:
+#              DEBIAN_USER: $(DEBIAN_USER)
+#              DEBIAN_IP: $(DEBIAN_IP_REAL)
+#            displayName: 'Setup SSH access'
+#
+#          - script: |
+#              scp "$(Build.ArtifactStagingDirectory)/$IMAGE.tar" "ovhVM_rel:${DEBIAN_PATH}"
+#            env:
+#              DEBIAN_PATH: $(DEBIAN_PATH)
+#            displayName: 'Save containers'
+#
+#
+#  - stage: Deploy
+#    jobs:
+#      - job: Deploy_Docker_Containers
+#        steps:
+#          - checkout: self
+#          - checkout: MyGitHub_splitman2run
+#
+#          - task: DownloadSecureFile@1
+#            name: sshKey
+#            displayName: 'Download SSH key'
+#            inputs:
+#              secureFile: 'id_releaseUser'
+#
+#          - script: |
+#              chmod +x SplitMan2-run/*.sh
+#              bash SplitMan2-run/prepare_azure_ssh.sh "$(sshKey.secureFilePath)"
+#            displayName: 'Prepare SSH key'
+#
+#          - script: |
+#              cat SplitMan2-run/setup_azure_ssh.sh
+#              . SplitMan2-run/setup_azure_ssh.sh
+#              cat "$HOME/.ssh/config"
+#            env:
+#              DEBIAN_USER: $(DEBIAN_USER)
+#              DEBIAN_IP: $(DEBIAN_IP_REAL)
+#            displayName: 'Setup SSH access'
+#
+#          - download: current
+#            artifact: splitman2_tar
+#
+#          - script: |
+#              ls -ald "$(Pipeline.Workspace)/splitman2_tar/$IMAGE.tar"
+#
 #          - script: |
 #              bash SplitMan2-run/backup_current.sh
 #            env:
