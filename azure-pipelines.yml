@@ -81,7 +81,7 @@ stages:
               DEBIAN_IP: $(DEBIAN_IP)
             displayName: 'Build containers'
 
-          - publish: '$(Build.ArtifactStagingDirectory)/$IMAGE.tar'
+          - publish: '$(Build.ArtifactStagingDirectory)/splitman2.tar'
             displayName: 'Publish tar image'
             artifact: splitman2_tar
 

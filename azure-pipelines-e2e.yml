@@ -9,10 +9,10 @@
 
 pr: none
 
-#trigger:
-#  branches:
-#    include:
-#      - master
+trigger:
+  branches:
+    include:
+      - master
 
 resources:
   - repo: self
