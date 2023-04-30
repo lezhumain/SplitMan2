@@ -1,0 +1,7 @@
+#iban.invalid {
+  border: 2px solid var(--bs-danger);
+}
+
+#iban.invalid {
+  border: 2px solid var(--bs-success);
+}

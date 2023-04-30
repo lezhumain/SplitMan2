@@ -16,6 +16,7 @@ export class UserModel {
   password: string = "";
   password1: string = "";
   invites: InviteDate[] = [];
+  iban?: string;
 
   toString(): string {
     return `${this.email} ${this.username} ${this.password} ${this.password1}`;

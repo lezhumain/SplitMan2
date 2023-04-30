@@ -1,10 +1,13 @@
 import {Component, OnInit} from '@angular/core';
 import {UserServiceService} from "../user-service.service";
 import {ActivatedRoute, Router} from "@angular/router";
-import {take} from "rxjs/operators";
+import {catchError, first, take} from "rxjs/operators";
 import {UserModel} from "../models/user-model";
 import {ToastComponent} from "../toast/toast.component";
 import {ToastMessage, ToastType} from "../toast/toast.shared";
+import {TravelService} from "../travel.service";
+import {ExpenseService} from "../expense.service";
+import {Expense} from "../models/expense";
 
 @Component({
   selector: 'app-login',
