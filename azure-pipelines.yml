@@ -3,12 +3,12 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-#pr:
-#  branches:
-#    include:
-#    - '*'  # must quote since "*" is a YAML reserved character; we want a string
+pr:
+  branches:
+    include:
+    - '*'  # must quote since "*" is a YAML reserved character; we want a string
 
-pr: none
+#pr: none
 
 trigger:
   branches:
@@ -142,30 +142,30 @@ stages:
           - script: |
               ls -ald "$(Pipeline.Workspace)/splitman2_tar/$IMAGE.tar"
 
-          - script: |
-              bash SplitMan2-run/backup_current.sh
-            env:
-              DEBIAN_PATH: $(DEBIAN_PATH)
-            displayName: 'Backup current'
-
-          - script: |
-              ssh -oBatchMode=yes "ovhVM_rel" bash << EOF
-                cd "$DEBIAN_PATH"
-                docker ps
-                docker images
-                docker load -i "$IMAGE.tar"
-                docker images
-                docker ps
-              EOF
-            env:
-              DEBIAN_PATH: $(DEBIAN_PATH)
-            displayName: 'Update containers'
-
-          - script: |
-              cd SplitMan2-run
-              bash run_containers.sh
-            env:
-              MONGO_USER: $(MONGO_USER)
-              MONGO_PASS: $(MONGO_PASS)
-              DEBIAN_PATH: $(DEBIAN_PATH)
-            displayName: 'Run containers'
+#          - script: |
+#              bash SplitMan2-run/backup_current.sh
+#            env:
+#              DEBIAN_PATH: $(DEBIAN_PATH)
+#            displayName: 'Backup current'
+#
+#          - script: |
+#              ssh -oBatchMode=yes "ovhVM_rel" bash << EOF
+#                cd "$DEBIAN_PATH"
+#                docker ps
+#                docker images
+#                docker load -i "$IMAGE.tar"
+#                docker images
+#                docker ps
+#              EOF
+#            env:
+#              DEBIAN_PATH: $(DEBIAN_PATH)
+#            displayName: 'Update containers'
+#
+#          - script: |
+#              cd SplitMan2-run
+#              bash run_containers.sh
+#            env:
+#              MONGO_USER: $(MONGO_USER)
+#              MONGO_PASS: $(MONGO_PASS)
+#              DEBIAN_PATH: $(DEBIAN_PATH)
+#            displayName: 'Run containers'
