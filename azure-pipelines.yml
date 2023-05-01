@@ -3,12 +3,12 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-#pr:
-#  branches:
-#    include:
-#    - '*'  # must quote since "*" is a YAML reserved character; we want a string
+pr:
+  branches:
+    include:
+    - '*'  # must quote since "*" is a YAML reserved character; we want a string
 
-pr: none
+#pr: none
 
 trigger:
   branches:
