@@ -2,12 +2,12 @@
 # Build a Docker image
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
-pr:
-  branches:
-    include:
-      - '*'  # must quote since "*" is a YAML reserved character; we want a string
+#pr:
+#  branches:
+#    include:
+#      - '*'  # must quote since "*" is a YAML reserved character; we want a string
 
-# pr: none
+pr: none
 
 trigger:
   branches:
