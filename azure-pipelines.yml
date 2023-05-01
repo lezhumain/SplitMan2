@@ -40,6 +40,11 @@ stages:
           - checkout: self
           - checkout: MyGitHub_splitman2run
 
+          - task: NodeTool@0
+            inputs:
+              versionSource: 'spec'
+              versionSpec: '20.x'
+
           - task: DownloadSecureFile@1
             name: sslCert
             displayName: 'Download cert'

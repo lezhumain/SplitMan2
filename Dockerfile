@@ -3,7 +3,7 @@
 # Which version of Node image to use depends on project dependencies
 # This is needed to build and compile our code
 # while generating the docker image
-FROM node:16.13.1-alpine AS build
+FROM node:20-alpine AS build
 # Create a Virtual directory inside the docker image
 WORKDIR /dist/src/app
 #WORKDIR /app
