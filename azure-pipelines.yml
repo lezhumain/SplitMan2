@@ -40,6 +40,11 @@ stages:
           - checkout: self
           - checkout: MyGitHub_splitman2run
 
+          - task: NodeTool@0
+            inputs:
+              versionSource: 'spec'
+              versionSpec: '20.x'
+
           - task: DownloadSecureFile@1
             name: sslCert
             displayName: 'Download cert'
@@ -81,9 +86,24 @@ stages:
               DEBIAN_IP: $(DEBIAN_IP)
             displayName: 'Build containers'
 
+          - script: |
+              cp "SplitMan2-run/prepare_azure_ssh.sh" "$(Build.ArtifactStagingDirectory)/"
+              cp "SplitMan2-run/setup_azure_ssh.sh" "$(Build.ArtifactStagingDirectory)/"
+              echo "Saved scripts"
+              ls -alh "$(Build.ArtifactStagingDirectory)/"
+            displayName: 'Copy SSH script to artifacts'
+
           - publish: '$(Build.ArtifactStagingDirectory)/$(IMAGE).tar'
             displayName: 'Publish tar image'
             artifact: splitman2_tar
+
+          - publish: '$(Build.ArtifactStagingDirectory)/prepare_azure_ssh.sh'
+            displayName: 'Publish prepare script'
+            artifact: prepare_azure_ssh
+
+          - publish: '$(Build.ArtifactStagingDirectory)/setup_azure_ssh.sh'
+            displayName: 'Publish SSH script'
+            artifact: setup_azure_ssh
 
 #          - task: DownloadSecureFile@1
 #            name: sshKey
@@ -192,3 +212,32 @@ stages:
 #          - script: |
 #              docker run splitman2_e2e
 #            displayName: 'Run E2E image'
+
+#  - stage: GenerateAPK
+#    jobs:
+#      - job: Generate_APK
+#        steps:
+#          - checkout: self
+#          - checkout: MyGitHub_splitman2run
+#
+#          - task: DownloadSecureFile@1
+#            name: sshKey
+#            displayName: 'Download SSH key'
+#            inputs:
+#              secureFile: 'id_releaseUser'
+#
+#          - script: |
+#              chmod +x SplitMan2-run/*.sh
+#              bash SplitMan2-run/prepare_azure_ssh.sh "$(sshKey.secureFilePath)"
+#            displayName: 'Prepare SSH key'
+#
+#          - script: |
+#              cd SplitMan2
+#              mkdir -p apks
+#              chmod +x ./buildCordovaApp.sh
+#              ./buildCordovaApp.sh SplitMan2
+#              scp apks/splitman2.apk "$DEBIAN_USER"@"$DEBIAN_IP:"
+#            env:
+#              DEBIAN_USER: $(DEBIAN_USER)
+#              DEBIAN_IP: $(DEBIAN_IP_REAL)
+#            displayName: 'Generate APK'

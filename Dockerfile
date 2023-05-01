@@ -3,7 +3,7 @@
 # Which version of Node image to use depends on project dependencies
 # This is needed to build and compile our code
 # while generating the docker image
-FROM node:16.13.1-alpine AS build
+FROM node:20-alpine AS build
 # Create a Virtual directory inside the docker image
 WORKDIR /dist/src/app
 #WORKDIR /app
@@ -14,7 +14,7 @@ RUN npm cache clean --force
 # Copy files from local machine to virtual directory in docker image
 COPY . .
 
-RUN ["npm", "install", "-g", "npm@8.1.2"]
+RUN ["npm", "install", "-g", "npm@latest"]
 
 #RUN cd /app && npm i && npm run cp-libs
 RUN ls

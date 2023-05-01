@@ -27,4 +27,6 @@ describe('ExpenseEditComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  // TODO unit test category list
 });

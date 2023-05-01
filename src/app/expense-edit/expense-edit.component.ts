@@ -10,6 +10,85 @@ import {combineLatest, of} from "rxjs";
 import {Participant, ParticipantModel} from "../models/participants";
 import {ExpenseParticipantModel} from "../models/expenseParticipants";
 import {NavBarService} from "../nav-bar.service";
+import {catchError, first} from "rxjs/operators";
+
+class AutoCompleteStuff {
+  data: any[];
+  keyword: string = "";
+  autoCompleteValue: any = null;
+
+  private _autoCompleteValue1: {name: string} | null = null; // ngModel of autocomplete
+  get autoCompleteValue1(): {name: string} | null {
+    // return typeof(this._autoCompleteValue1) === "string"
+    //   ? {name: this._autoCompleteValue1}
+    //   : this._autoCompleteValue1;
+    return this._autoCompleteValue1;
+  }
+  set autoCompleteValue1(val: string | {name: string} | null) {
+    this._autoCompleteValue1 = typeof(val) === "string" ? {name: val} : val;
+    if (this._autoCompleteValue1) {
+      this._autoCompleteValue1.name = this._autoCompleteValue1.name.toLowerCase();
+    }
+  }
+
+  constructor(private readonly _expService: ExpenseService ) {
+    // this.data = ["aaaaa", "baaaa", "caaaa"];
+    // this.data = [{name: "aaaaa"}, {name: "baaaa"}, {name: "caaaa"}];
+    this.data = [];
+  }
+
+  init(tripID: number) {
+    this._expService.getExpensesByTripID(tripID).pipe(
+      first(),
+      catchError((err) => {
+        console.warn("Caught error:");
+        console.warn(err);
+
+        return [];
+      })
+    ).subscribe((exp: Expense[]) => {
+      let categs = exp.map(a => a.categorie).filter(e => !!e);
+      if(categs.length === 0) {
+        categs = ["aaaaa", "baaaa", "caaaa"];
+      }
+
+      // make uniq
+      this.data = categs.filter((e, i) => categs.indexOf(e) === i)
+        .map(e => {
+          return {name: e};
+        });
+    })
+  }
+
+  selectEvent($event: any) {
+    console.log("Selected autocomplete");
+    console.log($event);
+    this.autoCompleteValue = $event;
+  }
+
+  onChangeSearch($event: any) {
+    console.log("Search changed");
+    console.log($event);
+    // TODO maybe store event
+  }
+
+  onFocused($event: void) {
+    console.log("Input focused");
+    console.log($event);
+
+    const val = ((<any>$event as FocusEvent).target as HTMLInputElement).value;
+    console.log("val: " + val);
+  }
+
+  autocompleteCleared() {
+    console.log("Input cleared");
+    this.autoCompleteValue = null;
+  }
+
+  test() {
+    debugger;
+  }
+}
 
 @Component({
   selector: 'app-expense-edit',
@@ -45,12 +124,16 @@ export class ExpenseEditComponent implements OnInit {
     return this._isPerDay;
   }
 
+  public readonly ac: AutoCompleteStuff;
+
   constructor(private readonly expenseService: ExpenseService,
               private readonly travelService: TravelService,
               private readonly userServiceService: UserServiceService,
               private readonly router: Router,
               private readonly route: ActivatedRoute,
-              private readonly _navService: NavBarService) { }
+              private readonly _navService: NavBarService) {
+    this.ac = new AutoCompleteStuff(expenseService);
+  }
 
   ngOnInit(): void {
     const routeParams = this.route.snapshot.paramMap;
@@ -147,6 +230,8 @@ export class ExpenseEditComponent implements OnInit {
     this.expenseModel.tripId = travelID;
 
     this._navService.setBackValue(`/travels/${travelID}/expense/${expenseID}`);
+
+    this.ac.init(travelID);
   }
 
   saveExpense() {
@@ -157,6 +242,8 @@ export class ExpenseEditComponent implements OnInit {
         return p;
       });
     this.expenseModel.payees = participants;
+
+    this.expenseModel.categorie = this.ac.autoCompleteValue1?.name || "";
 
     this.savingExpense = true;
     this.expenseService.saveExpense(this.expenseModel, this.userServiceService).subscribe(() => {

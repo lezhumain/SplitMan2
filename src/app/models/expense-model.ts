@@ -23,6 +23,7 @@ export class ExpenseModel {
   createdBy: string = "";
   updatedAt: Date | string | null  = null;
   updatedBy: string = "";
+  categorie?: string;
 
   get allPayees(): string {
     return this.payees.map(p => p.name).join(", ");
@@ -73,6 +74,7 @@ export class ExpenseModel {
     m.createdBy = t.createdBy;
     m.updatedAt = ExpenseModel.dateFromISO(t.updatedAt);
     m.updatedBy = t.updatedBy;
+    m.categorie = t.categorie;
 
     return m;
   }
@@ -91,10 +93,7 @@ export class ExpenseModel {
     // m.updatedAt = ExpenseModel.dateFromISO(t.updatedAt);
     // m.updatedBy = t.updatedBy;
 
-
     m.assignFromObj(t);
-
-
 
     return m;
   }

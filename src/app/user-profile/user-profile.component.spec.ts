@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UserProfileComponent } from './user-profile.component';
 import {getBaseTestStuff} from "../../../e2e/baseTestStuff";
 import {LoginComponent} from "../login/login.component";
+import {UserModel} from "../models/user-model";
 
 describe('UserProfileComponent', () => {
   let component: UserProfileComponent;
@@ -23,5 +24,23 @@ describe('UserProfileComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('test IBAN', () => {
+    expect(component).toBeTruthy();
+    component.user = new UserModel();
+    component.user.iban = "BE51 9670 2940 0662";
+    expect(component.ibanValid).toBeFalse();
+    component.checkIBAN();
+    expect(component.ibanValid).toBeTrue();
+
+    component.user.iban = "BE51 9670 2940 0";
+    // expect(component.ibanValid).toBeFalse();
+    component.checkIBAN();
+    expect(component.ibanValid).toBeFalse();
+
+    component.user.iban = "";
+    component.checkIBAN();
+    expect(component.ibanValid).toBeTrue();
   });
 });

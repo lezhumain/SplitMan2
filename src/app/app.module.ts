@@ -26,6 +26,7 @@ import {HttpClientModule} from "@angular/common/http";
 import { TestEndpointComponent } from './test-endpoint/test-endpoint.component';
 import { ToastComponent } from './toast/toast.component';
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {AutocompleteLibModule} from "angular-ng-autocomplete";
 
 @NgModule({
   declarations: [
@@ -55,7 +56,8 @@ import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
     AppRoutingModule,
     FormsModule,
     HttpClientModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    AutocompleteLibModule
   ],
   providers: [AuthGuard],
   bootstrap: [AppComponent]
