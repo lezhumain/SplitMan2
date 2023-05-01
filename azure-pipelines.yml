@@ -3,12 +3,12 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-#pr:
-#  branches:
-#    include:
-#    - '*'  # must quote since "*" is a YAML reserved character; we want a string
+pr:
+  branches:
+    include:
+    - '*'  # must quote since "*" is a YAML reserved character; we want a string
 
-pr: none
+#pr: none
 
 trigger:
   branches:
@@ -33,77 +33,77 @@ variables:
   value: SplitMan2
 
 stages:
-  - stage: Build
-    jobs:
-      - job: Build_Docker_Containers
-        steps:
-          - checkout: self
-          - checkout: MyGitHub_splitman2run
-
-          - task: NodeTool@0
-            inputs:
-              versionSource: 'spec'
-              versionSpec: '20.x'
-
-          - task: DownloadSecureFile@1
-            name: sslCert
-            displayName: 'Download cert'
-            inputs:
-              secureFile: 'letsencrypt.crt'
-
-          - task: DownloadSecureFile@1
-            name: sslKey
-            displayName: 'Download key'
-            inputs:
-              secureFile: 'letsencrypt.key'
-
-          - script: |
-              if [ -z "$IMAGE" ]; then
-                exit 1
-              fi
-            displayName: 'Test variables'
-
-          - script: |
-              cd "$SREPO"
-              TARGET_DIR="/home/$(whoami)/.ssl"
-              echo "TARGET_DIR: $TARGET_DIR"
-              mkdir -p "$TARGET_DIR"
-              sudo cp $(sslCert.secureFilePath) "$TARGET_DIR/letsencrypt.crt"
-              sudo cp $(sslKey.secureFilePath) "$TARGET_DIR/letsencrypt.key"
-              sudo chown -R "$(whoami)" "$TARGET_DIR"
-              chmod 600 "$TARGET_DIR"/*
-            displayName: 'Prepare SSL key and cert'
-
-          - script: |
-              cd "$SREPO"
-              bash ../SplitMan2-run/run_docker_e2e.sh "$DEBIAN_IP" "https" "$SREPO"
-              docker save "$IMAGE" -o "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
-              echo "Saved tar:"
-              ls -ald "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
-            env:
-              MONGO_USER: $(MONGO_USER)
-              MONGO_PASS: $(MONGO_PASS)
-              DEBIAN_IP: $(DEBIAN_IP)
-            displayName: 'Build containers'
-
-          - script: |
-              cp "SplitMan2-run/prepare_azure_ssh.sh" "$(Build.ArtifactStagingDirectory)/"
-              cp "SplitMan2-run/setup_azure_ssh.sh" "$(Build.ArtifactStagingDirectory)/"
-              echo "Saved scripts"
-              ls -alh "$(Build.ArtifactStagingDirectory)/"
-            displayName: 'Copy SSH script to artifacts'
-
-          - publish: '$(Build.ArtifactStagingDirectory)/$(IMAGE).tar'
-            displayName: 'Publish tar image'
-            artifact: splitman2_tar
-
-          - publish: '$(Build.ArtifactStagingDirectory)/prepare_azure_ssh.sh'
-            displayName: 'Publish prepare script'
-            artifact: prepare_azure_ssh
-
-          - publish: '$(Build.ArtifactStagingDirectory)/setup_azure_ssh.sh'
-            displayName: 'Publish SSH script'
-            artifact: setup_azure_ssh
+#  - stage: Build
+#    jobs:
+#      - job: Build_Docker_Containers
+#        steps:
+#          - checkout: self
+#          - checkout: MyGitHub_splitman2run
+#
+#          - task: NodeTool@0
+#            inputs:
+#              versionSource: 'spec'
+#              versionSpec: '20.x'
+#
+#          - task: DownloadSecureFile@1
+#            name: sslCert
+#            displayName: 'Download cert'
+#            inputs:
+#              secureFile: 'letsencrypt.crt'
+#
+#          - task: DownloadSecureFile@1
+#            name: sslKey
+#            displayName: 'Download key'
+#            inputs:
+#              secureFile: 'letsencrypt.key'
+#
+#          - script: |
+#              if [ -z "$IMAGE" ]; then
+#                exit 1
+#              fi
+#            displayName: 'Test variables'
+#
+#          - script: |
+#              cd "$SREPO"
+#              TARGET_DIR="/home/$(whoami)/.ssl"
+#              echo "TARGET_DIR: $TARGET_DIR"
+#              mkdir -p "$TARGET_DIR"
+#              sudo cp $(sslCert.secureFilePath) "$TARGET_DIR/letsencrypt.crt"
+#              sudo cp $(sslKey.secureFilePath) "$TARGET_DIR/letsencrypt.key"
+#              sudo chown -R "$(whoami)" "$TARGET_DIR"
+#              chmod 600 "$TARGET_DIR"/*
+#            displayName: 'Prepare SSL key and cert'
+#
+#          - script: |
+#              cd "$SREPO"
+#              bash ../SplitMan2-run/run_docker_e2e.sh "$DEBIAN_IP" "https" "$SREPO"
+#              docker save "$IMAGE" -o "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
+#              echo "Saved tar:"
+#              ls -ald "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
+#            env:
+#              MONGO_USER: $(MONGO_USER)
+#              MONGO_PASS: $(MONGO_PASS)
+#              DEBIAN_IP: $(DEBIAN_IP)
+#            displayName: 'Build containers'
+#
+#          - script: |
+#              cp "SplitMan2-run/prepare_azure_ssh.sh" "$(Build.ArtifactStagingDirectory)/"
+#              cp "SplitMan2-run/setup_azure_ssh.sh" "$(Build.ArtifactStagingDirectory)/"
+#              echo "Saved scripts"
+#              ls -alh "$(Build.ArtifactStagingDirectory)/"
+#            displayName: 'Copy SSH script to artifacts'
+#
+#          - publish: '$(Build.ArtifactStagingDirectory)/$(IMAGE).tar'
+#            displayName: 'Publish tar image'
+#            artifact: splitman2_tar
+#
+#          - publish: '$(Build.ArtifactStagingDirectory)/prepare_azure_ssh.sh'
+#            displayName: 'Publish prepare script'
+#            artifact: prepare_azure_ssh
+#
+#          - publish: '$(Build.ArtifactStagingDirectory)/setup_azure_ssh.sh'
+#            displayName: 'Publish SSH script'
+#            artifact: setup_azure_ssh
 
 #          - task: DownloadSecureFile@1
 #            name: sshKey
