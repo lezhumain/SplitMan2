@@ -213,31 +213,37 @@ stages:
 #              docker run splitman2_e2e
 #            displayName: 'Run E2E image'
 
-#  - stage: GenerateAPK
-#    jobs:
-#      - job: Generate_APK
-#        steps:
-#          - checkout: self
-#          - checkout: MyGitHub_splitman2run
-#
-#          - task: DownloadSecureFile@1
-#            name: sshKey
-#            displayName: 'Download SSH key'
-#            inputs:
-#              secureFile: 'id_releaseUser'
-#
-#          - script: |
-#              chmod +x SplitMan2-run/*.sh
-#              bash SplitMan2-run/prepare_azure_ssh.sh "$(sshKey.secureFilePath)"
-#            displayName: 'Prepare SSH key'
-#
-#          - script: |
-#              cd SplitMan2
-#              mkdir -p apks
-#              chmod +x ./buildCordovaApp.sh
-#              ./buildCordovaApp.sh SplitMan2
-#              scp apks/splitman2.apk "$DEBIAN_USER"@"$DEBIAN_IP:"
-#            env:
-#              DEBIAN_USER: $(DEBIAN_USER)
-#              DEBIAN_IP: $(DEBIAN_IP_REAL)
-#            displayName: 'Generate APK'
+  - stage: GenerateAPK
+    jobs:
+      - job: Generate_APK
+        steps:
+          - checkout: self
+          - checkout: MyGitHub_splitman2run
+
+          - task: DownloadSecureFile@1
+            name: sshKey
+            displayName: 'Download SSH key'
+            inputs:
+              secureFile: 'id_releaseUser'
+
+          - script: |
+              chmod +x SplitMan2-run/*.sh
+              bash SplitMan2-run/prepare_azure_ssh.sh "$(sshKey.secureFilePath)"
+            displayName: 'Prepare SSH key'
+
+          - script: |
+              cd SplitMan2
+              mkdir -p apks
+              chmod +x ./buildCordovaApp.sh
+              ./buildCordovaApp.sh SplitMan2
+
+              cp "apks/splitman2.apk" "$(Build.ArtifactStagingDirectory)/"
+              scp apks/splitman2.apk "$DEBIAN_USER"@"$DEBIAN_IP:"
+            env:
+              DEBIAN_USER: $(DEBIAN_USER)
+              DEBIAN_IP: $(DEBIAN_IP_REAL)
+            displayName: 'Generate APK'
+
+          - publish: '$(Build.ArtifactStagingDirectory)/splitman2.apk'
+            displayName: 'Publish APK'
+            artifact: apk
