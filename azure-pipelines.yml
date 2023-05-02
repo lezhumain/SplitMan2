@@ -246,8 +246,8 @@ stages:
               chmod +x ./*.sh
               ./buildCordovaApp.sh SplitMan2
 
-              cp "apks/$IMAGE.apk" "$(Build.ArtifactStagingDirectory)/"
-              #scp "apks/$IMAGE.apk" "$DEBIAN_USER"@"$DEBIAN_IP:"
+#              cp "apks/$IMAGE.apk" "$(Build.ArtifactStagingDirectory)/"
+#              #scp "apks/$IMAGE.apk" "$DEBIAN_USER"@"$DEBIAN_IP:"
             env:
               DEBIAN_USER: $(DEBIAN_USER)
               DEBIAN_IP: $(DEBIAN_IP_REAL)
