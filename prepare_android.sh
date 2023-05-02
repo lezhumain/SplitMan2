@@ -65,6 +65,6 @@ function install_android_sdk1() {
 	#sdkmanager --install "platform-tools" "build-tools;30.0.1" "emulator" "platforms:android-33"
 }
 
-#install_gradle
+install_gradle
 install_android_sdk
 # install_android_sdk1

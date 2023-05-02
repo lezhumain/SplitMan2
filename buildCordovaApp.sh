@@ -12,7 +12,7 @@ npm ci
 echo 1
 npm run cp-libs
 echo 2
-ng build --configuration production
+npx ng build --configuration production
 echo 3
 PROJ_NAME="$1"
 if [ -z "$PROJ_NAME" ]; then
