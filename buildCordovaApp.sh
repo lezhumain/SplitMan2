@@ -3,6 +3,7 @@
 set -e
 
 LIFEMAN="$(pwd)"
+mkdir -p dist
 npm run build:prod
 
 PROJ_NAME="$1"
