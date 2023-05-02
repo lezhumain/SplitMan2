@@ -234,16 +234,17 @@ stages:
           - script: |
               cd SplitMan2
               mkdir -p apks
-              chmod +x ./buildCordovaApp.sh
+              chmod +x ./*.sh
+              ./prepare_android.sh
               ./buildCordovaApp.sh SplitMan2
 
-              cp "apks/splitman2.apk" "$(Build.ArtifactStagingDirectory)/"
-              scp apks/splitman2.apk "$DEBIAN_USER"@"$DEBIAN_IP:"
+              cp "apks/$IMAGE.apk" "$(Build.ArtifactStagingDirectory)/"
+              #scp "apks/$IMAGE.apk" "$DEBIAN_USER"@"$DEBIAN_IP:"
             env:
               DEBIAN_USER: $(DEBIAN_USER)
               DEBIAN_IP: $(DEBIAN_IP_REAL)
             displayName: 'Generate APK'
 
-          - publish: '$(Build.ArtifactStagingDirectory)/splitman2.apk'
+          - publish: '$(Build.ArtifactStagingDirectory)/$(IMAGE).apk'
             displayName: 'Publish APK'
             artifact: apk
