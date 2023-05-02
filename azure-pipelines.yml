@@ -233,9 +233,17 @@ stages:
 
           - script: |
               cd SplitMan2
-              mkdir -p apks
               chmod +x ./*.sh
               ./prepare_android.sh
+            env:
+              DEBIAN_USER: $(DEBIAN_USER)
+              DEBIAN_IP: $(DEBIAN_IP_REAL)
+            displayName: 'Prepare APK'
+
+          - script: |
+              cd SplitMan2
+              mkdir -p apks
+              chmod +x ./*.sh
               ./buildCordovaApp.sh SplitMan2
 
               cp "apks/$IMAGE.apk" "$(Build.ArtifactStagingDirectory)/"
