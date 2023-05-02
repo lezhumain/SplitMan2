@@ -4,7 +4,10 @@ set -e
 
 LIFEMAN="$(pwd)"
 mkdir -p dist
-npm run build:prod
+#npm run build:prod
+npx rimraf dist
+npm run cp-libs
+ng build --configuration production
 
 PROJ_NAME="$1"
 if [ -z "$PROJ_NAME" ]; then
