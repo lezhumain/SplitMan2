@@ -244,6 +244,7 @@ stages:
               cd SplitMan2
               mkdir -p apks
               chmod +x ./*.sh
+              npm i -g ng
               ./buildCordovaApp.sh SplitMan2
 
 #              cp "apks/$IMAGE.apk" "$(Build.ArtifactStagingDirectory)/"
