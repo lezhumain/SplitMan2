@@ -56,8 +56,9 @@ stages:
               npm i -g ng
               ./buildCordovaApp.sh SplitMan2
 
+              APK="$(find . -name "$IMAGE.apk")"
 #              cp "apks/$IMAGE.apk" "$(Build.ArtifactStagingDirectory)/"
-              cp "$(find . -name "$IMAGE.apk")" "$(Build.ArtifactStagingDirectory)/"
+              cp "$APK" "$(Build.ArtifactStagingDirectory)/"
             env:
               DEBIAN_IP: $(DEBIAN_IP_REAL)
             displayName: 'Generate APK'
