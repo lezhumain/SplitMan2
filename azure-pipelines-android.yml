@@ -57,7 +57,7 @@ stages:
               ./buildCordovaApp.sh SplitMan2
 
               APK="$(find . -name "$IMAGE.apk")"
-#              cp "apks/$IMAGE.apk" "$(Build.ArtifactStagingDirectory)/"
+              # cp "apks/$IMAGE.apk" "$(Build.ArtifactStagingDirectory)/"
               cp "$APK" "$(Build.ArtifactStagingDirectory)/"
             env:
               DEBIAN_IP: $(DEBIAN_IP_REAL)
