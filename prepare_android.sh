@@ -63,9 +63,9 @@ function install_android_sdk1() {
 
   echo "list...."
   sdkmanager --list
-  echo "install...."
-  sdkmanager --install "platform-tools" "build-tools;30.0.1" "emulator" "platforms:android-33"
-  echo "installed 1...."
+  #  echo "install...."
+  #  sdkmanager --install "platform-tools" "build-tools;30.0.1" "emulator" "platforms:android-33"
+  #  echo "installed 1...."
 }
 
 install_gradle
