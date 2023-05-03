@@ -40,37 +40,25 @@ stages:
           - checkout: self
           - checkout: MyGitHub_splitman2run
 
-          - task: DownloadSecureFile@1
-            name: sshKey
-            displayName: 'Download SSH key'
-            inputs:
-              secureFile: 'id_releaseUser'
-
-          - script: |
-              chmod +x SplitMan2-run/*.sh
-              bash SplitMan2-run/prepare_azure_ssh.sh "$(sshKey.secureFilePath)"
-            displayName: 'Prepare SSH key'
-
           - script: |
               cd SplitMan2
               chmod +x ./*.sh
               ./prepare_android.sh
-            env:
-              DEBIAN_USER: $(DEBIAN_USER)
-              DEBIAN_IP: $(DEBIAN_IP_REAL)
-            displayName: 'Prepare APK'
+            displayName: 'Install Gradle and Android SDK'
 
           - script: |
               cd SplitMan2
+
+              sed -i.bak "s|PROD_IP|$DEBIAN_IP:8081|g" src/environments/environment.prod.ts
+
               mkdir -p apks
               chmod +x ./*.sh
               npm i -g ng
               ./buildCordovaApp.sh SplitMan2
 
-              cp "apks/$IMAGE.apk" "$(Build.ArtifactStagingDirectory)/"
-              #scp "apks/$IMAGE.apk" "$DEBIAN_USER"@"$DEBIAN_IP:"
+#              cp "apks/$IMAGE.apk" "$(Build.ArtifactStagingDirectory)/"
+              cp "$(find . -name "$IMAGE.apk")" "$(Build.ArtifactStagingDirectory)/"
             env:
-              DEBIAN_USER: $(DEBIAN_USER)
               DEBIAN_IP: $(DEBIAN_IP_REAL)
             displayName: 'Generate APK'
 
