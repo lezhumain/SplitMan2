@@ -58,10 +58,13 @@ stages:
 
               pwd
               ls -alh
-              find /tmp/cordova_react_test/platforms/android/app/build/outputs/apk -name *.apk
-              find . -name *.apk
+              APK="$(find /tmp/cordova_react_test/platforms/android/app/build/outputs/apk -name *.apk | head -n 1)"
+              if [ -z "$APK" ]; then
+                APK="$(find . -name *.apk | head -n 1)"
+              fi
 
               # cp "apks/$IMAGE.apk" "$(Build.ArtifactStagingDirectory)/"
+              echo "APK: $APK"
               cp "$APK" "$(Build.ArtifactStagingDirectory)/"
               #              APK="$(find . -name "$IMAGE.apk")"
               #              # cp "apks/$IMAGE.apk" "$(Build.ArtifactStagingDirectory)/"
