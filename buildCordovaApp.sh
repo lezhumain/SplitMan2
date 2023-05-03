@@ -58,10 +58,10 @@ fi
 echo "here: $(pwd)"
 ls -ald build
 
-export ANDROID_SDK_ROOT="/c/Program Files (x86)/Android/android-sdk"
+export ANDROID_SDK_ROOT="/usr/local/lib/android/sdk"
 if [[ "$PATH" != *"radle"* ]]; then
   echo "Adding gradle to path"
-  export PATH="$PATH:/c/Gradle/gradle-7.6/bin"
+  #export PATH="$PATH:/c/Gradle/gradle-7.6/bin"
 fi
 chmod +x ./resetAndroid.sh
 ./resetAndroid.sh > /dev/null
