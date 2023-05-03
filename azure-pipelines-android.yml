@@ -1,0 +1,72 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+#pr:
+#  branches:
+#    include:
+#    - '*'  # must quote since "*" is a YAML reserved character; we want a string
+
+pr: none
+
+trigger:
+  branches:
+    include:
+      - master
+
+pool:
+  vmImage: ubuntu-latest
+
+resources:
+  repositories:
+    - repository: MyGitHub_splitman2run # The name used to reference this repository in the checkout step
+      type: github
+      endpoint: lezhumain
+      name: lezhumain/SplitMan2-run
+
+variables:
+- group: var_groupe
+- name: IMAGE
+  value: splitman2
+- name: SREPO
+  value: SplitMan2
+
+stages:
+  - stage: GenerateAPK
+    jobs:
+      - job: Generate_APK
+        steps:
+          - checkout: self
+          - checkout: MyGitHub_splitman2run
+
+          - script: |
+              cd SplitMan2
+              chmod +x ./*.sh
+              ./prepare_android.sh
+            displayName: 'Install Gradle and Android SDK'
+
+          - script: |
+              cd SplitMan2
+
+              sed -i.bak "s|PROD_IP|$DEBIAN_IP:8081|g" src/environments/environment.prod.ts
+
+              mkdir -p apks
+              chmod +x ./*.sh
+              npm i -g ng
+              ./buildCordovaApp.sh SplitMan2
+
+              APK="$(find . -name *.apk | head -n 1)"
+              if [ -z "$APK" ]; then
+                APK="$(find /tmp/cordova_react_test/platforms/android/app/build/outputs/apk -name *.apk | head -n 1)"
+              fi
+
+              echo "APK: $APK"
+              cp "$APK" "$(Build.ArtifactStagingDirectory)/$IMAGE.apk"
+            env:
+              DEBIAN_IP: $(DEBIAN_IP_REAL)
+            displayName: 'Generate APK'
+
+          - publish: '$(Build.ArtifactStagingDirectory)/$(IMAGE).apk'
+            displayName: 'Publish APK'
+            artifact: apk
