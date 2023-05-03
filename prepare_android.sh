@@ -43,23 +43,6 @@ function install_android_sdk() {
 #	echo "11"
 #	sudo find /usr/local/lib/android/sdk/ -name sdkmanager
 #	echo "12"
-  sdkmanager --list
-  sdkmanager --install "platform-tools" "build-tools;30.0.1" "emulator" "platforms:android-33"
-}
-
-function install_android_sdk1() {
-	# install android sdk 1
-  mkdir -p ~/android/sdk
-  cd ~/android/sdk
-  curl https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O
-  sudo unzip *.zip
-  cd cmdline-tools
-  mkdir tools
-  mv -i * tools
-  export ANDROID_HOME="$HOME/android/sdk"
-  export PATH="$ANDROID_HOME/cmdline-tools/tools/bin/:$PATH"
-  export PATH="$ANDROID_HOME/emulator/:$PATH"
-  export PATH="$ANDROID_HOME/platform-tools/:$PATH"
 
   echo "list...."
   sdkmanager --list
@@ -67,6 +50,27 @@ function install_android_sdk1() {
   #  sdkmanager --install "platform-tools" "build-tools;30.0.1" "emulator" "platforms:android-33"
   #  echo "installed 1...."
 }
+
+#function install_android_sdk1() {
+#	# install android sdk 1
+#  mkdir -p ~/android/sdk
+#  cd ~/android/sdk
+#  curl https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O
+#  sudo unzip *.zip
+#  cd cmdline-tools
+#  mkdir tools
+#  mv -i * tools
+#  export ANDROID_HOME="$HOME/android/sdk"
+#  export PATH="$ANDROID_HOME/cmdline-tools/tools/bin/:$PATH"
+#  export PATH="$ANDROID_HOME/emulator/:$PATH"
+#  export PATH="$ANDROID_HOME/platform-tools/:$PATH"
+#
+#  echo "list...."
+#  sdkmanager --list
+#  #  echo "install...."
+#  #  sdkmanager --install "platform-tools" "build-tools;30.0.1" "emulator" "platforms:android-33"
+#  #  echo "installed 1...."
+#}
 
 install_gradle
 install_android_sdk
