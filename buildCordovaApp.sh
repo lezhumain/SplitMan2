@@ -89,5 +89,10 @@ if [ -z "$TARGET_APK" ]; then
 fi
 cp "$TARGET_APK" ./apks/splitman2.apk
 
-md5sum.exe ./apks/splitman2.apk > ./apks/checksum.md5
+if [[ "$(uname -a)" == *"Linux"* ]]; then
+  md5sum ./apks/splitman2.apk > ./apks/checksum.md5
+else
+  md5sum.exe ./apks/splitman2.apk > ./apks/checksum.md5
+fi
+
 ls apks

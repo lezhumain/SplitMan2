@@ -1,0 +1,79 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+pr:
+  branches:
+    include:
+    - '*'  # must quote since "*" is a YAML reserved character; we want a string
+
+#pr: none
+
+trigger:
+  branches:
+    include:
+      - master
+
+pool:
+  vmImage: ubuntu-latest
+
+resources:
+  repositories:
+    - repository: MyGitHub_splitman2run # The name used to reference this repository in the checkout step
+      type: github
+      endpoint: lezhumain
+      name: lezhumain/SplitMan2-run
+
+variables:
+- group: var_groupe
+- name: IMAGE
+  value: splitman2
+- name: SREPO
+  value: SplitMan2
+
+stages:
+  - stage: GenerateAPK
+    jobs:
+      - job: Generate_APK
+        steps:
+          - checkout: self
+          - checkout: MyGitHub_splitman2run
+
+          - task: DownloadSecureFile@1
+            name: sshKey
+            displayName: 'Download SSH key'
+            inputs:
+              secureFile: 'id_releaseUser'
+
+          - script: |
+              chmod +x SplitMan2-run/*.sh
+              bash SplitMan2-run/prepare_azure_ssh.sh "$(sshKey.secureFilePath)"
+            displayName: 'Prepare SSH key'
+
+          - script: |
+              cd SplitMan2
+              chmod +x ./*.sh
+              ./prepare_android.sh
+            env:
+              DEBIAN_USER: $(DEBIAN_USER)
+              DEBIAN_IP: $(DEBIAN_IP_REAL)
+            displayName: 'Prepare APK'
+
+          - script: |
+              cd SplitMan2
+              mkdir -p apks
+              chmod +x ./*.sh
+              npm i -g ng
+              ./buildCordovaApp.sh SplitMan2
+
+              cp "apks/$IMAGE.apk" "$(Build.ArtifactStagingDirectory)/"
+              #scp "apks/$IMAGE.apk" "$DEBIAN_USER"@"$DEBIAN_IP:"
+            env:
+              DEBIAN_USER: $(DEBIAN_USER)
+              DEBIAN_IP: $(DEBIAN_IP_REAL)
+            displayName: 'Generate APK'
+
+          - publish: '$(Build.ArtifactStagingDirectory)/$(IMAGE).apk'
+            displayName: 'Publish APK'
+            artifact: apk
