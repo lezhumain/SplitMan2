@@ -57,12 +57,15 @@ function install_android_sdk1() {
   mkdir tools
   mv -i * tools
   export ANDROID_HOME="$HOME/android/sdk"
-	export PATH="$ANDROID_HOME/cmdline-tools/tools/bin/:$PATH"
-	export PATH="$ANDROID_HOME/emulator/:$PATH"
-	export PATH="$ANDROID_HOME/platform-tools/:$PATH"
+  export PATH="$ANDROID_HOME/cmdline-tools/tools/bin/:$PATH"
+  export PATH="$ANDROID_HOME/emulator/:$PATH"
+  export PATH="$ANDROID_HOME/platform-tools/:$PATH"
 
-	sdkmanager --list
-	#sdkmanager --install "platform-tools" "build-tools;30.0.1" "emulator" "platforms:android-33"
+  echo "list...."
+  sdkmanager --list
+  echo "install...."
+  sdkmanager --install "platform-tools" "build-tools;30.0.1" "emulator" "platforms:android-33"
+  echo "installed 1...."
 }
 
 install_gradle
