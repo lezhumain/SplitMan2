@@ -1590,10 +1590,13 @@ async function runAll() {
   }
 }
 
+function getTimeFromMS(ms: number) {
+  return new Date(ms).toISOString().slice(11, 19);
+}
 
 const logTiming = (start: Date) => {
   const end = new Date();
-  console.log("Took " + ((end.getTime() - start.getTime() / 1000)) + "s");
+  console.log("Elapsed " + getTimeFromMS(end.getTime() - start.getTime()));
 }
 
 const start = new Date();
