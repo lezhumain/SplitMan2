@@ -18,6 +18,7 @@ resources:
   - repo: self
 
 variables:
+  - group: var_groupe
   - name: IMAGE
     value: splitman2e2e
   - name: tag
@@ -38,8 +39,10 @@ stages:
               dockerfile: '**/Dockerfile_e2e'
               tags: |
                 $(tag)
-              arguments: '--build-arg IP="splitman2.fr:8081" -t $(IMAGE)'
-            displayName: Build E2E image
+              arguments: '--build-arg IP="$DEBIAN_IP.fr:8081" -t $(IMAGE)'
+            env:
+              DEBIAN_IP: $(DEBIAN_IP)
+            displayName: "Build E2E image"
 
           - script: |
               du -sh ./*
