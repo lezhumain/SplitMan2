@@ -1091,7 +1091,7 @@ async function MainTest(params: any[]) {
     await waitForMS(2000);
     const urlPage = page.url();
     console.log("URL: " + urlPage);
-    if(!urlPage.includes("splitman2") && url.includes("splitman2") && urlPage !== url) {
+    if(!urlPage.includes("splitman2")) {
       await page.goto(url, {timeout: 20000, waitUntil: "networkidle2"});
       await waitForMS(2000);
       console.log("URL 1: " + page.url());
