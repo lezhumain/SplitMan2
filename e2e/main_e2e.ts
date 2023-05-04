@@ -335,6 +335,7 @@ const host = hparam ? `https://${hparam}` : "http://127.0.0.1:4200";
 // const host = "https://79.137.33.77:8081"
 
 const url = `${host}/login`;
+console.log("url: " + url);
 
 
 let getCount = 0,
