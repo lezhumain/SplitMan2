@@ -54,7 +54,3 @@ stages:
           - publish: '$(Build.ArtifactStagingDirectory)/$(IMAGE).tar'
             displayName: 'Publish tar image'
             artifact: $(IMAGE)_tar
-
-#          - script: |
-#              docker run splitman2_e2e
-#            displayName: 'Run E2E image'

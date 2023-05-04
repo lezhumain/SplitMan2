@@ -45,18 +45,6 @@ stages:
               versionSource: 'spec'
               versionSpec: '20.x'
 
-          - task: DownloadSecureFile@1
-            name: sslCert
-            displayName: 'Download cert'
-            inputs:
-              secureFile: 'letsencrypt.crt'
-
-          - task: DownloadSecureFile@1
-            name: sslKey
-            displayName: 'Download key'
-            inputs:
-              secureFile: 'letsencrypt.key'
-
           - script: |
               if [ -z "$IMAGE" ]; then
                 exit 1
@@ -65,25 +53,12 @@ stages:
 
           - script: |
               cd "$SREPO"
-              TARGET_DIR="/home/$(whoami)/.ssl"
-              echo "TARGET_DIR: $TARGET_DIR"
-              mkdir -p "$TARGET_DIR"
-              sudo cp $(sslCert.secureFilePath) "$TARGET_DIR/letsencrypt.crt"
-              sudo cp $(sslKey.secureFilePath) "$TARGET_DIR/letsencrypt.key"
-              sudo chown -R "$(whoami)" "$TARGET_DIR"
-              chmod 600 "$TARGET_DIR"/*
-            displayName: 'Prepare SSL key and cert'
-
-          - script: |
-              cd "$SREPO"
-              bash ../SplitMan2-run/run_docker_e2e.sh "$DEBIAN_IP" "https" "$SREPO"
+              bash ../SplitMan2-run/run_docker_e2e.sh "https" "$SREPO"
               docker save "$IMAGE" -o "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
               echo "Saved tar:"
               ls -ald "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
             env:
-              MONGO_USER: $(MONGO_USER)
-              MONGO_PASS: $(MONGO_PASS)
-              DEBIAN_IP: $(DEBIAN_IP)
+              HOST_IP: $(DEBIAN_IP)
             displayName: 'Build containers'
 
           - script: |
