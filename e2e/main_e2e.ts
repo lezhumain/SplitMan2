@@ -13,6 +13,7 @@ import {CreateBrowsers, honor10} from "./e2e_utils";
 import * as fs from "fs";
 import * as https from "https";
 import {allExpenses1} from "./data/allExpenses1";
+import {writeFileSync} from "fs";
 
 const userData = {
   email: "a",
@@ -860,7 +861,7 @@ async function AddExpenses(pag: Page, expenses: Expense[]) {
 
     // await pag.waitForNavigation();
 
-    console.log("adding expense name");
+    console.log("adding expense name: " + expense.name);
     try {
       await pag.waitForSelector("#name", {visible: true})
         .then((e: ElementHandle) => e ? e.type(expense.name, {delay: 30}) : null);
@@ -1490,17 +1491,17 @@ async function runAll() {
         true
       ]
     },
-    // {
-    //   fn: MainTest,
-    //   msg: "E2E with 1 expenses ski 2023",
-    //   params: [
-    //     allExpenses1.slice(0, 1),
-    //     "dju doit a 169.25€ stan aissa doit a 169.25€ stan",
-    //     false,
-    //     xpeopleSki2023,
-    //     false
-    //   ]
-    // },
+    {
+      fn: MainTest,
+      msg: "E2E with 1 expenses ski 2023",
+      params: [
+        allExpenses1.slice(0, 1),
+        "dju doit a 169.25€ stan aissa doit a 169.25€ stan",
+        false,
+        xpeopleSki2023,
+        false
+      ]
+    },
     // {
     //   fn: MainTest,
     //   msg: "E2E with all expenses ski 2023 no rembours",
@@ -1553,6 +1554,9 @@ async function runAll() {
 
     allRes.push(resOO);
   }
+
+  // writeFileSync("index.html", `<html><head></head><body><img src=""></body></html>`)
+  writeFileSync("index.json", JSON.stringify(allRes, null, 2));
 
   console.log("====================");
   for(const resPart of allRes) {
