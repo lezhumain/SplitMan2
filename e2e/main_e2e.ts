@@ -13,6 +13,7 @@ import {CreateBrowsers, honor10} from "./e2e_utils";
 import * as fs from "fs";
 import * as https from "https";
 import {allExpenses1} from "./data/allExpenses1";
+import {writeFileSync} from "fs";
 
 const userData = {
   email: "a",
@@ -334,6 +335,7 @@ const host = hparam ? `https://${hparam}` : "http://127.0.0.1:4200";
 // const host = "https://79.137.33.77:8081"
 
 const url = `${host}/login`;
+console.log("url: " + url);
 
 
 let getCount = 0,
@@ -860,7 +862,7 @@ async function AddExpenses(pag: Page, expenses: Expense[]) {
 
     // await pag.waitForNavigation();
 
-    console.log("adding expense name");
+    console.log("adding expense name: " + expense.name);
     try {
       await pag.waitForSelector("#name", {visible: true})
         .then((e: ElementHandle) => e ? e.type(expense.name, {delay: 30}) : null);
@@ -1294,8 +1296,7 @@ async function takeScreenshot(page: Page, doPrivNote = true) {
   const pa = await brow.newPage();
 
   const fileName = "./screen.jpeg";
-  const data: string = await page.screenshot({path: fileName, type: "jpeg", encoding: "base64", quality: 33})
-    .then((e: string) => e);
+  const data: string = await page.screenshot({path: fileName, type: "jpeg", encoding: "base64", quality: 33});
 
   console.log(`Data:\n${data}\n`);
 
@@ -1303,7 +1304,7 @@ async function takeScreenshot(page: Page, doPrivNote = true) {
     return doPrivNoteFn(pa, data);
     // await uploadToFilebin(data, fileName);
   } else {
-    return Promise.resolve("");
+    return Promise.resolve(data);
   }
 }
 
@@ -1443,7 +1444,7 @@ async function runPrivNote(_: string[]) { //: Promise<string> {
 
   const pa = await browser.pages().then((e: Page[]) => e[0]);
 
-  const link = await takeScreenshot(pa);
+  const link = await takeScreenshot(pa, true);
   console.log("Screenshot link: " + link);
 }
 
@@ -1478,6 +1479,7 @@ async function runAll() {
     //     true
     //   ]
     // },
+
     {
       fn: MainTest,
       msg: "E2E with all expenses",
@@ -1500,17 +1502,18 @@ async function runAll() {
         false
       ]
     },
-    {
-      fn: MainTest,
-      msg: "E2E with all expenses ski 2023 no rembours",
-      params: [
-        allExpenses1.slice(0, allExpenses1.length - 2),
-        "dju doit a 201.35€ stan Max doit a 45.23€ stan Alexis doit a 309.81€ aissa dju doit a 43.84€ aissa",
-        false,
-        xpeopleSki2023,
-        false
-      ]
-    },
+    // {
+    //   fn: MainTest,
+    //   msg: "E2E with all expenses ski 2023 no rembours",
+    //   params: [
+    //     allExpenses1.slice(0, allExpenses1.length - 2),
+    //     "dju doit a 201.35€ stan Max doit a 45.23€ stan Alexis doit a 309.81€ aissa dju doit a 43.84€ aissa",
+    //     false,
+    //     xpeopleSki2023,
+    //     false
+    //   ]
+    // },
+
     // {
     //   fn: MainTest,
     //   msg: "E2E with all expenses ski 2023 (bug to fix)",
@@ -1533,7 +1536,8 @@ async function runAll() {
     const resOO: {msg: string, errorMsg?: string, hasError: boolean, links?: string[]} = {
       msg: msg,
       errorMsg: res,
-      hasError: !!res
+      hasError: !!res,
+      links: []
     };
 
     if(resOO.hasError) {
@@ -1552,6 +1556,15 @@ async function runAll() {
     allRes.push(resOO);
   }
 
+  try {
+    writeFileSync("index.json", JSON.stringify(allRes, null, 2));
+    writeFileSync("index.html", `<html><head></head><body>${
+      allRes.map(ar => `<img src="data:image/png;base64,${ar.links[0]}">`).join("")
+    }</body></html>`)
+  } catch (e) {
+    console.log("Error writing files: " + e.message);
+  }
+
   console.log("====================");
   for(const resPart of allRes) {
     console.log(JSON.stringify(resPart, null, 2));
@@ -1568,7 +1581,6 @@ async function runAll() {
     )
   );
 
-
   console.log("Browsers closed");
 
   if(allRes.some(a => a.hasError)) {
@@ -1579,10 +1591,13 @@ async function runAll() {
   }
 }
 
+function getTimeFromMS(ms: number) {
+  return new Date(ms).toISOString().slice(11, 19);
+}
 
 const logTiming = (start: Date) => {
   const end = new Date();
-  console.log("Took " + ((end.getTime() - start.getTime() / 1000)) + "s");
+  console.log("Elapsed " + getTimeFromMS(end.getTime() - start.getTime()));
 }
 
 const start = new Date();
