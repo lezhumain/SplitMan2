@@ -37,11 +37,12 @@ stages:
               command: build
               dockerfile: '**/Dockerfile_e2e'
               tags: |
-                $(IMAGE):$(tag)
-              arguments: '--build-arg IP="splitman2.fr:8081"'
+                $(tag)
+              arguments: '--build-arg IP="splitman2.fr:8081" -t $(IMAGE)'
             displayName: Build E2E image
 
           - script: |
+              docker images
               docker save "$IMAGE:$tag" -o "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
               #cp "SplitMan2-run/setup_azure_ssh.sh" "$(Build.ArtifactStagingDirectory)/"
             displayName: 'Save E2E image'
