@@ -53,12 +53,12 @@ stages:
 
           - script: |
               cd "$SREPO"
-              bash ../SplitMan2-run/run_docker_e2e.sh "$DEBIAN_IP" "https" "$SREPO"
+              bash ../SplitMan2-run/run_docker_e2e.sh "https" "$SREPO"
               docker save "$IMAGE" -o "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
               echo "Saved tar:"
               ls -ald "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
             env:
-              DEBIAN_IP: $(DEBIAN_IP)
+              HOST_IP: $(DEBIAN_IP)
             displayName: 'Build containers'
 
           - script: |
