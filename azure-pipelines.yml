@@ -58,8 +58,6 @@ stages:
               echo "Saved tar:"
               ls -ald "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
             env:
-              MONGO_USER: $(MONGO_USER)
-              MONGO_PASS: $(MONGO_PASS)
               DEBIAN_IP: $(DEBIAN_IP)
             displayName: 'Build containers'
 
