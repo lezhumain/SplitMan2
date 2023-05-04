@@ -1295,8 +1295,7 @@ async function takeScreenshot(page: Page, doPrivNote = true) {
   const pa = await brow.newPage();
 
   const fileName = "./screen.jpeg";
-  const data: string = await page.screenshot({path: fileName, type: "jpeg", encoding: "base64", quality: 33})
-    .then((e: string) => e);
+  const data: string = await page.screenshot({path: fileName, type: "jpeg", encoding: "base64", quality: 33});
 
   console.log(`Data:\n${data}\n`);
 
@@ -1304,7 +1303,7 @@ async function takeScreenshot(page: Page, doPrivNote = true) {
     return doPrivNoteFn(pa, data);
     // await uploadToFilebin(data, fileName);
   } else {
-    return Promise.resolve("");
+    return Promise.resolve(data);
   }
 }
 
@@ -1444,7 +1443,7 @@ async function runPrivNote(_: string[]) { //: Promise<string> {
 
   const pa = await browser.pages().then((e: Page[]) => e[0]);
 
-  const link = await takeScreenshot(pa);
+  const link = await takeScreenshot(pa, true);
   console.log("Screenshot link: " + link);
 }
 
@@ -1536,7 +1535,8 @@ async function runAll() {
     const resOO: {msg: string, errorMsg?: string, hasError: boolean, links?: string[]} = {
       msg: msg,
       errorMsg: res,
-      hasError: !!res
+      hasError: !!res,
+      links: []
     };
 
     if(resOO.hasError) {
@@ -1555,8 +1555,14 @@ async function runAll() {
     allRes.push(resOO);
   }
 
-  // writeFileSync("index.html", `<html><head></head><body><img src=""></body></html>`)
-  writeFileSync("index.json", JSON.stringify(allRes, null, 2));
+  try {
+    writeFileSync("index.json", JSON.stringify(allRes, null, 2));
+    writeFileSync("index.html", `<html><head></head><body>${
+      allRes.map(ar => `<img src="data:image/png;base64,${ar.links[0]}">`).join("")
+    }</body></html>`)
+  } catch (e) {
+    console.log("Error writing files: " + e.message);
+  }
 
   console.log("====================");
   for(const resPart of allRes) {
@@ -1573,7 +1579,6 @@ async function runAll() {
       })
     )
   );
-
 
   console.log("Browsers closed");
 
