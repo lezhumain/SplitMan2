@@ -95,7 +95,7 @@ stages:
 
           - publish: '$(Build.ArtifactStagingDirectory)/$(IMAGE).tar'
             displayName: 'Publish tar image'
-            artifact: splitman2_tar
+            artifact: $(IMAGE)_tar
 
           - publish: '$(Build.ArtifactStagingDirectory)/prepare_azure_ssh.sh'
             displayName: 'Publish prepare script'
