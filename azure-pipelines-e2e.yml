@@ -42,8 +42,9 @@ stages:
             displayName: Build E2E image
 
           - script: |
+              du -sh ./*
               docker images
-              docker save "$IMAGE:$tag" -o "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
+              docker save "$IMAGE" -o "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
               #cp "SplitMan2-run/setup_azure_ssh.sh" "$(Build.ArtifactStagingDirectory)/"
             displayName: 'Save E2E image'
 
