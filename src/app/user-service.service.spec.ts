@@ -1,6 +1,6 @@
 import { UserServiceService } from './user-service.service';
 import {HttpClient} from "@angular/common/http";
-import {flatMap} from "rxjs/internal/operators";
+import {mergeMap} from "rxjs";
 import {UserModel} from "./models/user-model";
 import {of} from "rxjs";
 import {someTravels} from "../test-data/travels";
@@ -76,7 +76,7 @@ describe('UserServiceService', () => {
 
     service.getConnectedUser().pipe(
       // delay(750),
-      flatMap((cu) => {
+      mergeMap((cu) => {
         expect(cu).toBeTruthy();
         return service.getUserByID(userID);
       }),
@@ -86,7 +86,7 @@ describe('UserServiceService', () => {
         expect(d?.email).toContain("@");
         expect(httpClientSpy.get).toHaveBeenCalledTimes(1);
       }),
-      flatMap(() => {
+      mergeMap(() => {
         return service.getUserByID(userID);
       }),
       tap((d) => {

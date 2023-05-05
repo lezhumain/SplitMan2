@@ -96,7 +96,7 @@ export class RepartitionComponent implements OnInit {
           }
         }).filter((a: IRepartitionItem | null) => !!a);
       }).reduce((res: IRepartitionItem[], itemArr: any[], index: number, arr: any) => {
-        return itemArr ? res.concat(itemArr) : res; // flatMap
+        return itemArr ? res.concat(itemArr) : res; // mergeMap
       }, []);
     }
 

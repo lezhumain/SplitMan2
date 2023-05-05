@@ -28,7 +28,7 @@ export class AuthGuard implements CanActivate {
     // const user$: Observable<UserModel | null> = this.userServiceService.getConnectedUser(Number(sessionData)).pipe(
     //   debounceTime(200),
     //   distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)),
-    //   flatMap((cUser: UserModel | null) => {
+    //   mergeMap((cUser: UserModel | null) => {
     //     return cUser
     //       ? of(cUser)
     //       : this.userServiceService.getUserByPass("", "");
@@ -41,13 +41,13 @@ export class AuthGuard implements CanActivate {
     // const user$: Observable<UserModel | null> = this.userServiceService.getConnectedUser().pipe(
 
     // const user$: Observable<UserModel | null> = this.userServiceService.getConnectedUser().pipe(
-    //   flatMap((us: UserModel | null) => {
+    //   mergeMap((us: UserModel | null) => {
     //     // return this.userServiceService.getConnectedUser(us ? undefined : Number(sessionData))
     //     return us ? of(us) : this.userServiceService.getConnectedUser(Number(sessionData))
     //   }),
     //   debounceTime(200),
     //   distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)),
-    //   // flatMap((cUser: UserModel | null) => {
+    //   // mergeMap((cUser: UserModel | null) => {
     //   //   return cUser
     //   //     ? of(cUser)
     //   //     : this.userServiceService.getUserByPass("", "");
@@ -85,7 +85,7 @@ export class AuthGuard implements CanActivate {
     // this.userServiceService.getConnectedUser(Number(sessionData)).pipe(
     //   debounceTime(200),
     //   distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)),
-    //   // flatMap((cUser: UserModel | null) => {
+    //   // mergeMap((cUser: UserModel | null) => {
     //   //   return cUser
     //   //     ? of(cUser)
     //   //     : this.userServiceService.getUserByPass("", "");
@@ -115,7 +115,7 @@ export class AuthGuard implements CanActivate {
     // return this.isConnected$.pipe(
     // return this.isConnected$.pipe(
     //   first(),
-    //   flatMap((isConnected: boolean) => {
+    //   mergeMap((isConnected: boolean) => {
     //     if (isConnected) {
     //       const routeParams = route.paramMap;
     //       const paramID: string | null = routeParams.get('travelID');

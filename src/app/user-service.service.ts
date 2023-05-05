@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
 import {InviteDate, UserModel} from "./models/user-model";
-import {BehaviorSubject, Observable, of} from "rxjs";
+import {BehaviorSubject, mergeMap, Observable, of} from "rxjs";
 import {User} from "./models/user";
 import {catchError, distinctUntilChanged, filter, first, map, take, tap} from "rxjs/operators";
 import {BaseService} from "./base-service.service";
 import {Travel} from "./models/travel";
-import {flatMap} from "rxjs/internal/operators";
 import {environment} from "../environments/environment";
 import {HttpClient, HttpResponse} from "@angular/common/http";
 import {IAPIResult} from "./models/iapiresult";
@@ -122,7 +121,7 @@ export class UserServiceService extends BaseService {
     const newID$ = of(data?.id || -2);
 
     return newID$.pipe(
-      flatMap((lastID: number) => {
+      mergeMap((lastID: number) => {
         data.id = isRegister ? -2 : lastID;
         return this._apiService.updateItem(data, isRegister);
       })
@@ -159,7 +158,7 @@ export class UserServiceService extends BaseService {
 
         return userRes;
       }),
-      flatMap((u: UserModel | null) => {
+      mergeMap((u: UserModel | null) => {
         if(!u) {
           return of(u);
         }
@@ -183,7 +182,7 @@ export class UserServiceService extends BaseService {
     // );
 
     return this.getUserByNameAndPass(username, password).pipe(
-      flatMap((u: User | null) => {
+      mergeMap((u: User | null) => {
         this._updateConnectedUser(u);
 
         return this._connectedUser.pipe(
@@ -227,7 +226,7 @@ export class UserServiceService extends BaseService {
     //   this._updateConnectedUser(uu);
     // });
     return obs$.pipe(
-      flatMap((uu: User | null) => {
+      mergeMap((uu: User | null) => {
         if(setSeesion) {
           this.setSessionData(uu);
         }
@@ -266,7 +265,7 @@ export class UserServiceService extends BaseService {
     //
     //     return u;
     //   }),
-    //   flatMap((uu: User | null) => {
+    //   mergeMap((uu: User | null) => {
     //     this._updateConnectedUser(uu);
     //
     //     return this._connectedUser.pipe(
@@ -336,7 +335,7 @@ export class UserServiceService extends BaseService {
 
     return combineLatest([pre$, this._connectedUser]).pipe(
       // first(),
-      flatMap(([user, currentUser]: [UserModel | null, User | null]) => {
+      mergeMap(([user, currentUser]: [UserModel | null, User | null]) => {
         const userM: User | null = user ? User.from(user) : (currentUser || null);
         console.log("userM: %o", userM);
         // if(user && userM !== currentUser) {
@@ -392,7 +391,7 @@ export class UserServiceService extends BaseService {
     return this._connectedUser.pipe(
       filter(c => c == null || !!c._id),
       first(),
-      flatMap((connectedUser: User | null) => {
+      mergeMap((connectedUser: User | null) => {
         if(connectedUser == null) {
           console.error("No user connected");
           return of(null);
@@ -413,7 +412,7 @@ export class UserServiceService extends BaseService {
           // tap(() => {
           //   this._updateConnectedUser(connectedUser);
           // })
-          flatMap(() => {
+          mergeMap(() => {
             // this._updateConnectedUser(connectedUser);
             return this.setConnectedUserByObj(connectedUser);
           }),
@@ -440,7 +439,7 @@ export class UserServiceService extends BaseService {
     const userObs$ = of(cu);
 
     return userObs$.pipe(
-      flatMap((u: User | null) => {
+      mergeMap((u: User | null) => {
         if(!u) {
           return of(null);
         }
@@ -465,7 +464,7 @@ export class UserServiceService extends BaseService {
 
         return obs$;
       }),
-      flatMap(() => {
+      mergeMap(() => {
         return this._apiService.getAll(true).pipe(
           map((all) => {
             const us = this._connectedUser.getValue();
@@ -485,7 +484,7 @@ export class UserServiceService extends BaseService {
   logOut(): Observable<null> {
     return this._apiService.httpGet(environment.api + "/logout").pipe(
       take(1),
-      flatMap(() => {
+      mergeMap(() => {
         BaseService.USER_ID_INIT = null;
         this._updateConnectedUser(null);
         this.setSessionData(null);
