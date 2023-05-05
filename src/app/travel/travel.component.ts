@@ -5,13 +5,13 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {Travel} from "../models/travel";
 import {Expense} from "../models/expense";
 import {ExpenseService} from "../expense.service";
+import {mergeMap} from "rxjs";
 import {BehaviorSubject, combineLatest, Observable, of, Subject} from "rxjs";
 import {ExpenseModel} from "../models/expense-model";
 import {NavBarService} from "../nav-bar.service";
 import {UserServiceService} from "../user-service.service";
 import {InviteDate, UserModel} from "../models/user-model";
 import {filter, first, map, takeWhile, tap} from "rxjs/operators";
-import {flatMap} from "rxjs/internal/operators";
 import {ToastComponent} from "../toast/toast.component";
 import {ToastType} from "../toast/toast.shared";
 import {BaseService} from "../base-service.service";
@@ -65,15 +65,15 @@ export class TravelComponent implements OnInit {
       // ];
       // const theObs$ = combineLatest(obs);
 
-      const theObs$ = this.connectedUser$.pipe(
+      const theObs$: Observable<[Travel | null, Expense[], UserModel | null]> = this.connectedUser$.pipe(
         filter(u => !!u),
         first(),
-        flatMap((u) => {
+        mergeMap((u: UserModel | null) => {
           if(u) {
             BaseService.USER_ID_INIT = u.id;
           }
 
-          const obs = [
+          const obs: [Observable<Travel | null>, Observable<Expense[]>, Observable<UserModel | null>] = [
             this.travelService.getTravelByID(travelID),
             this.expenseService.getExpensesByTripID(travelID),
             this.connectedUser$
@@ -86,7 +86,7 @@ export class TravelComponent implements OnInit {
       // combineLatest(obs).subscribe(([t, expenses]: [Travel | null, Expense[]]) => {
       theObs$.pipe(
         takeWhile(() => this.alive)
-      ).subscribe((res: any[]) => {
+      ).subscribe((res: [Travel | null, Expense[], UserModel | null]) => {
         const t: Travel | null = res[0],
           expenses: Expense[] = res[1],
           user: UserModel | null = res[2];
@@ -165,7 +165,7 @@ export class TravelComponent implements OnInit {
     this.connectedUser$?.pipe(
       filter(u => !!u),
       first(),
-      flatMap((u: UserModel | null) => {
+      mergeMap((u: UserModel | null) => {
         if(!u?.invites) {
           return of(null);
         }
@@ -228,13 +228,13 @@ export class TravelComponent implements OnInit {
     // var blob = file.slice(start, stop + 1);
     reader.readAsText(this.file);
 
-    subj.pipe(
+    const em$: Observable<ExpenseModel[]> = subj.pipe(
       first(),
       // map((res: string) => {
       //   debugger;
       //   return null;
       // })
-      flatMap((res: string) => {
+      mergeMap((res: string) => {
         if(!res) {
           return of([]);
         }
@@ -255,9 +255,11 @@ export class TravelComponent implements OnInit {
         // debugger;
         return this.expenseService.saveExpenses(all, this.userServiceService).pipe(
           map(() => all)
-        );
+        ) as Observable<ExpenseModel[]>;
       })
-    ).subscribe((all: ExpenseModel[]) => {
+    );
+
+    em$.subscribe((all: ExpenseModel[]) => {
       console.log("done");
       this.expenses = all.slice();
     });

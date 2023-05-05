@@ -7,7 +7,7 @@ import {of} from "rxjs";
 import {Travel} from "./models/travel";
 import {someTravels} from "../test-data/travels";
 import {User} from "./models/user";
-import {flatMap} from "rxjs/internal/operators";
+import {mergeMap} from "rxjs";
 import {catchError, filter, first} from "rxjs/operators";
 import {BaseService} from "./base-service.service";
 import {ApiService} from "./api.service";
@@ -59,7 +59,7 @@ describe('TravelService', () => {
     //   this.router.navigate(['login']);
     // });
     userService.getConnectedUser().pipe(
-      flatMap((u) => {
+      mergeMap((u) => {
         return service["getTravels"]();
       }),
       catchError(() => of(undefined))
@@ -98,7 +98,7 @@ describe('TravelService', () => {
     userService["_connectedUser"].pipe(
       filter(u => !!u),
       first(),
-      flatMap((u) => {
+      mergeMap((u) => {
           return service["getTravels"]();
       }),
       catchError(() => of(undefined))

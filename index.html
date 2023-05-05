@@ -1,0 +1,32 @@
+<html>
+  <head>
+    <script type="application/javascript" src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  </head>
+  <body>
+    <div id="ress"></div>
+    <script type="application/javascript">
+      function createReport() {
+        let html = "";
+        for(const r of window.all) {
+          html += `<div id="${r.msg.toLowerCase().replace(/ /g, "_")}">
+                <h3>${r.msg}</h3>
+                <strong>${r.errorMsg}</strong>
+                <div>
+                    ${r.links.map(l => `<img src="data:image/png;base64,${l}">`)}
+                </div>
+            </div>`;
+        }
+        $("#ress").append($(html));
+      }
+
+      $( document ).ready(function() {
+        $.get("index.json", function(data, _status) {
+          window.all = data.slice();
+          console.log(all);
+
+          createReport();
+        });
+      });
+    </script>
+  </body>
+</html>

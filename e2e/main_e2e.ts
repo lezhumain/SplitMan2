@@ -7,7 +7,7 @@ import {badData} from "./data/bugData";
 import {allExpenses} from "./data/allExpenses";
 import {from, Subject} from "rxjs";
 import {filter, first, timeout} from "rxjs/operators";
-import {flatMap} from "rxjs/internal/operators";
+import {mergeMap} from "rxjs";
 import {Expense} from "../src/app/models/expense";
 import {CreateBrowsers, honor10} from "./e2e_utils";
 import * as fs from "fs";
@@ -710,7 +710,7 @@ async function startCheckInviteCall(pag: Page) {
   checkInvite$.pipe(
     filter(e => e === null),
     first(),
-    flatMap(() => {
+    mergeMap(() => {
       return from(pag.setRequestInterception(true));
     })
   ).subscribe(() => {
@@ -1568,11 +1568,18 @@ async function runAll() {
 
   try {
     writeFileSync("index.json", JSON.stringify(allRes, null, 2));
-    writeFileSync("index.html", `<html><head></head><body>${
-      allRes.filter(ar => !!ar.links && ar.links.length > 0)
-        .map(ar => `<img src="data:image/png;base64,${ar.links[0]}">`)
-        .join("")
-    }</body></html>`)
+    // writeFileSync("index.html", `<html><head><script type="application/javascript" src="https://code.jquery.com/jquery-3.6.4.min.js"></script></head><body>${
+    //   allRes.filter(ar => !!ar.links && ar.links.length > 0)
+    //     .map(ar => `<img src="data:image/png;base64,${ar.links[0]}">`)
+    //     .join("")
+    // }<script type="application/javascript">
+    //     $( document ).ready(function() {
+    //         $.get("index.json", function(data, _status) {
+    //             window.all = data.slice();
+    //             console.log(all);
+    //         });
+    //     });
+    // </script></body></html>`)
   } catch (e) {
     console.log("Error writing files: " + e.message);
   }

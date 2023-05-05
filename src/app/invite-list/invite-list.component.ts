@@ -5,7 +5,7 @@ import {combineLatest} from "rxjs";
 import {first, map, takeWhile, tap} from "rxjs/operators";
 import {UserServiceService} from "../user-service.service";
 import {ActivatedRoute, Router} from "@angular/router";
-import {flatMap} from "rxjs/internal/operators";
+import {mergeMap} from "rxjs";
 import {TravelService} from "../travel.service";
 import {Travel} from "../models/travel";
 import {NavBarService} from "../nav-bar.service";
@@ -41,7 +41,7 @@ export class InviteListComponent implements OnInit {
     //   //     this.router.navigate(['travels']);
     //   //   }
     //   // }),
-    //   flatMap((u: UserModel | null): Observable<[UserModel | null, Travel[]]> => {
+    //   mergeMap((u: UserModel | null): Observable<[UserModel | null, Travel[]]> => {
     //     const allIds = u && u.invites ? u.invites.map(i => i.tripID) : [];
     //     // return combineLatest(of(u), this.travelService.getTravelsByIDs(allIds)) as Observable<[UserModel | null, Travel[]]>
     //     return <any>combineLatest([
@@ -70,7 +70,7 @@ export class InviteListComponent implements OnInit {
       //     this.router.navigate(['travels']);
       //   }
       // }),
-      flatMap((u: UserModel | null): Observable<UserModel | null> => {
+      mergeMap((u: UserModel | null): Observable<UserModel | null> => {
         const allIds = u && u.invites ? u.invites.map(i => i.tripID) : [];
         // return combineLatest(of(u), this.travelService.getTravelsByIDs(allIds)) as Observable<[UserModel | null, Travel[]]>
         return this.travelService.getTravelsByIDs(allIds).pipe(
