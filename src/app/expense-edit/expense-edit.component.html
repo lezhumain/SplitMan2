@@ -68,6 +68,7 @@
         [notFoundTemplate]="notFoundTemplate"
         (inputCleared)="ac.autocompleteCleared()"
         [(ngModel)]="ac.autoCompleteValue1"
+        [initialValue]="expenseModel.categorie"
         id="categ"
         class="form-control categ-input"
       >
@@ -95,3 +96,4 @@
     </button>
   </div>
 </div>
+
