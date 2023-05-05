@@ -886,6 +886,11 @@ async function AddExpenses(pag: Page, expenses: Expense[]) {
         .then((e: ElementHandle[]) => e.length > 0 ? e[0].type(payee.e4xpenseRatio.toString(), {delay: 30}) : null);
     }
 
+    if(expense.categorie) {
+      const categ = await pag.waitForSelector("#categ input");
+      categ.type(expense.categorie);
+    }
+
     await pag.waitForXPath("//button[contains(text(), 'Save Expense')]", {visible: true})
       .then((e: ElementHandle) => e ? Promise.all([scrollAndClick(e, pag), pag.waitForNavigation({timeout: 10000}).then(() => waitForTimeout(1000))]) : null);
 
@@ -897,7 +902,8 @@ async function AddExpenses(pag: Page, expenses: Expense[]) {
 
 async function EditLast(pag: Page, expenses: Expense[], newVal = 34.23) {
   // debugger;
-  const lastTitle = expenses[expenses.length - 1].name;
+  const lastExpense = expenses[expenses.length - 1];
+  const lastTitle = lastExpense.name;
   await pag.waitForXPath(`//div[contains(@class, 'expense-card')]//h6[contains(text(), '${lastTitle}')]`, {visible: true})
     // .then((e: ElementHandle) => e ? Promise.all([scrollAndClick(e, pag), pag.waitForNavigation({timeout: 10000}).then(() => waitForTimeout(1000))]) : null);
     .then((e: ElementHandle) => e ? Promise.all([scrollAndClick(e, pag), pag.waitForNavigation({timeout: 10000, waitUntil:"networkidle2"}).then(() => waitForTimeout(1000))]) : null);
@@ -920,7 +926,11 @@ async function EditLast(pag: Page, expenses: Expense[], newVal = 34.23) {
   await pag.waitForSelector("#amount", {visible: true})
     .then((e: ElementHandle) => e ? clearAndType(e, newVal.toLocaleString()) : null);
 
-  // debugger;
+  if(lastExpense.categorie) {
+    const inp = await pag.waitForSelector("#categ input");
+    const val = await inp.evaluate((el) => el.value);
+    expect(val.trim(),"Category was not saved.").to.equal(lastExpense.categorie.trim());
+  }
 
   await pag.waitForXPath("//button[contains(text(), 'Save Expense')]")
     .then((e: ElementHandle) => e ? scrollAndClick(e, pag) : null);
@@ -1491,28 +1501,28 @@ async function runAll() {
         true
       ]
     },
-    // {
-    //   fn: MainTest,
-    //   msg: "E2E with 1 expenses ski 2023",
-    //   params: [
-    //     allExpenses1.slice(0, 1),
-    //     "dju doit a 169.25€ stan aissa doit a 169.25€ stan",
-    //     false,
-    //     xpeopleSki2023,
-    //     false
-    //   ]
-    // },
-    // {
-    //   fn: MainTest,
-    //   msg: "E2E with all expenses ski 2023 no rembours",
-    //   params: [
-    //     allExpenses1.slice(0, allExpenses1.length - 2),
-    //     "dju doit a 201.35€ stan Max doit a 45.23€ stan Alexis doit a 309.81€ aissa dju doit a 43.84€ aissa",
-    //     false,
-    //     xpeopleSki2023,
-    //     false
-    //   ]
-    // },
+    {
+      fn: MainTest,
+      msg: "E2E with 1 expenses ski 2023",
+      params: [
+        allExpenses1.slice(0, 1),
+        "dju doit a 169.25€ stan aissa doit a 169.25€ stan",
+        false,
+        xpeopleSki2023,
+        false
+      ]
+    },
+    {
+      fn: MainTest,
+      msg: "E2E with all expenses ski 2023 no rembours",
+      params: [
+        allExpenses1.slice(0, allExpenses1.length - 2),
+        "dju doit a 201.35€ stan Max doit a 45.23€ stan Alexis doit a 309.81€ aissa dju doit a 43.84€ aissa",
+        false,
+        xpeopleSki2023,
+        false
+      ]
+    },
 
     // {
     //   fn: MainTest,
