@@ -22,10 +22,12 @@ RUN cd /dist/src/app && npm ci && npm run cp-libs
 
 ARG IP
 ARG API
+ARG VERSION
 RUN echo "API: $IP $API $(cat api.tmp)" \
     && cat src/environments/environment.prod.ts \
     && sed -i.bak -e "s|PROD_IP|$IP|g" src/environments/environment.prod.ts \
     && sed -i.bak -e "s|/api|$(cat /dist/src/app/api.tmp)|g" src/environments/environment.prod.ts \
+    && sed -i.bak -E "s|(\"version\": \")[^\"]+\"|\1$VERSION\"|" package.json \
     && chmod +x ./*.sh
 
 RUN ["npm", "run", "build:prod"]
