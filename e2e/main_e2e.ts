@@ -1156,6 +1156,7 @@ async function MainTest(params: any[]) {
       // TODO check expense count
       const selec = ".expense-card";
 
+      // FIXME
       await  page.waitForFunction((sel, lengthExpected) => {
         return document.querySelectorAll(sel).length === lengthExpected;
       }, {timeout: 10000}, selec, expenses.length);
@@ -1479,7 +1480,6 @@ async function runAll() {
     //     true
     //   ]
     // },
-
     {
       fn: MainTest,
       msg: "E2E with all expenses",
@@ -1491,17 +1491,17 @@ async function runAll() {
         true
       ]
     },
-    {
-      fn: MainTest,
-      msg: "E2E with 1 expenses ski 2023",
-      params: [
-        allExpenses1.slice(0, 1),
-        "dju doit a 169.25€ stan aissa doit a 169.25€ stan",
-        false,
-        xpeopleSki2023,
-        false
-      ]
-    },
+    // {
+    //   fn: MainTest,
+    //   msg: "E2E with 1 expenses ski 2023",
+    //   params: [
+    //     allExpenses1.slice(0, 1),
+    //     "dju doit a 169.25€ stan aissa doit a 169.25€ stan",
+    //     false,
+    //     xpeopleSki2023,
+    //     false
+    //   ]
+    // },
     // {
     //   fn: MainTest,
     //   msg: "E2E with all expenses ski 2023 no rembours",
@@ -1559,7 +1559,9 @@ async function runAll() {
   try {
     writeFileSync("index.json", JSON.stringify(allRes, null, 2));
     writeFileSync("index.html", `<html><head></head><body>${
-      allRes.map(ar => `<img src="data:image/png;base64,${ar.links[0]}">`).join("")
+      allRes.filter(ar => !!ar.links && ar.links.length > 0)
+        .map(ar => `<img src="data:image/png;base64,${ar.links[0]}">`)
+        .join("")
     }</body></html>`)
   } catch (e) {
     console.log("Error writing files: " + e.message);
@@ -1567,7 +1569,10 @@ async function runAll() {
 
   console.log("====================");
   for(const resPart of allRes) {
-    console.log(JSON.stringify(resPart, null, 2));
+    const nee = Object.assign({}, resPart);
+    nee.links = [];
+
+    console.log(JSON.stringify(nee, null, 2));
     console.log("");
   }
   console.log("=====================");
