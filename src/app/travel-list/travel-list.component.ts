@@ -7,7 +7,7 @@ import {NavBarService} from "../nav-bar.service";
 import {combineLatest, of} from "rxjs";
 import {UserServiceService} from "../user-service.service";
 import {UserModel} from "../models/user-model";
-import {first, flatMap} from "rxjs/operators";
+import {first, mergeMap} from "rxjs/operators";
 
 @Component({
   selector: 'app-travel-list',

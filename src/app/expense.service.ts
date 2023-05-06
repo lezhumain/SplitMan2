@@ -5,7 +5,7 @@ import {map} from "rxjs/operators";
 import {combineLatest} from "rxjs";
 import {BaseService} from "./base-service.service";
 import {ExpenseModel} from "./models/expense-model";
-import {flatMap} from "rxjs/internal/operators";
+import {mergeMap} from "rxjs";
 import {UserServiceService} from "./user-service.service";
 import {HttpClient} from "@angular/common/http";
 import {ApiService} from "./api.service";
@@ -59,7 +59,7 @@ export class ExpenseService extends BaseService {
           data.createdAt = now;
           data.createdBy = userName;
           return this.getNewId().pipe(
-            flatMap((newId: number) => {
+            mergeMap((newId: number) => {
               data.id = newId;
               expense.id = data.id;
               return this._apiService.saveInDb(data);
