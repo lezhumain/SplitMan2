@@ -5,9 +5,8 @@ import {Browser, ClickOptions, ElementHandle, HTTPRequest, JSHandle, Page} from 
 import {expect} from "chai";
 import {badData} from "./data/bugData";
 import {allExpenses} from "./data/allExpenses";
-import {from, Subject} from "rxjs";
+import {from, mergeMap, Subject} from "rxjs";
 import {filter, first, timeout} from "rxjs/operators";
-import {flatMap} from "rxjs/internal/operators";
 import {Expense} from "../src/app/models/expense";
 import {CreateBrowsers, honor10} from "./e2e_utils";
 import * as fs from "fs";
@@ -710,7 +709,7 @@ async function startCheckInviteCall(pag: Page) {
   checkInvite$.pipe(
     filter(e => e === null),
     first(),
-    flatMap(() => {
+    mergeMap(() => {
       return from(pag.setRequestInterception(true));
     })
   ).subscribe(() => {
@@ -888,7 +887,8 @@ async function AddExpenses(pag: Page, expenses: Expense[]) {
 
     if(expense.categorie) {
       const categ = await pag.waitForSelector("#categ input");
-      categ.type(expense.categorie);
+      await categ.type(expense.categorie);
+      await categ.press('Enter'); // Enter Key
     }
 
     await pag.waitForXPath("//button[contains(text(), 'Save Expense')]", {visible: true})
@@ -1567,12 +1567,12 @@ async function runAll() {
   }
 
   try {
-    writeFileSync("index.json", JSON.stringify(allRes, null, 2));
-    writeFileSync("index.html", `<html><head></head><body>${
-      allRes.filter(ar => !!ar.links && ar.links.length > 0)
-        .map(ar => `<img src="data:image/png;base64,${ar.links[0]}">`)
-        .join("")
-    }</body></html>`)
+    writeFileSync("e2e_report/index.json", JSON.stringify(allRes, null, 2));
+    // writeFileSync("index.html", `<html><head></head><body>${
+    //   allRes.filter(ar => !!ar.links && ar.links.length > 0)
+    //     .map(ar => `<img src="data:image/png;base64,${ar.links[0]}">`)
+    //     .join("")
+    // }</body></html>`)
   } catch (e) {
     console.log("Error writing files: " + e.message);
   }
