@@ -900,6 +900,14 @@ async function AddExpenses(pag: Page, expenses: Expense[]) {
   }
 }
 
+function waitForValue(pag: Page, inp: ElementHandle<HTMLInputElement>, targetVal: string, timeout: number) {
+  debugger;
+  return pag.waitForFunction((el: HTMLInputElement, pTargetVal: string) => {
+    debugger;
+    return el.value.trim() === pTargetVal;
+  }, { timeout: timeout }, inp, targetVal);
+}
+
 async function EditLast(pag: Page, expenses: Expense[], newVal = 34.23) {
   // debugger;
   const lastExpense = expenses[expenses.length - 1];
@@ -928,8 +936,7 @@ async function EditLast(pag: Page, expenses: Expense[], newVal = 34.23) {
 
   if(lastExpense.categorie) {
     const inp = await pag.waitForSelector("#categ input");
-    const val = await inp.evaluate((el) => el.value);
-    expect(val.trim(),"Category was not saved.").to.equal(lastExpense.categorie.trim());
+    await waitForValue(pag, inp, lastExpense.categorie.trim(), 2000);
   }
 
   await pag.waitForXPath("//button[contains(text(), 'Save Expense')]")
