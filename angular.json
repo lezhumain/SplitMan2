@@ -102,7 +102,6 @@
       }
     }
   },
-  "defaultProject": "SplitMan21",
   "cli": {
     "analytics": false
   }

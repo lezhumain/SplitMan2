@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import {UserServiceService} from "../user-service.service";
 import {UserModel} from "../models/user-model";
 import {Observable} from "rxjs";
@@ -7,7 +7,7 @@ import {debounceTime, distinctUntilChanged, filter, first, map, tap} from "rxjs/
 import {User} from "../models/user";
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class AuthGuard  {
   private authorizedTravelIDs$: Observable<number[] | null>;
   // private isConnected$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private isConnected$: Observable<boolean>;
