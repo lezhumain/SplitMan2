@@ -32,7 +32,7 @@ jobs:
 
             -   name: Prepare
                 run: |
-                    npm ci
+                    npm ci --force
 
             -   name: Build
                 run: |

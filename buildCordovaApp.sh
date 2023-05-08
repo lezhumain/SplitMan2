@@ -8,7 +8,7 @@ LIFEMAN="$(pwd)"
 #npm run build:prod
 #npx rimraf dist
 #rm -r dist || true
-npm ci
+npm ci --force
 echo 1
 npm run cp-libs
 echo 2

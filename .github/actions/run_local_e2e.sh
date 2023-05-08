@@ -13,7 +13,7 @@ curl -o SplitMan2-API.zip https://codeload.github.com/lezhumain/SplitMan2-API/zi
 unzip SplitMan2-API.zip > /dev/null
 
 echo "Build APP"
-npm ci
+npm ci --force
 npm run cp-libs
 npm run fix_font_awesome
 #./fixFontAwesome.sh

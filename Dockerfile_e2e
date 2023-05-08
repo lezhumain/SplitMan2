@@ -6,7 +6,7 @@ WORKDIR /app
 
 RUN npm cache clean --force
 COPY . .
-RUN npm ci
+RUN npm ci --force
 
 ARG IP
 RUN echo "npm run e2e -- --headless=true --host=\"$IP\" --docker=true" > /app/run.sh
