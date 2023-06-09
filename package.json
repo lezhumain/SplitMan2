@@ -15,7 +15,8 @@
     "e2e": "npx ts-node e2e/main_e2e.ts",
     "clear-chromium": "clearChromium.sh",
     "fix_font_awesome": "sh ./fixFontAwesome.sh",
-    "cp-libs": "npx cp-cli node_modules/bootstrap/dist src/assets/bootstrap && npx make-dir-cli src/assets/font-awesome && npx cp-cli node_modules/font-awesome/css/ src/assets/font-awesome/css && npx cp-cli node_modules/font-awesome/fonts src/assets/font-awesome/fonts"
+    "cp-libs": "npx cp-cli node_modules/bootstrap/dist src/assets/bootstrap && npx make-dir-cli src/assets/font-awesome && npx cp-cli node_modules/font-awesome/css/ src/assets/font-awesome/css && npx cp-cli node_modules/font-awesome/fonts src/assets/font-awesome/fonts",
+    "prepare_android": "docker build -t android_base -f Dockerfile_android ."
   },
   "private": true,
   "dependencies": {

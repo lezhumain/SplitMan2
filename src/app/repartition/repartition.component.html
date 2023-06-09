@@ -1,10 +1,10 @@
 <div>
-  <div *ngFor="let s of allDeps">
+  <div *ngFor="let s of allDeps" class="repart">
 <!--    {{s}}-->
     <app-repartition-card [expense]="s" [connectedUser]="connectedUser"></app-repartition-card>
   </div>
   <br>
-  <div>
+  <div id="spendWrapper">
     <h4>Spent</h4>
     <div class="container">
       <div class="row" *ngFor="let pers of allWhoSpent">
