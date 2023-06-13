@@ -1,11 +1,5 @@
-import { TestBed } from '@angular/core/testing';
-
-import { UserServiceService } from './user-service.service';
-import {getBaseTestStuff, getBaseTestStuffService} from "../../e2e/baseTestStuff";
-import {HttpClient, HttpErrorResponse} from "@angular/common/http";
+import {HttpClient} from "@angular/common/http";
 import {BaseService} from "./base-service.service";
-import {ActivatedRoute} from "@angular/router";
-import {Observable, of} from "rxjs";
 
 describe('BaseServiceService', () => {
   let httpClientSpy: jasmine.SpyObj<HttpClient>;

@@ -2,8 +2,6 @@ import {ExpenseModel} from "../models/expense-model";
 import {ExpenseParticipantModel} from "../models/expenseParticipants";
 import Splitwise1 from "splitwise-js-map";
 import {IRepartitionItem} from "../repartition/repartition.component";
-import {Utils} from "./utils";
-import {checkBalance} from "../../../../node-splitwise-js/test_utils";
 import {RepartitionUtils} from "../../test-data/test_utils";
 
 
@@ -67,13 +65,13 @@ export class SplitwiseHelper {
     const splits = this.splitOnly(input);
 
     let checked = false;
-    try{
-      checkBalance(splits, input);
-      checked = true;
-    }
-    catch (e: any) {
-      console.warn(`Error: ${e.message}`);
-    }
+    // try{
+    //   checkBalance(splits, input);
+    //   checked = true;
+    // }
+    // catch (e: any) {
+    //   console.warn(`Error: ${e.message}`);
+    // }
 
     console.log("splits:");
     console.log(JSON.stringify(splits, null, 2));

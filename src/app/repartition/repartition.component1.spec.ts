@@ -4,9 +4,8 @@ import {IRepartitionItem, RepartitionComponent} from './repartition.component';
 import {ExpenseModel} from "../models/expense-model";
 import {RepartitionCardComponent} from "../repartition-card/repartition-card.component";
 import {ActivatedRoute} from "@angular/router";
-
-import {getExpensesBug} from "../../test-data/getEzxpenses";
 import {checkArray, RepartitionUtils, sanityCheck} from "../../test-data/test_utils";
+import {getExpensesBug} from "../../test-data/getEzxpenses";
 
 describe('RepartitionComponent1', () => {
   let component: RepartitionComponent;
