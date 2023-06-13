@@ -1,11 +1,13 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {ExpenseModel} from "../models/expense-model";
-import {ExpenseParticipantModel} from "../models/expenseParticipants";
 import {UserModel} from "../models/user-model";
 import {Utils} from "../utilities/utils";
-import {Participant, ParticipantModel} from "../models/participants";
+import {ParticipantModel} from "../models/participants";
+import {SplitwiseHelper} from "../utilities/splitwiseHelper";
 
 export interface IRepartitionItem {
+  checked?: boolean;
+  removed?: boolean;
   person: string;
   owesTo: string;
   amount: number;
@@ -47,22 +49,43 @@ export class RepartitionComponent implements OnInit {
     //   owesTo: payer,
     //   amount: 0
     // };
-
+    //
     // this.allDeps = exp.payees.map((p: string, index: number, arr: string[]) => {
     //   const o = Object.assign({}, res);
     //   o.person = p;
     //   o.amount = exp.amount / arr.length;
-    //
+    //    // this.allDeps = newArr1;
     //   return o;
     // });
-
+    //
     // this.setup();
   }
 
   private setup() {
-    const newArr1 = this.handleRepartition();
-
+    // const newArr1 = this.handleRepartition();
+    const newArr1 = this.handleRepartitionSplitWise();
     this.allDeps = newArr1;
+
+    // const raprt1 = this.getInitialRepartition();
+    // const data = raprt1.map((e: IRepartitionItem) => {
+    //   const paidFor: {[person: string]: number} = {};
+    //   paidFor[e.person] = e.amount;
+    //
+    //   return {
+    //     paidBy: e.owesTo,
+    //     paidFor: paidFor
+    //   }
+    // });
+    // const res = new Splitwise(data);
+    // this.allDeps = res.map(([from, to, value]: [string, string, number]) => {
+    //   return {
+    //     person: from,
+    //     owesTo: to,
+    //     amount: value
+    //   }
+    // });
+    // debugger;
+
     this.allStr = this.allDeps.map(e => JSON.stringify(e));
 
     this.allWhoSpent = this.getWhoSpent();
@@ -72,32 +95,7 @@ export class RepartitionComponent implements OnInit {
     let gvbdf0: IRepartitionItem[] = current || [];
 
     if(gvbdf0.length === 0) {
-      gvbdf0 = this._expenses.map(exp => {
-        const payer = exp.payer;
-
-        // const res: IRepartitionItem = {
-        //   person: "",
-        //   owesTo: payer,
-        //   amount: 0
-        // };
-
-        return exp.payees.map((p: ExpenseParticipantModel, index: number, arr: ExpenseParticipantModel[]) => {
-          if (p.name !== payer && p.e4xpenseRatio) {
-            const o: IRepartitionItem = {} as IRepartitionItem;
-            o.person = p.name;
-            o.owesTo = payer;
-            // o.amount = exp.amount / arr.length;
-            o.amount = exp.amount * p.e4xpenseRatio;
-
-            return o;
-          }
-          else {
-            return null;
-          }
-        }).filter((a: IRepartitionItem | null) => !!a);
-      }).reduce((res: IRepartitionItem[], itemArr: any[], index: number, arr: any) => {
-        return itemArr ? res.concat(itemArr) : res; // mergeMap
-      }, []);
+      gvbdf0 = this.getInitialRepartition();
     }
 
     let gvbdf: IRepartitionItem[] = (gvbdf0 || []).reduce((res: any[], item: any, index: number, arr: any) => {
@@ -146,31 +144,51 @@ export class RepartitionComponent implements OnInit {
     newArr.forEach((item: IRepartitionItem) => {
       // removes what we owe someone who already owes someone else
 
-      if(!newArr1.includes(item)) {
+      if(!newArr1.includes(item) || item.removed) {
         return; // already handled
       }
 
       let otherOwes = newArr1.filter(na1 => na1.person !== item.person && na1.owesTo === item.owesTo);
       if(otherOwes.length > 0 && newArr1.length > 2) {
         otherOwes.forEach((oth: any) => {
+          if(!newArr1.includes(item) || item.removed) {
+            return; // already handled
+          }
+
           const target = newArr1.find(nn => nn.person === oth.person && nn.owesTo === item.person);
-          if (!target) {
+          if (!target || target.removed) {
             return;
           }
 
 
-          if (item.amount > target.amount) {
-            oth.amount += target.amount;
-            item.amount -= target.amount;
-
-            const inh = newArr1.indexOf(target);
-            newArr1.splice(inh, 1);
-          } else {
+          // if (item.amount > target.amount) {
+          //   oth.amount += target.amount;
+          //   item.amount -= target.amount;
+          //
+          //   // const inh = newArr1.indexOf(target);
+          //   // newArr1.splice(inh, 1);
+          //   // target.removed = true;
+          // } else {
+          //   oth.amount += item.amount;
+          //   target.amount -= item.amount;
+          //
+          //   const inh = newArr1.indexOf(item);
+          //   if (inh > -1) {
+          //     newArr1.splice(inh, 1);
+          //     item.removed = true;
+          //     return;;
+          //   }
+          // }
+          if (item.amount <= target.amount) {
             oth.amount += item.amount;
             target.amount -= item.amount;
 
             const inh = newArr1.indexOf(item);
-            newArr1.splice(inh, 1);
+            if (inh > -1) {
+              newArr1.splice(inh, 1);
+              item.removed = true;
+              return;
+            }
           }
         });
       }
@@ -217,10 +235,21 @@ export class RepartitionComponent implements OnInit {
       }
     });
 
-    const res = newArr2;
+    const res = newArr2; //newArr2;
     return res.length <= 1 || JSON.stringify(res) === JSON.stringify(current)
       ? res
       : this.handleRepartition(res);
+  }
+
+  private handleRepartitionSplitWise(current?: IRepartitionItem[]): IRepartitionItem[] {
+    // let gvbdf0: IRepartitionItem[] = current || [];
+    //
+    // if(gvbdf0.length === 0) {
+    //   gvbdf0 = this.getInitialRepartition();
+    // }
+    //
+    // return SplitwiseHelper.splitFromRepart(gvbdf0);
+    return SplitwiseHelper.split(this._expenses);
   }
 
   private getWhoSpent() {
@@ -256,5 +285,13 @@ export class RepartitionComponent implements OnInit {
       return 0;
     }
     return Number(spent) / targetPart.dayCount
+  }
+
+  private getInitialRepartition(): IRepartitionItem[] {
+    return SplitwiseHelper.reduceExpenses(this._expenses);
+  }
+
+  private handleAC_AB_BC(all: IRepartitionItem[]) {
+    return;
   }
 }

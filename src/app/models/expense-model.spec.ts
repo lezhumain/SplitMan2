@@ -52,6 +52,33 @@ export function getExpenses(): ExpenseModel[] {
       "updatedAt": "2021-10-31T17:58:46.016Z",
       "updatedBy": ""
     }
+
+    // {
+    //   "amount": 300,
+    //   "payer": "Dju",
+    //   "payees": [
+    //     {"name": "Dju", "e4xpenseRatio": 0.333333333},
+    //     {"name": "Cams", "e4xpenseRatio": 0.333333333},
+    //     {"name": "Alx", "e4xpenseRatio": 0.333333333}
+    //   ]
+    // },
+    // {
+    //   "amount": 20,
+    //   "payer": "Cams",
+    //   "payees": [
+    //     {"name": "Dju", "e4xpenseRatio": 0.5},
+    //     {"name": "Cams", "e4xpenseRatio": 0.5}
+    //   ]
+    // },
+    // {
+    //   "amount": 30,
+    //   "payer": "Alx",
+    //   "payees": [
+    //     {"name": "Dju", "e4xpenseRatio": 0.333333333},
+    //     {"name": "Cams", "e4xpenseRatio": 0.333333333},
+    //     {"name": "Alx", "e4xpenseRatio": 0.333333333}
+    //   ]
+    // }
   ].map(e => ExpenseModel.fromJson(e));
 }
 
