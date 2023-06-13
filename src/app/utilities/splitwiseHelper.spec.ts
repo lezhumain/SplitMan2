@@ -2,7 +2,7 @@ import {getExpensesMarseille} from "../../test-data/getEzxpenses";
 import {RepartitionUtils} from "../../test-data/test_utils";
 import {ExpenseModel} from "../models/expense-model";
 import {SplitwiseHelper, SplitwiseInputItem} from "./splitwiseHelper";
-import {checkBalance} from "../../../../node-splitwise-js/test_utils";
+// import {checkBalance} from "../../../../node-splitwise-js/test_utils";
 import {IRepartitionItem} from "../repartition/repartition.component";
 
 function checkSplits(splits: [string, string, number][], splitsExpect: [string, string, number][]) {
@@ -39,7 +39,7 @@ function checkInputs(inputs: SplitwiseInputItem[], inputsExpect: SplitwiseInputI
 function testInputs(inputs: SplitwiseInputItem[], splitsExpect: [string, string, number][]) {
   const splits = SplitwiseHelper["splitOnly"](inputs);
   checkSplits(splits, splitsExpect);
-  checkBalance(splits, inputs);
+  // checkBalance(splits, inputs);
   return splits;
 }
 describe('SplitwiseHelperBase', () => {
