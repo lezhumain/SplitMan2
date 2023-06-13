@@ -1,17 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { NavBarComponent } from './nav-bar.component';
-import {RouterTestingModule} from "@angular/router/testing";
-import {allRoutes} from "../app-routing/app-routing.module";
-import {HttpClientModule} from "@angular/common/http";
-import {TravelService} from "../travel.service";
 import {UserServiceService} from "../user-service.service";
-import {NavBarService} from "../nav-bar.service";
-import {BehaviorSubject, of} from "rxjs";
-import {ActivatedRoute, NavigationEnd, NavigationStart, Router} from "@angular/router";
-import {BabelAstHost} from "@angular/compiler-cli/linker/babel/src/ast/babel_ast_host";
+import {BehaviorSubject} from "rxjs";
+import {NavigationEnd, NavigationStart, Router} from "@angular/router";
 import {getBaseTestStuff} from "../../../e2e/baseTestStuff";
-import {TravelEditComponent} from "../travel-edit/travel-edit.component";
 import {filter, first} from "rxjs/operators";
 // import {expect} from "chai";
 

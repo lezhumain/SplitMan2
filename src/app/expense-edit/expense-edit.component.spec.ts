@@ -2,8 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ExpenseEditComponent } from './expense-edit.component';
 import {getBaseActivatedTestRoute, getBaseTestStuff} from "../../../e2e/baseTestStuff";
-import {ActivatedRoute} from "@angular/router";
-import {TravelEditComponent} from "../travel-edit/travel-edit.component";
 
 describe('ExpenseEditComponent', () => {
   let component: ExpenseEditComponent;

@@ -3,12 +3,17 @@ export class Utils {
     return !!d.getTime && !isNaN(d.getTime())
   }
 
-  static checkAmounts(amount: number, amount1: number, decimals: number, targetBit = "==="): boolean {
-    amount = Math.round(amount * Math.pow(10, decimals));
-    amount1 = Math.round(amount1 * Math.pow(10, decimals));
+  static round(amount: number, decimals: number): number {
+    const val = Math.pow(10, decimals)
+    return Math.round(amount * val) / val;
+  }
 
-    const res = eval(`${amount} ${targetBit} ${amount1}`);
+  static checkAmounts<T>(amount: number, amount1: number, decimals: number, targetBit = "==="): T {
+    amount = Utils.round(amount, decimals);
+    amount1 = Utils.round(amount1, decimals);
 
-    return res
+    const res: T = eval(`${amount} ${targetBit} ${amount1}`);
+
+    return res;
   }
 }
