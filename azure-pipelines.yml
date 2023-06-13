@@ -3,12 +3,12 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-#pr:
-#  branches:
-#    include:
-#    - '*'  # must quote since "*" is a YAML reserved character; we want a string
+pr:
+  branches:
+    include:
+    - '*'  # must quote since "*" is a YAML reserved character; we want a string
 
-pr: none
+#pr: none
 
 trigger:
   branches:
@@ -39,6 +39,12 @@ stages:
         steps:
           - checkout: self
           - checkout: MyGitHub_splitman2run
+          
+          - task: DownloadSecureFile@1
+            name: rsa_github
+            displayName: 'Download key'
+            inputs:
+              secureFile: 'id_rsa'
 
           - task: NodeTool@0
             inputs:
@@ -52,6 +58,13 @@ stages:
             displayName: 'Test variables'
 
           - script: |
+              # add ssh key
+              sudo cp $(rsa_github.secureFilePath) ~/.ssh/id_rsa
+              sudo chown "$(whoami)" ~/.ssh/id_rsa
+              sudo chmod 600 ~/.ssh/id_rsa
+              eval "$(ssh-agent -s)"
+              ssh-add ~/.ssh/id_rsa
+
               cd "$SREPO"
               bash ../SplitMan2-run/run_docker_e2e.sh "https" "$SREPO"
               docker save "$IMAGE" -o "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
