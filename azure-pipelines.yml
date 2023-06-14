@@ -67,7 +67,7 @@ stages:
               sudo cp $(rsaGithub.secureFilePath) ~/.ssh/id_rsa
               sudo chown "$(whoami)" ~/.ssh/id_rsa
               sudo chmod 600 ~/.ssh/id_rsa
-              if [ ! -f "~/.ssh/id_rsa" ]; then
+              if [ ! -f ~/.ssh/id_rsa ]; then
                   echo "Can't find copied SSH key"
                   exit 1
               fi
