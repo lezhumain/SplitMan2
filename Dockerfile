@@ -18,7 +18,7 @@ RUN ["npm", "install", "-g", "npm@latest"]
 
 #RUN cd /app && npm i && npm run cp-libs
 RUN ls
-RUN cd /dist/src/app && npm ci --force && npm run cp-libs
+#RUN cd /dist/src/app && npm ci --force && npm run cp-libs # TODO remove me when using npm packages for splitwise repart
 
 ARG IP
 ARG API
