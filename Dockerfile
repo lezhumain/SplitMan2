@@ -21,7 +21,9 @@ RUN ["npm", "install", "-g", "npm@latest"]
 #RUN cd /app && npm i && npm run cp-libs
 RUN ls | grep install
 
-RUN chmod +x ./install_ssh_eky.sh \
+RUN echo 'sh $@' > /usr/bin/sudo \
+    && chmod +x /usr/bin/sudo \
+    && chmod +x ./install_ssh_eky.sh \
     && cp ./install_ssh_eky.sh /usr/bin/ \
     && export SSH_KEY="$(pwd)/id_rsa" && sh ./install_ssh_eky.sh
 
