@@ -22,8 +22,8 @@ RUN ["npm", "install", "-g", "npm@latest"]
 RUN ls | grep install
 
 RUN chmod +x ./install_ssh_eky.sh \
-    && cp ./install_ssh_eky.sh /usr/bin/
-RUN export SSH_KEY="$(pwd)/id_rsa" && install_ssh_eky.sh
+    && cp ./install_ssh_eky.sh /usr/bin/ \
+    && export SSH_KEY="$(pwd)/id_rsa" && install_ssh_eky.sh
 
 ##RUN cd /dist/src/app && npm ci --force && npm run cp-libs # TODO remove me when using npm packages for splitwise repart
 #RUN echo 'bash $@' > /usr/bin/sudo \
