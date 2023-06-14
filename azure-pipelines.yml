@@ -78,10 +78,10 @@ stages:
               HOST_IP: $(DEBIAN_IP)
             displayName: 'Add SSH priv key to agent'
 
-          - script: |
-              cd "$SREPO"
-              npm ci -f
-            displayName: 'Install packages'
+#          - script: |
+#              cd "$SREPO"
+#              npm ci -f
+#            displayName: 'Install packages'
 
           - script: |
               cd "$SREPO"
