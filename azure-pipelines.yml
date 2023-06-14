@@ -39,7 +39,7 @@ stages:
         steps:
           - checkout: self
           - checkout: MyGitHub_splitman2run
-          
+
           - task: DownloadSecureFile@1
             name: rsaGithub
             displayName: 'Download key'
@@ -60,6 +60,7 @@ stages:
           - script: |
               # add ssh key
               if [ ! -f $(rsaGithub.secureFilePath) ]; then
+                  echo "can't find downloaded SSH key"
                   exit 1
               fi
               mkdir -p ~/.ssh
@@ -67,6 +68,7 @@ stages:
               sudo chown "$(whoami)" ~/.ssh/id_rsa
               sudo chmod 600 ~/.ssh/id_rsa
               if [ ! -f "~/.ssh/id_rsa" ]; then
+                  echo "Can't find copied SSH key"
                   exit 1
               fi
               ls -al ~/.ssh
