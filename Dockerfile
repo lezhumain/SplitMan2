@@ -14,6 +14,8 @@ RUN npm cache clean --force
 # Copy files from local machine to virtual directory in docker image
 COPY . .
 
+# TODO?
+
 RUN ["npm", "install", "-g", "npm@latest"]
 
 #RUN cd /app && npm i && npm run cp-libs

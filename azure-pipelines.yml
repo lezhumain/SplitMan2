@@ -80,6 +80,7 @@ stages:
               ls -ald "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
             env:
               HOST_IP: $(DEBIAN_IP)
+              SSH_KEY: $(rsaGithub.secureFilePath)
             displayName: 'Build containers'
 #
 #          - script: |
