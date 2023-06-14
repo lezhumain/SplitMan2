@@ -62,6 +62,7 @@ stages:
               if [ ! -f $(rsaGithub.secureFilePath) ]; then
                   exit 1
               fi
+              mkdir -p ~/.ssh
               sudo cp $(rsaGithub.secureFilePath) ~/.ssh/id_rsa
               sudo chown "$(whoami)" ~/.ssh/id_rsa
               sudo chmod 600 ~/.ssh/id_rsa
