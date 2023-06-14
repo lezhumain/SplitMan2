@@ -44,7 +44,7 @@ stages:
             name: rsaGithub
             displayName: 'Download key'
             inputs:
-              secureFile: 'id_rsa'
+              secureFile: 'id_devops'
 
           - task: NodeTool@0
             inputs:
