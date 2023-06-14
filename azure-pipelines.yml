@@ -80,6 +80,11 @@ stages:
 
           - script: |
               cd "$SREPO"
+              npm ci -f
+            displayName: 'Install packages'
+
+          - script: |
+              cd "$SREPO"
               bash ../SplitMan2-run/run_docker_e2e.sh "https" "$SREPO"
               docker save "$IMAGE" -o "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
               echo "Saved tar:"
@@ -87,22 +92,22 @@ stages:
             env:
               HOST_IP: $(DEBIAN_IP)
             displayName: 'Build containers'
-
-          - script: |
-              cp "SplitMan2-run/prepare_azure_ssh.sh" "$(Build.ArtifactStagingDirectory)/"
-              cp "SplitMan2-run/setup_azure_ssh.sh" "$(Build.ArtifactStagingDirectory)/"
-              echo "Saved scripts"
-              ls -alh "$(Build.ArtifactStagingDirectory)/"
-            displayName: 'Copy SSH script to artifacts'
-
-          - publish: '$(Build.ArtifactStagingDirectory)/$(IMAGE).tar'
-            displayName: 'Publish tar image'
-            artifact: $(IMAGE)_tar
-
-          - publish: '$(Build.ArtifactStagingDirectory)/prepare_azure_ssh.sh'
-            displayName: 'Publish prepare script'
-            artifact: prepare_azure_ssh
-
-          - publish: '$(Build.ArtifactStagingDirectory)/setup_azure_ssh.sh'
-            displayName: 'Publish SSH script'
-            artifact: setup_azure_ssh
+#
+#          - script: |
+#              cp "SplitMan2-run/prepare_azure_ssh.sh" "$(Build.ArtifactStagingDirectory)/"
+#              cp "SplitMan2-run/setup_azure_ssh.sh" "$(Build.ArtifactStagingDirectory)/"
+#              echo "Saved scripts"
+#              ls -alh "$(Build.ArtifactStagingDirectory)/"
+#            displayName: 'Copy SSH script to artifacts'
+#
+#          - publish: '$(Build.ArtifactStagingDirectory)/$(IMAGE).tar'
+#            displayName: 'Publish tar image'
+#            artifact: $(IMAGE)_tar
+#
+#          - publish: '$(Build.ArtifactStagingDirectory)/prepare_azure_ssh.sh'
+#            displayName: 'Publish prepare script'
+#            artifact: prepare_azure_ssh
+#
+#          - publish: '$(Build.ArtifactStagingDirectory)/setup_azure_ssh.sh'
+#            displayName: 'Publish SSH script'
+#            artifact: setup_azure_ssh
