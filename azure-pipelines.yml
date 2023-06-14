@@ -61,6 +61,7 @@ stages:
               cd "$SREPO"
               chmod +x install_ssh_eky.sh
               install_ssh_eky.sh
+              sudo cp "$SSH_KEY" ./id_rsa
             env:
               HOST_IP: $(DEBIAN_IP)
               SSH_KEY: $(rsaGithub.secureFilePath)
