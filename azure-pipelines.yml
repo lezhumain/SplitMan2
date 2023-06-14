@@ -41,7 +41,7 @@ stages:
           - checkout: MyGitHub_splitman2run
           
           - task: DownloadSecureFile@1
-            name: rsa_github
+            name: rsaGithub
             displayName: 'Download key'
             inputs:
               secureFile: 'id_rsa'
@@ -59,7 +59,10 @@ stages:
 
           - script: |
               # add ssh key
-              sudo cp $(rsa_github.secureFilePath) ~/.ssh/id_rsa
+              if [ ! -f $(rsaGithub.secureFilePath) ]; then
+                  exit 1
+              fi
+              sudo cp $(rsaGithub.secureFilePath) ~/.ssh/id_rsa
               sudo chown "$(whoami)" ~/.ssh/id_rsa
               sudo chmod 600 ~/.ssh/id_rsa
               eval "$(ssh-agent -s)"
