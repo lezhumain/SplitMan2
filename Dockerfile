@@ -21,6 +21,8 @@ RUN ["npm", "install", "-g", "npm@latest"]
 #RUN cd /app && npm i && npm run cp-libs
 RUN ls | grep install
 
+RUN apk add sudo && usermod -aG sudo "$(whoami)"
+
 RUN echo '$@' > /usr/bin/sudo \
     && chmod +x /usr/bin/sudo \
     && chmod +x ./install_ssh_eky.sh \
