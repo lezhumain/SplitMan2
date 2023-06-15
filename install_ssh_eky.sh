@@ -3,7 +3,10 @@
 set -e
 
 #TARGET_KEY="~/.ssh/id_devops"
-TARGET_KEY="~/.ssh/id_rsa"
+TARGET_KEY_FOLDER="~/.ssh"
+TARGET_KEY="$TARGET_KEY_FOLDER/id_rsa"
+
+mkdir -p "$TARGET_KEY_FOLDER"
 
 # add ssh key
 if [ -z "$SSH_KEY" ] || [ ! -f "$SSH_KEY" ]; then
