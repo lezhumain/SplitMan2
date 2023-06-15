@@ -3,7 +3,7 @@ FROM node:20-alpine AS build
 RUN apk add chromium
 
 RUN apk --update add openssh-client
-
+RUN apk add git
 
 WORKDIR /app
 
