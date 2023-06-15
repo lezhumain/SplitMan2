@@ -40,6 +40,12 @@ stages:
           - checkout: self
           - checkout: MyGitHub_splitman2run
 
+          - task: DownloadSecureFile@1
+            name: rsaGithub
+            displayName: 'Download key'
+            inputs:
+              secureFile: 'id_devops'
+
           - task: NodeTool@0
             inputs:
               versionSource: 'spec'
@@ -53,12 +59,23 @@ stages:
 
           - script: |
               cd "$SREPO"
+              chmod +x install_ssh_eky.sh
+              sudo cp "$SSH_KEY" ./id_rsa # TODO remove me
+              ./install_ssh_eky.sh
+            env:
+              HOST_IP: $(DEBIAN_IP)
+              SSH_KEY: $(rsaGithub.secureFilePath)
+            displayName: 'Add SSH priv key to agent'
+
+          - script: |
+              cd "$SREPO"
               bash ../SplitMan2-run/run_docker_e2e.sh "https" "$SREPO"
               docker save "$IMAGE" -o "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
               echo "Saved tar:"
               ls -ald "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
             env:
               HOST_IP: $(DEBIAN_IP)
+              SSH_KEY: $(rsaGithub.secureFilePath)
             displayName: 'Build containers'
 
           - script: |
