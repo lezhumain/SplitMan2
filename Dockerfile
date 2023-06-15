@@ -15,6 +15,7 @@ RUN npm cache clean --force
 COPY . .
 
 # TODO?
+RUN apk --update add openssh-client
 
 RUN ["npm", "install", "-g", "npm@latest"]
 
