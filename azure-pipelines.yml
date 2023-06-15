@@ -67,11 +67,6 @@ stages:
               SSH_KEY: $(rsaGithub.secureFilePath)
             displayName: 'Add SSH priv key to agent'
 
-#          - script: |
-#              cd "$SREPO"
-#              npm ci -f
-#            displayName: 'Install packages'
-
           - script: |
               cd "$SREPO"
               bash ../SplitMan2-run/run_docker_e2e.sh "https" "$SREPO"
