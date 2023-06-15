@@ -82,22 +82,22 @@ stages:
               HOST_IP: $(DEBIAN_IP)
               SSH_KEY: $(rsaGithub.secureFilePath)
             displayName: 'Build containers'
-#
-#          - script: |
-#              cp "SplitMan2-run/prepare_azure_ssh.sh" "$(Build.ArtifactStagingDirectory)/"
-#              cp "SplitMan2-run/setup_azure_ssh.sh" "$(Build.ArtifactStagingDirectory)/"
-#              echo "Saved scripts"
-#              ls -alh "$(Build.ArtifactStagingDirectory)/"
-#            displayName: 'Copy SSH script to artifacts'
-#
-#          - publish: '$(Build.ArtifactStagingDirectory)/$(IMAGE).tar'
-#            displayName: 'Publish tar image'
-#            artifact: $(IMAGE)_tar
-#
-#          - publish: '$(Build.ArtifactStagingDirectory)/prepare_azure_ssh.sh'
-#            displayName: 'Publish prepare script'
-#            artifact: prepare_azure_ssh
-#
-#          - publish: '$(Build.ArtifactStagingDirectory)/setup_azure_ssh.sh'
-#            displayName: 'Publish SSH script'
-#            artifact: setup_azure_ssh
+
+          - script: |
+              cp "SplitMan2-run/prepare_azure_ssh.sh" "$(Build.ArtifactStagingDirectory)/"
+              cp "SplitMan2-run/setup_azure_ssh.sh" "$(Build.ArtifactStagingDirectory)/"
+              echo "Saved scripts"
+              ls -alh "$(Build.ArtifactStagingDirectory)/"
+            displayName: 'Copy SSH script to artifacts'
+
+          - publish: '$(Build.ArtifactStagingDirectory)/$(IMAGE).tar'
+            displayName: 'Publish tar image'
+            artifact: $(IMAGE)_tar
+
+          - publish: '$(Build.ArtifactStagingDirectory)/prepare_azure_ssh.sh'
+            displayName: 'Publish prepare script'
+            artifact: prepare_azure_ssh
+
+          - publish: '$(Build.ArtifactStagingDirectory)/setup_azure_ssh.sh'
+            displayName: 'Publish SSH script'
+            artifact: setup_azure_ssh

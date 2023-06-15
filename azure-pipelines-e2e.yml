@@ -33,6 +33,23 @@ stages:
         pool:
           vmImage: ubuntu-latest
         steps:
+
+          - task: DownloadSecureFile@1
+            name: rsaGithub
+            displayName: 'Download key'
+            inputs:
+              secureFile: 'id_devops'
+
+          - script: |
+              cd "$SREPO"
+              # chmod +x install_ssh_eky.sh
+              sudo cp "$SSH_KEY" ./id_rsa # TODO remove me
+              #./install_ssh_eky.sh
+            env:
+              HOST_IP: $(DEBIAN_IP)
+              SSH_KEY: $(rsaGithub.secureFilePath)
+            displayName: 'Add SSH priv key to agent'
+
           - task: Docker@2
             inputs:
               command: build
