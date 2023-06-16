@@ -59,7 +59,7 @@ stages:
 
           - script: |
               cd "$SREPO"
-              chmod +x install_ssh_eky.sh
+              chmod +x ./install_ssh_eky.sh
               sudo cp "$SSH_KEY" ./id_rsa # TODO remove me
               ./install_ssh_eky.sh
             env:
