@@ -22,7 +22,7 @@ RUN ["npm", "install", "-g", "npm@latest"]
 #RUN cd /app && npm i && npm run cp-libs
 RUN ls | grep install
 
-# TODO remove me when using npm packages for splitwise repart
+# TODO remove me  when using npm packages for splitwise repart
 RUN chmod +x ./install_ssh_eky.sh \
     && sh ./install_ssh_eky.sh
 
