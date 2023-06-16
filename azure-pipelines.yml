@@ -83,7 +83,7 @@ stages:
               cp "SplitMan2-run/setup_azure_ssh.sh" "$(Build.ArtifactStagingDirectory)/"
               echo "Saved scripts"
               ls -alh "$(Build.ArtifactStagingDirectory)/"
-            displayName: 'Copy SSH script to artifacts'
+            displayName: 'Copy SSH script to  artifacts'
 
           - publish: '$(Build.ArtifactStagingDirectory)/$(IMAGE).tar'
             displayName: 'Publish tar image'
