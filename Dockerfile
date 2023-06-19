@@ -16,6 +16,7 @@ COPY . .
 
 # TODO?
 RUN apk --update add openssh-client
+RUN apk --update add git
 
 RUN ["npm", "install", "-g", "npm@latest"]
 
