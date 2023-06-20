@@ -59,7 +59,7 @@ stages:
 
           - script: |
               cd "$SREPO"
-              chmod +x install_ssh_eky.sh
+              chmod +x ./install_ssh_eky.sh
               sudo cp "$SSH_KEY" ./id_rsa # TODO remove me
               ./install_ssh_eky.sh
             env:
@@ -83,7 +83,7 @@ stages:
               cp "SplitMan2-run/setup_azure_ssh.sh" "$(Build.ArtifactStagingDirectory)/"
               echo "Saved scripts"
               ls -alh "$(Build.ArtifactStagingDirectory)/"
-            displayName: 'Copy SSH script to artifacts'
+            displayName: 'Copy SSH script to  artifacts'
 
           - publish: '$(Build.ArtifactStagingDirectory)/$(IMAGE).tar'
             displayName: 'Publish tar image'
