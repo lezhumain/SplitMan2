@@ -6,8 +6,8 @@ import {RepartitionCardComponent} from "../repartition-card/repartition-card.com
 import {ActivatedRoute} from "@angular/router";
 
 import {getExpensesBug, getExpensesMarseille} from "../../test-data/getEzxpenses";
-import {checkArray} from "../../test-data/test_utils";
-
+import {checkArray, RepartitionUtils, sanityCheck} from "../../test-data/test_utils";
+import lacDeps from "src/test-data/expensesLacanau2021.json";
 
 describe('RepartitionComponentMain', () => {
   let component: RepartitionComponent;
@@ -54,7 +54,7 @@ describe('RepartitionComponentMain', () => {
   function checkBugRepart() {
     const expected: IRepartitionItem[] = [
       {
-        "person": "cam ",
+        "person": "cam",
         "owesTo": "alx",
         "amount": 18
       },
@@ -70,8 +70,10 @@ describe('RepartitionComponentMain', () => {
       }
     ];
 
-    debugger;
-    checkArray(component.allDeps, expected);
+    const checkArrayFailed = checkArray(component.allDeps, expected, false);
+    if(checkArrayFailed) {
+      sanityCheck(component.allDeps, component.expenses, expected);
+    }
   }
 
   beforeEach(async () => {
@@ -84,7 +86,7 @@ describe('RepartitionComponentMain', () => {
         {provide: ActivatedRoute, useValue: fakeActivatedRoute}
       ]
     })
-    .compileComponents();
+      .compileComponents();
   });
 
   beforeEach(() => {
@@ -110,6 +112,7 @@ describe('RepartitionComponentMain', () => {
     ];
 
     checkArray(component.allDeps, expected);
+    sanityCheck(component.allDeps, component.expenses, expected);
   });
 
   it('should not be owed more than spent BUG', () => {
@@ -123,13 +126,35 @@ describe('RepartitionComponentMain', () => {
   });
 
   it('should do repart for BUG', () => {
-    // // FIXME
-    // expect(component).toBeTruthy();
-    // const dep = getExpensesBug();
-    //
-    // component.expenses = dep.slice();
-    // fixture.detectChanges();
-    //
-    // checkBugRepart();
+    // FIXME
+    expect(component).toBeTruthy();
+    const dep = getExpensesBug();
+
+    component.expenses = dep.slice();
+    fixture.detectChanges();
+
+    checkBugRepart();
   });
+
+  it('should get Lacanau repartition properly BUG', () => {
+    // FIXME
+    expect(component).toBeTruthy();
+    const dep: ExpenseModel[] = (lacDeps as any[]).slice();
+
+    component.expenses = dep.slice();
+    fixture.detectChanges();
+
+    const expected: any[] = [];
+
+    const checkArrayFailed = expected.length > 0
+      ? checkArray(component.allDeps, expected, false)
+      : true;
+
+    if(checkArrayFailed) {
+      sanityCheck(component.allDeps, component.expenses, expected);
+    }
+
+    console.log(JSON.stringify(component.allDeps, null, 2));
+  });
+
 });

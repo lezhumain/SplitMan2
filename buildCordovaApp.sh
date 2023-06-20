@@ -8,6 +8,7 @@ LIFEMAN="$(pwd)"
 #npm run build:prod
 #npx rimraf dist
 #rm -r dist || true
+echo 0
 npm ci --force
 echo 1
 npm run cp-libs
@@ -65,34 +66,34 @@ if [[ "$PATH" != *"radle"* ]]; then
 fi
 chmod +x ./resetAndroid.sh
 ./resetAndroid.sh > /dev/null
-
-cp -r "$LIFEMAN/dist/SplitMan21" ./build
-
-if [ ! -d build ]; then
-  echo "Couldn't find \"build\""
-  exit 1
-fi
-
-#npm run build
-pwd
-ls -ald build
-npm run build_cordova_android
-
-popd
-
-# TODO handle all of them
-mkdir -p apks
-TARGET_APK="$(find "$TARGET/platforms/" -name "*.apk" | head -n 1)"
-if [ -z "$TARGET_APK" ]; then
-  echo "No APK found"
-  exit 1
-fi
-cp "$TARGET_APK" ./apks/splitman2.apk
-
-if [[ "$(uname -a)" == *"Linux"* ]]; then
-  md5sum ./apks/splitman2.apk > ./apks/checksum.md5
-else
-  md5sum.exe ./apks/splitman2.apk > ./apks/checksum.md5
-fi
-
-ls apks
+#
+#cp -r "$LIFEMAN/dist/SplitMan21" ./build
+#
+#if [ ! -d build ]; then
+#  echo "Couldn't find \"build\""
+#  exit 1
+#fi
+#
+##npm run build
+#pwd
+#ls -ald build
+#npm run build_cordova_android
+#
+#popd
+#
+## TODO handle all of them
+#mkdir -p apks
+#TARGET_APK="$(find "$TARGET/platforms/" -name "*.apk" | head -n 1)"
+#if [ -z "$TARGET_APK" ]; then
+#  echo "No APK found"
+#  exit 1
+#fi
+#cp "$TARGET_APK" ./apks/splitman2.apk
+#
+#if [[ "$(uname -a)" == *"Linux"* ]]; then
+#  md5sum ./apks/splitman2.apk > ./apks/checksum.md5
+#else
+#  md5sum.exe ./apks/splitman2.apk > ./apks/checksum.md5
+#fi
+#
+#ls apks

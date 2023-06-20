@@ -5,6 +5,8 @@ import {UserModel} from "../models/user-model";
 import {Utils} from "../utilities/utils";
 import {Participant, ParticipantModel} from "../models/participants";
 
+// import {Splitwise} from "splitwise-js-map";
+
 export interface IRepartitionItem {
   removed?: boolean;
   person: string;
@@ -62,7 +64,16 @@ export class RepartitionComponent implements OnInit {
 
   private setup() {
     const newArr1 = this.handleRepartition();
-
+    // const res = new Splitwise(this._expenses.map(e => {
+    //   return {
+    //     paidBy: e.payer,
+    //     paidFor: e.payees.reduce((res: {[payer: string]: number}, item) => {
+    //       res[item.name] = e.amount * (item.e4xpenseRatio || 0);
+    //       return res;
+    //     }, {})
+    //       // { 'B': 300, 'C': 40, 'D': 30 }
+    //   }
+    // }));
     this.allDeps = newArr1;
     this.allStr = this.allDeps.map(e => JSON.stringify(e));
 

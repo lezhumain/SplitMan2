@@ -1,0 +1,35 @@
+FROM androidsdk/android-30:latest
+
+RUN apt update && apt install -y dos2unix vim jq curl unzip zip
+
+WORKDIR /app
+
+COPY ./to_rename.sh .
+COPY ./prepare_android.sh .
+COPY cordova_react_test.zip .
+COPY ./buildCordovaAppPrepared.sh .
+COPY ./dist /app/dist
+
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
+RUN apt install -y nodejs
+#RUN node -v
+#
+RUN chmod +x /app/*.sh && dos2unix /app/*.sh && bash /app/to_rename.sh
+
+#RUN bash /app/to_rename.sh
+
+RUN mkdir /app/tmp && cd /app/tmp && unzip -u ../cordova_react_test.zip \
+	&& ls -al cordova_react_test \
+	&& dos2unix cordova_react_test/*.sh && chmod +x cordova_react_test/*.sh \
+	&& zip -r ../cordova_react_test.zip cordova_react_test
+
+RUN bash /app/prepare_android.sh # just install gradle here
+
+#RUN GRADL="$(ls -d /opt/gradle/gradle-*/bin | head -n 1)"; export PATH="$PATH:$GRADL"
+RUN sdkmanager --install "build-tools;30.0.3"
+
+RUN echo 'export PATH="$PATH:$(ls -d /opt/gradle/gradle-*/bin | head -n 1)"' >> ~/.bashrc
+
+#ENV PATH="$PATH:$(ls -d /opt/gradle/gradle-*/bin | head -n 1)"
+RUN PATH="$PATH:$(ls -d /opt/gradle/gradle-*/bin | head -n 1)" \
+  && bash /app/buildCordovaAppPrepared.sh
