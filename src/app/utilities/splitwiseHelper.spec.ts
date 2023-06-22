@@ -1,9 +1,11 @@
 import {getExpensesMarseille} from "../../test-data/getEzxpenses";
 import {RepartitionUtils} from "../../test-data/test_utils";
 import {ExpenseModel} from "../models/expense-model";
-import {SplitwiseHelper, SplitwiseInputItem} from "./splitwiseHelper";
-// import {checkBalance} from "../../../../node-splitwise-js/test_utils";
+import {IBalanceItem, SplitwiseHelper, SplitwiseInputItem} from "./splitwiseHelper";
 import {IRepartitionItem} from "../repartition/repartition.component";
+
+import exp_surf_2_0_live from "../../test-data/exp_surf_2.0_live.json";
+import {Expense} from "../models/expense";
 
 function checkSplits(splits: [string, string, number][], splitsExpect: [string, string, number][]) {
   for(const [from, to, amout] of splitsExpect) {
@@ -42,6 +44,72 @@ function testInputs(inputs: SplitwiseInputItem[], splitsExpect: [string, string,
   // checkBalance(splits, inputs);
   return splits;
 }
+
+function getExpensesSki2023() {
+  return [];
+}
+
+function testBalance(bal: IBalanceItem[]) {
+  const total = bal.reduce((res: number, item) => res + item.amount, 0);
+  const totalRound = Math.round(total * 10) / 10;
+  expect(totalRound).toEqual(0);
+}
+
+describe('SplitwiseHelperBase_balance', () => {
+  // works with with hardcoded
+  beforeEach(() => {
+  });
+
+  it('test balance', () => {
+    const bal: IBalanceItem[] = [
+      { name: "Aissa", amount: 1.67 },
+      { name: "Alx", amount: 17.10 },
+      { name: "Anne-Cha", amount: -10.85 },
+      { name: "Cam", amount: -20.22 },
+      { name: "Dju", amount: 280.74 },
+      { name: "Ely", amount: 2.73 },
+      { name: "Jeff", amount: 96.39 },
+      { name: "Leslie", amount: -253.83 },
+      { name: "MaxK", amount: -179.86 },
+      { name: "Mymy", amount: 66.15 }
+    ];
+
+    testBalance(bal);
+  });
+
+  it('test balance from repart', () => {
+    const repart: IRepartitionItem[] = [
+      { person: "Cam", owesTo: "Dju", amount: 12.30 },
+      { person: "Leslie", owesTo: "Dju", amount: 253.83 },
+      { person: "MaxK", owesTo: "Dju", amount: 14.61 },
+      { person: "Anne-Cha", owesTo: "Aissa", amount: 1.67 },
+      { person: "Anne-Cha", owesTo: "Alx", amount: 9.18 },
+      { person: "Cam", owesTo: "Alx", amount: 7.92 },
+      { person: "MaxK", owesTo: "Ely", amount: 2.73 },
+      { person: "MaxK", owesTo: "Jeff", amount: 96.39 },
+      { person: "MaxK", owesTo: "Mymy", amount: 66.13 }
+    ];
+    const bal: IBalanceItem[] = SplitwiseHelper.getBalance(repart);
+
+    testBalance(bal);
+  });
+});
+
+
+function mainTestFromExp(expenses: ExpenseModel[]) {
+  const allDeps: IRepartitionItem[] = SplitwiseHelper.split(expenses);
+
+  console.log("Expenses:");
+  console.log(JSON.stringify(expenses, null, 2));
+  console.log("Repart:");
+  console.log(JSON.stringify(allDeps, null, 2));
+
+  expect(allDeps.every(a => a.checked));
+  RepartitionUtils.checkBalanceRepart(expenses, allDeps);
+  const bal: IBalanceItem[] = SplitwiseHelper.getBalance(allDeps);
+  testBalance(bal);
+}
+
 describe('SplitwiseHelperBase', () => {
   const mainInputsExpect: SplitwiseInputItem[] = [
     {
@@ -232,23 +300,18 @@ describe('SplitwiseHelperBase', () => {
   });
 
   it('should get marseille repartition properly BUG HELPER', () => {
-    // const exp = getExpensesMarseille();
-    // const i = 3;
-    // console.log("i: " + i);
-    //
-    // const expenses = exp.slice(0, Math.min(i, exp.length)); // FIXME remove slice
     const expenses = getExpensesMarseille(); // FIXME remove slice
-    // const rep0: IRepartitionItem[] = SplitwiseHelper.reduceExpenses(expenses);
-    // const allDeps = SplitwiseHelper.splitFromRepart(rep0);
-    const allDeps: IRepartitionItem[] = SplitwiseHelper.split(expenses);
+    mainTestFromExp(expenses);
+  });
 
-    console.log("Expenses:");
-    console.log(JSON.stringify(expenses, null, 2));
-    console.log("Repart:");
-    console.log(JSON.stringify(allDeps, null, 2));
+  it('should get Ski2023 repartition properly BUG HELPER', () => {
+    const expenses = getExpensesSki2023(); // FIXME remove slice
+    mainTestFromExp(expenses);
+  });
 
-    expect(allDeps.every(a => a.checked));
-    RepartitionUtils.checkBalanceRepart(expenses, allDeps);
+  it('should get Surf2.0 repartition properly BUG HELPER', () => {
+    const expenses = exp_surf_2_0_live.map(e => ExpenseModel.fromJson(e));
+    mainTestFromExp(expenses);
   });
 
   // it("splitwise", () => {

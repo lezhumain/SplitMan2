@@ -25,6 +25,8 @@ export interface SplitwiseInputItem {
 //   }
 // }
 
+export interface IBalanceItem {name: string, amount: number}
+
 export class SplitwiseHelper {
   private static expenseToInput(expenses: ExpenseModel[]): SplitwiseInputItem[] {
     return expenses.map((e: ExpenseModel, _index: number, all: ExpenseModel[]) => {
@@ -222,4 +224,28 @@ export class SplitwiseHelper {
 
     return expenses;
   }
+
+  static getBalance(reparts: IRepartitionItem[]): IBalanceItem[] {
+    return reparts.reduce((res: IBalanceItem[], item: IRepartitionItem) => {
+      const target = res.find(r => r.name === item.person);
+      if(!target) {
+        const targetO = { name: item.person, amount: item.amount };
+        res.push(targetO);
+      }
+      else {
+        target.amount += item.amount;
+      }
+
+      const target1 = res.find(r => r.name === item.owesTo);
+      if(!target1) {
+        const targetO = { name: item.owesTo, amount: item.amount * -1 };
+        res.push(targetO);
+      }
+      else {
+        target1.amount -= item.amount;
+      }
+
+      return res;
+    }, []);
+  };
 }

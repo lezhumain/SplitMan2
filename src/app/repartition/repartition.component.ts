@@ -3,7 +3,7 @@ import {ExpenseModel} from "../models/expense-model";
 import {UserModel} from "../models/user-model";
 import {Utils} from "../utilities/utils";
 import {ParticipantModel} from "../models/participants";
-import {SplitwiseHelper} from "../utilities/splitwiseHelper";
+import {IBalanceItem, SplitwiseHelper} from "../utilities/splitwiseHelper";
 
 export interface IRepartitionItem {
   checked?: boolean;
@@ -37,6 +37,7 @@ export class RepartitionComponent implements OnInit {
 
   allDeps: IRepartitionItem[] = [];
   allStr: string[] = [];
+  balance: IBalanceItem[] = [];
 
   constructor() { }
 
@@ -63,8 +64,11 @@ export class RepartitionComponent implements OnInit {
 
   private setup() {
     // const newArr1 = this.handleRepartition();
-    const newArr1 = this.handleRepartitionSplitWise();
+    const newArr1: IRepartitionItem[] = this.handleRepartitionSplitWise();
+    const balance: IBalanceItem[] = SplitwiseHelper.getBalance(newArr1);
+
     this.allDeps = newArr1;
+    this.balance = balance;
 
     // const raprt1 = this.getInitialRepartition();
     // const data = raprt1.map((e: IRepartitionItem) => {
