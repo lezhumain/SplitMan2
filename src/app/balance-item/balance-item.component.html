@@ -1,0 +1,28 @@
+<div class="container">
+  <div class="row">
+    <div class="col-6" style="color: red; text-align: -webkit-right;">
+      <div class="w3-light-grey">
+        <div class="w3-container w3-green w3-center"
+             style="width:{{getPerc()}}%; background-color: lightcoral" *ngIf="(item?.amount || 0) < 0; else showName">{{(item?.amount || 0).toFixed(1)}}
+        </div>
+        <ng-template #showName>
+          <div class="w3-container w3-green w3-center" style="width: 100%; color: black;">
+            {{item?.name}}
+          </div>
+        </ng-template>
+      </div>
+    </div>
+    <div class="col-6" style="color: green">
+      <div class="w3-light-grey">
+        <div class="w3-container w3-green w3-center"
+             style="width:{{getPerc()}}%; background-color: lightgreen" *ngIf="(item?.amount || 0) > 0; else showName">{{(item?.amount || 0).toFixed(1)}}
+        </div>
+        <ng-template #showName>
+          <div class="w3-container w3-green w3-center" style="width: 100%; color: black;">
+            {{item?.name}}
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>
