@@ -1,0 +1,15 @@
+.progress-indic {
+  overflow-x: visible;
+}
+
+.progress-indic.posi {
+  background-color: lightgreen;
+}
+
+.progress-indic.neg {
+  background-color: lightcoral;
+}
+
+.neg {
+  text-align: right;
+}

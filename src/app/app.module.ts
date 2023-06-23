@@ -27,6 +27,8 @@ import { TestEndpointComponent } from './test-endpoint/test-endpoint.component';
 import { ToastComponent } from './toast/toast.component';
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {AutocompleteLibModule} from "angular-ng-autocomplete";
+import { BalanceComponent } from './balance/balance.component';
+import { BalanceItemComponent } from './balance-item/balance-item.component';
 
 @NgModule({
   declarations: [
@@ -49,7 +51,9 @@ import {AutocompleteLibModule} from "angular-ng-autocomplete";
     UserProfileComponent,
     UserEditComponent,
     TestEndpointComponent,
-    ToastComponent
+    ToastComponent,
+    BalanceComponent,
+    BalanceItemComponent
   ],
   imports: [
     BrowserModule,

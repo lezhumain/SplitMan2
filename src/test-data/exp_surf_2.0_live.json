@@ -1,0 +1,1744 @@
+[
+  {
+    "_id": {"$oid": "64824a498cbebc0ddbaf613e"},
+    "_rev": "1_191d414020b45888a22f35a3170720fd",
+    "amount": 37,
+    "categorie": "courses",
+    "createdAt": "2023-06-08T21:38:16.800Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T21:37:21.462Z",
+    "id": 616,
+    "name": "Reste courses",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.1,
+        "selected": true
+      },
+      {
+        "name": "alx",
+        "e4xpenseRatio": 0.1,
+        "selected": true
+      },
+      {
+        "name": "aissa ",
+        "e4xpenseRatio": 0.1,
+        "selected": true
+      },
+      {
+        "name": "annecha",
+        "e4xpenseRatio": 0.1,
+        "selected": true
+      },
+      {
+        "name": "cam",
+        "e4xpenseRatio": 0.1,
+        "selected": true
+      },
+      {
+        "name": "jeffmile",
+        "e4xpenseRatio": 0.1,
+        "selected": true
+      },
+      {
+        "name": "leslie",
+        "e4xpenseRatio": 0.1,
+        "selected": true
+      },
+      {
+        "name": "maxk",
+        "e4xpenseRatio": 0.1,
+        "selected": true
+      },
+      {
+        "name": "sekou",
+        "e4xpenseRatio": 0.1,
+        "selected": true
+      },
+      {
+        "name": "mymy",
+        "e4xpenseRatio": 0.1,
+        "selected": true
+      }
+    ],
+    "payer": "alx",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T21:38:16.800Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "64824abc8cbebc0ddbaf63d3"},
+    "_rev": "1_7aeedd28d9da99da416496189d485332",
+    "amount": 106,
+    "categorie": "courses",
+    "createdAt": "2023-06-08T21:40:09.697Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T21:38:44.968Z",
+    "id": 617,
+    "name": "Courses ever one",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "alx",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "aissa ",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "annecha",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "jeffmile",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "leslie",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "maxk",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "sekou",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "mymy",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      }
+    ],
+    "payer": "alx",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T21:40:09.697Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "64824af58cbebc0ddbaf6669"},
+    "_rev": "1_9d40e7d1d4ff78c50ed24291b0318e0a",
+    "amount": 228,
+    "categorie": "activity",
+    "createdAt": "2023-06-08T21:41:08.136Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T21:40:29.483Z",
+    "id": 618,
+    "name": "velo 2",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.25,
+        "selected": true
+      },
+      {
+        "name": "cam",
+        "e4xpenseRatio": 0.25,
+        "selected": true
+      },
+      {
+        "name": "leslie",
+        "e4xpenseRatio": 0.25,
+        "selected": true
+      },
+      {
+        "name": "maxk",
+        "e4xpenseRatio": 0.25,
+        "selected": true
+      }
+    ],
+    "payer": "dju ",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T21:41:08.136Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "64824b2f8cbebc0ddbaf6900"},
+    "_rev": "1_ab20de3ada8952a1ac2cb3164c839bd3",
+    "amount": 65,
+    "categorie": "trajet",
+    "createdAt": "2023-06-08T21:42:06.444Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T21:41:23.479Z",
+    "id": 619,
+    "name": "trajet retou",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.3333333333333333,
+        "selected": true
+      },
+      {
+        "name": "cam",
+        "e4xpenseRatio": 0.3333333333333333,
+        "selected": true
+      },
+      {
+        "name": "maxk",
+        "e4xpenseRatio": 0.3333333333333333,
+        "selected": true
+      }
+    ],
+    "payer": "cam",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T21:42:06.444Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "64824b6a8cbebc0ddbaf6b98"},
+    "_rev": "1_c75c9a0b537cdf4db00f12a44f0e1925",
+    "amount": 10,
+    "categorie": "courses",
+    "createdAt": "2023-06-08T21:43:05.598Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T21:42:13.679Z",
+    "id": 620,
+    "name": "courses",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "annecha",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "cam",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "elyan",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "jeffmile",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "leslie",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "maxk",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "suzie",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      }
+    ],
+    "payer": "annecha",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T21:43:05.598Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "64824bab8cbebc0ddbaf6e31"},
+    "_rev": "1_85fe8095011890a0096b53cb0f443ffe",
+    "amount": 94,
+    "categorie": "courses",
+    "createdAt": "2023-06-08T21:44:10.991Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T21:43:09.510Z",
+    "id": 621,
+    "name": "courses",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "annecha",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "cam",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "elyan",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "jeffmile",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "leslie",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "maxk",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "suzie",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      }
+    ],
+    "payer": "suzie",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T21:44:10.991Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "64824be68cbebc0ddbaf70cb"},
+    "_rev": "1_a58507e85a5028ca736ed0d210230f3d",
+    "amount": 46,
+    "categorie": "snac",
+    "createdAt": "2023-06-08T21:45:08.910Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T21:44:19.024Z",
+    "id": 622,
+    "name": "burger sa mere",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.5,
+        "selected": true
+      },
+      {
+        "name": "maxk",
+        "e4xpenseRatio": 0.5,
+        "selected": true
+      }
+    ],
+    "payer": "maxk",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T21:45:08.910Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "64824c0b8cbebc0ddbaf7366"},
+    "_rev": "1_c4b5c582c867180ae0a1134c13ec6210",
+    "amount": 48,
+    "categorie": "activity",
+    "createdAt": "2023-06-08T21:45:45.917Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T21:45:27.543Z",
+    "id": 623,
+    "name": "loc surf",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.5,
+        "selected": true
+      },
+      {
+        "name": "jeffmile",
+        "e4xpenseRatio": 0.5,
+        "selected": true
+      }
+    ],
+    "payer": "dju ",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T21:45:45.917Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "64824c2c8cbebc0ddbaf7602"},
+    "_rev": "1_18c966442433081f99728aed93228c28",
+    "amount": 20,
+    "categorie": "activity",
+    "createdAt": "2023-06-08T21:46:19.538Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T21:45:57.711Z",
+    "id": 624,
+    "name": "loc surf",
+    "payees": [
+      {
+        "name": "cam",
+        "e4xpenseRatio": 0.5,
+        "selected": true
+      },
+      {
+        "name": "leslie",
+        "e4xpenseRatio": 0.5,
+        "selected": true
+      }
+    ],
+    "payer": "cam",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T21:46:19.538Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "64824c608cbebc0ddbaf789f"},
+    "_rev": "1_e7325ca1001030d4a0900b34e4fbd288",
+    "amount": 80,
+    "categorie": "courses",
+    "createdAt": "2023-06-08T21:47:11.681Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T21:46:32.902Z",
+    "id": 625,
+    "name": "courses u",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "annecha",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "cam",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "elyan",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "jeffmile",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "leslie",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "maxk",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "suzie",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      }
+    ],
+    "payer": "annecha",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T21:47:11.681Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "64824c828cbebc0ddbaf7b3d"},
+    "_rev": "1_4da9afc583db1bcd48a14218178ca7f2",
+    "amount": 48,
+    "categorie": "activity",
+    "createdAt": "2023-06-08T21:47:45.165Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T21:47:24.892Z",
+    "id": 626,
+    "name": "loc surf",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.5,
+        "selected": true
+      },
+      {
+        "name": "jeffmile",
+        "e4xpenseRatio": 0.5,
+        "selected": true
+      }
+    ],
+    "payer": "jeffmile",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T21:47:45.165Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "64824cdd8cbebc0ddbaf7ddc"},
+    "_rev": "1_cadad31cbf541ffe296da89fb0413af0",
+    "amount": 29,
+    "categorie": "courses",
+    "createdAt": "2023-06-08T21:49:16.617Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T21:48:30.257Z",
+    "id": 627,
+    "name": "courses epicerie",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "annecha",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "cam",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "elyan",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "jeffmile",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "leslie",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "maxk",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "suzie",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      }
+    ],
+    "payer": "cam",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T21:49:16.617Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "64824d188cbebc0ddbaf807c"},
+    "_rev": "2_f45f52ac6aa0fa12f054a34e42a3a619",
+    "amount": 90,
+    "categorie": "activity",
+    "createdAt": "2023-06-08T21:50:15.612Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T21:49:48.388Z",
+    "id": 627,
+    "name": "loc paddle 2",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.3333333333333333,
+        "selected": true
+      },
+      {
+        "name": "alx",
+        "e4xpenseRatio": 0.3333333333333333,
+        "selected": true
+      },
+      {
+        "name": "cam",
+        "e4xpenseRatio": 0.3333333333333333,
+        "selected": true
+      }
+    ],
+    "payer": "cam",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T21:50:39.108Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "64824d658cbebc0ddbaf85bd"},
+    "_rev": "1_0e25d7d87d7d110dd6423e1246bb13ba",
+    "amount": 97,
+    "categorie": "courses",
+    "createdAt": "2023-06-08T21:51:32.095Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T21:50:43.236Z",
+    "id": 628,
+    "name": "courses",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.16666666666666666,
+        "selected": true
+      },
+      {
+        "name": "annecha",
+        "e4xpenseRatio": 0.16666666666666666,
+        "selected": true
+      },
+      {
+        "name": "cam",
+        "e4xpenseRatio": 0.16666666666666666,
+        "selected": true
+      },
+      {
+        "name": "jeffmile",
+        "e4xpenseRatio": 0.16666666666666666,
+        "selected": true
+      },
+      {
+        "name": "leslie",
+        "e4xpenseRatio": 0.16666666666666666,
+        "selected": true
+      },
+      {
+        "name": "maxk",
+        "e4xpenseRatio": 0.16666666666666666,
+        "selected": true
+      }
+    ],
+    "payer": "dju ",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T21:51:32.095Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "64824dab8cbebc0ddbaf885f"},
+    "_rev": "1_00e990e91aa979a9f4fd37a2d7625bfc",
+    "amount": 50,
+    "categorie": "courses",
+    "createdAt": "2023-06-08T21:52:42.642Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T21:51:36.552Z",
+    "id": 629,
+    "name": "alcool",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.1,
+        "selected": true
+      },
+      {
+        "name": "alx",
+        "e4xpenseRatio": 0.1,
+        "selected": true
+      },
+      {
+        "name": "aissa ",
+        "e4xpenseRatio": 0.1,
+        "selected": true
+      },
+      {
+        "name": "annecha",
+        "e4xpenseRatio": 0.1,
+        "selected": true
+      },
+      {
+        "name": "cam",
+        "e4xpenseRatio": 0.1,
+        "selected": true
+      },
+      {
+        "name": "jeffmile",
+        "e4xpenseRatio": 0.1,
+        "selected": true
+      },
+      {
+        "name": "leslie",
+        "e4xpenseRatio": 0.1,
+        "selected": true
+      },
+      {
+        "name": "maxk",
+        "e4xpenseRatio": 0.1,
+        "selected": true
+      },
+      {
+        "name": "sekou",
+        "e4xpenseRatio": 0.1,
+        "selected": true
+      },
+      {
+        "name": "mymy",
+        "e4xpenseRatio": 0.1,
+        "selected": true
+      }
+    ],
+    "payer": "jeffmile",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T21:52:42.642Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "64824de48cbebc0ddbaf8b02"},
+    "_rev": "1_267864488336de682f0530e222ba799f",
+    "amount": 42,
+    "categorie": "courses",
+    "createdAt": "2023-06-08T21:53:39.157Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T21:52:57.101Z",
+    "id": 630,
+    "name": "courses17",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "alx",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "annecha",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "cam",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "jeffmile",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "leslie",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "maxk",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      },
+      {
+        "name": "mymy",
+        "e4xpenseRatio": 0.125,
+        "selected": true
+      }
+    ],
+    "payer": "jeffmile",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T21:53:39.157Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "64824e138cbebc0ddbaf8da6"},
+    "_rev": "1_31e8a50c1345d27a9f5beb5a6d6e1fd8",
+    "amount": 83,
+    "categorie": "courses",
+    "createdAt": "2023-06-08T21:54:26.599Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T21:53:43.786Z",
+    "id": 631,
+    "name": "courses 11",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "alx",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "aissa ",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "annecha",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "cam",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "jeffmile",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "leslie",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "maxk",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "mymy",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      }
+    ],
+    "payer": "leslie",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T21:54:26.599Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "64824e2f8cbebc0ddbaf904b"},
+    "_rev": "1_15980648baa7ae3b108eac7672009fdc",
+    "amount": 60,
+    "categorie": "activity",
+    "createdAt": "2023-06-08T21:54:54.467Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T21:54:37.155Z",
+    "id": 632,
+    "name": "poney volant",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.5,
+        "selected": true
+      },
+      {
+        "name": "annecha",
+        "e4xpenseRatio": 0.5,
+        "selected": true
+      }
+    ],
+    "payer": "dju ",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T21:54:54.467Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "64824e548cbebc0ddbaf92f1"},
+    "_rev": "1_e6e344e7755eab46bd72e565aad6a4f5",
+    "amount": 15,
+    "categorie": "activity",
+    "createdAt": "2023-06-08T21:55:31.340Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T21:55:08.595Z",
+    "id": 633,
+    "name": "poney volant complement",
+    "payees": [
+      {
+        "name": "maxk",
+        "e4xpenseRatio": 1,
+        "selected": true
+      }
+    ],
+    "payer": "dju ",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T21:55:31.340Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "64824e998cbebc0ddbaf9598"},
+    "_rev": "1_669c3b93076dee967ac7eb3515bc969b",
+    "amount": 30,
+    "categorie": "activity",
+    "createdAt": "2023-06-08T21:56:39.902Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T21:55:59.048Z",
+    "id": 634,
+    "name": "cata pas marrant",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.2,
+        "selected": true
+      },
+      {
+        "name": "alx",
+        "e4xpenseRatio": 0.2,
+        "selected": true
+      },
+      {
+        "name": "aissa ",
+        "e4xpenseRatio": 0.2,
+        "selected": true
+      },
+      {
+        "name": "annecha",
+        "e4xpenseRatio": 0.2,
+        "selected": true
+      },
+      {
+        "name": "sekou",
+        "e4xpenseRatio": 0.2,
+        "selected": true
+      }
+    ],
+    "payer": "aissa ",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T21:56:39.902Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "64824ec88cbebc0ddbaf9840"},
+    "_rev": "1_8b5635012006892a3300ee346bb2db13",
+    "amount": 24,
+    "categorie": "snac",
+    "createdAt": "2023-06-08T21:57:27.736Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T21:56:53.307Z",
+    "id": 635,
+    "name": "ptit dej",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.5,
+        "selected": true
+      },
+      {
+        "name": "maxk",
+        "e4xpenseRatio": 0.5,
+        "selected": true
+      }
+    ],
+    "payer": "aissa ",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T21:57:27.736Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "64824efb8cbebc0ddbaf9ae9"},
+    "_rev": "1_d212a9260f1638a05637d5f25ea8c94e",
+    "amount": 42,
+    "categorie": "activity",
+    "createdAt": "2023-06-08T21:58:18.621Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T21:57:53.629Z",
+    "id": 636,
+    "name": "loc surf journee 13",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 1,
+        "selected": true
+      }
+    ],
+    "payer": "jeffmile",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T21:58:18.621Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "64824f588cbebc0ddbaf9d93"},
+    "_rev": "2_83bfaca9ac40658035087fe813ab2508",
+    "amount": 55,
+    "categorie": "alcool",
+    "createdAt": "2023-06-08T21:59:51.743Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T21:58:38.314Z",
+    "id": 637,
+    "name": "mission bieres",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.11111111111111108,
+        "selected": true
+      },
+      {
+        "name": "alx",
+        "e4xpenseRatio": 0.11111111111111108,
+        "selected": true
+      },
+      {
+        "name": "aissa ",
+        "e4xpenseRatio": 0.11111111111111108,
+        "selected": true
+      },
+      {
+        "name": "annecha",
+        "e4xpenseRatio": 0.11111111111111108,
+        "selected": true
+      },
+      {
+        "name": "jeffmile",
+        "e4xpenseRatio": 0.11111111111111108,
+        "selected": true
+      },
+      {
+        "name": "leslie",
+        "e4xpenseRatio": 0.11111111111111108,
+        "selected": true
+      },
+      {
+        "name": "maxk",
+        "e4xpenseRatio": 0.11111111111111108,
+        "selected": true
+      },
+      {
+        "name": "sekou",
+        "e4xpenseRatio": 0.11111111111111108,
+        "selected": true
+      },
+      {
+        "name": "mymy",
+        "e4xpenseRatio": 0.11111111111111108,
+        "selected": true
+      }
+    ],
+    "payer": "annecha",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T22:00:08.247Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "64824f9f8cbebc0ddbafa2e8"},
+    "_rev": "1_8c51674b658b240df37f909ace4528be",
+    "amount": 23,
+    "categorie": "snac",
+    "createdAt": "2023-06-08T22:01:01.953Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T22:00:34.048Z",
+    "id": 638,
+    "name": "bouffe lac",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 1,
+        "selected": true
+      }
+    ],
+    "payer": "aissa ",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T22:01:01.953Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "64824fe08cbebc0ddbafa594"},
+    "_rev": "1_50177519840c6a07c611649e84440a0c",
+    "amount": 48,
+    "categorie": "courses",
+    "createdAt": "2023-06-08T22:02:07.031Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T22:01:07.555Z",
+    "id": 639,
+    "name": "courses et gaz",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "alx",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "aissa ",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "annecha",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "jeffmile",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "leslie",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "maxk",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "sekou",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "mymy",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      }
+    ],
+    "payer": "jeffmile",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T22:02:07.031Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "648250098cbebc0ddbafa841"},
+    "_rev": "1_23c08aad1bb963ef1682a2024678e1d4",
+    "amount": 52,
+    "categorie": "activity",
+    "createdAt": "2023-06-08T22:02:48.570Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T22:02:17.583Z",
+    "id": 640,
+    "name": "surf",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.25,
+        "selected": true
+      },
+      {
+        "name": "jeffmile",
+        "e4xpenseRatio": 0.25,
+        "selected": true
+      },
+      {
+        "name": "leslie",
+        "e4xpenseRatio": 0.25,
+        "selected": true
+      },
+      {
+        "name": "sekou",
+        "e4xpenseRatio": 0.25,
+        "selected": true
+      }
+    ],
+    "payer": "sekou",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T22:02:48.570Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "648250398cbebc0ddbafaaef"},
+    "_rev": "1_6807a6e8376447da66f75b5b93593626",
+    "amount": 120,
+    "categorie": "activity",
+    "createdAt": "2023-06-08T22:03:36.079Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T22:03:00.376Z",
+    "id": 641,
+    "name": "velo",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.14285714285714285,
+        "selected": true
+      },
+      {
+        "name": "alx",
+        "e4xpenseRatio": 0.14285714285714285,
+        "selected": true
+      },
+      {
+        "name": "aissa ",
+        "e4xpenseRatio": 0.14285714285714285,
+        "selected": true
+      },
+      {
+        "name": "leslie",
+        "e4xpenseRatio": 0.14285714285714285,
+        "selected": true
+      },
+      {
+        "name": "maxk",
+        "e4xpenseRatio": 0.14285714285714285,
+        "selected": true
+      },
+      {
+        "name": "sekou",
+        "e4xpenseRatio": 0.14285714285714285,
+        "selected": true
+      },
+      {
+        "name": "mymy",
+        "e4xpenseRatio": 0.14285714285714285,
+        "selected": true
+      }
+    ],
+    "payer": "dju ",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T22:03:36.079Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "648250618cbebc0ddbafad9e"},
+    "_rev": "1_fa25bc714aa5cd2e41f94eabb25b7f1e",
+    "amount": 65,
+    "categorie": "activity",
+    "createdAt": "2023-06-08T22:04:16.873Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T22:03:40.694Z",
+    "id": 642,
+    "name": "surf",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.2,
+        "selected": true
+      },
+      {
+        "name": "alx",
+        "e4xpenseRatio": 0.2,
+        "selected": true
+      },
+      {
+        "name": "jeffmile",
+        "e4xpenseRatio": 0.2,
+        "selected": true
+      },
+      {
+        "name": "leslie",
+        "e4xpenseRatio": 0.2,
+        "selected": true
+      },
+      {
+        "name": "sekou",
+        "e4xpenseRatio": 0.2,
+        "selected": true
+      }
+    ],
+    "payer": "dju ",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T22:04:16.873Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "648250978cbebc0ddbafb04e"},
+    "_rev": "1_824472b6473caa933ff9d0a3703bf650",
+    "amount": 12,
+    "categorie": "snac",
+    "createdAt": "2023-06-08T22:05:10.627Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T22:04:34.795Z",
+    "id": 643,
+    "name": "poulet",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "alx",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "aissa ",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "annecha",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "jeffmile",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "leslie",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "maxk",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "sekou",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      },
+      {
+        "name": "mymy",
+        "e4xpenseRatio": 0.1111111111111111,
+        "selected": true
+      }
+    ],
+    "payer": "annecha",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T22:05:10.627Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "648250dc8cbebc0ddbafb2ff"},
+    "_rev": "1_84bbc9ff3fe6cda4e754f80fed7897af",
+    "amount": 23,
+    "categorie": "snac",
+    "createdAt": "2023-06-08T22:06:19.299Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T22:05:47.187Z",
+    "id": 644,
+    "name": "matin 11",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.2,
+        "selected": true
+      },
+      {
+        "name": "aissa ",
+        "e4xpenseRatio": 0.2,
+        "selected": true
+      },
+      {
+        "name": "jeffmile",
+        "e4xpenseRatio": 0.2,
+        "selected": true
+      },
+      {
+        "name": "leslie",
+        "e4xpenseRatio": 0.2,
+        "selected": true
+      },
+      {
+        "name": "sekou",
+        "e4xpenseRatio": 0.2,
+        "selected": true
+      }
+    ],
+    "payer": "jeffmile",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T22:06:19.299Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "6482510a8cbebc0ddbafb5b1"},
+    "_rev": "1_9cbf5a81e65b532a0d930698ed11f371",
+    "amount": 134,
+    "categorie": "courses",
+    "createdAt": "2023-06-08T22:07:05.494Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T22:06:30.643Z",
+    "id": 645,
+    "name": "courses",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.14285714285714285,
+        "selected": true
+      },
+      {
+        "name": "alx",
+        "e4xpenseRatio": 0.14285714285714285,
+        "selected": true
+      },
+      {
+        "name": "aissa ",
+        "e4xpenseRatio": 0.14285714285714285,
+        "selected": true
+      },
+      {
+        "name": "jeffmile",
+        "e4xpenseRatio": 0.14285714285714285,
+        "selected": true
+      },
+      {
+        "name": "leslie",
+        "e4xpenseRatio": 0.14285714285714285,
+        "selected": true
+      },
+      {
+        "name": "sekou",
+        "e4xpenseRatio": 0.14285714285714285,
+        "selected": true
+      },
+      {
+        "name": "mymy",
+        "e4xpenseRatio": 0.14285714285714285,
+        "selected": true
+      }
+    ],
+    "payer": "jeffmile",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T22:07:05.494Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "6482513a8cbebc0ddbafb864"},
+    "_rev": "1_0495739ad14231754323a7d6ab447dea",
+    "amount": 30,
+    "categorie": "snac",
+    "createdAt": "2023-06-08T22:07:53.508Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T22:07:19.103Z",
+    "id": 646,
+    "name": "pizza 1er soir",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.16666666666666666,
+        "selected": true
+      },
+      {
+        "name": "alx",
+        "e4xpenseRatio": 0.16666666666666666,
+        "selected": true
+      },
+      {
+        "name": "aissa ",
+        "e4xpenseRatio": 0.16666666666666666,
+        "selected": true
+      },
+      {
+        "name": "jeffmile",
+        "e4xpenseRatio": 0.16666666666666666,
+        "selected": true
+      },
+      {
+        "name": "leslie",
+        "e4xpenseRatio": 0.16666666666666666,
+        "selected": true
+      },
+      {
+        "name": "mymy",
+        "e4xpenseRatio": 0.16666666666666666,
+        "selected": true
+      }
+    ],
+    "payer": "leslie",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T22:07:53.508Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "648251788cbebc0ddbafbb18"},
+    "_rev": "1_f73134820bb7b80d3432dd962454ed7c",
+    "amount": 40,
+    "categorie": "snac",
+    "createdAt": "2023-06-08T22:08:55.560Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T22:08:12.439Z",
+    "id": 647,
+    "name": "pizza 1er soir",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.16666666666666666,
+        "selected": true
+      },
+      {
+        "name": "alx",
+        "e4xpenseRatio": 0.16666666666666666,
+        "selected": true
+      },
+      {
+        "name": "aissa ",
+        "e4xpenseRatio": 0.16666666666666666,
+        "selected": true
+      },
+      {
+        "name": "jeffmile",
+        "e4xpenseRatio": 0.16666666666666666,
+        "selected": true
+      },
+      {
+        "name": "leslie",
+        "e4xpenseRatio": 0.16666666666666666,
+        "selected": true
+      },
+      {
+        "name": "mymy",
+        "e4xpenseRatio": 0.16666666666666666,
+        "selected": true
+      }
+    ],
+    "payer": "jeffmile",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T22:08:55.560Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "648251ac8cbebc0ddbafbdcd"},
+    "_rev": "1_45b70c5e1ee06b0cc52bdf0a52c3d855",
+    "amount": 33,
+    "categorie": "",
+    "createdAt": "2023-06-08T22:09:47.012Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T22:09:11.512Z",
+    "id": 648,
+    "name": "Aissa",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.16666666666666666,
+        "selected": true
+      },
+      {
+        "name": "alx",
+        "e4xpenseRatio": 0.16666666666666666,
+        "selected": true
+      },
+      {
+        "name": "aissa ",
+        "e4xpenseRatio": 0.16666666666666666,
+        "selected": true
+      },
+      {
+        "name": "jeffmile",
+        "e4xpenseRatio": 0.16666666666666666,
+        "selected": true
+      },
+      {
+        "name": "leslie",
+        "e4xpenseRatio": 0.16666666666666666,
+        "selected": true
+      },
+      {
+        "name": "mymy",
+        "e4xpenseRatio": 0.16666666666666666,
+        "selected": true
+      }
+    ],
+    "payer": "aissa ",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T22:09:47.012Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "648251db8cbebc0ddbafc083"},
+    "_rev": "1_8c44e12115c86b8b20a1f94f0fe6b867",
+    "amount": 65,
+    "categorie": "trajet",
+    "createdAt": "2023-06-08T22:10:34.400Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T22:10:09.357Z",
+    "id": 649,
+    "name": "Trajet",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.25,
+        "selected": true
+      },
+      {
+        "name": "alx",
+        "e4xpenseRatio": 0.25,
+        "selected": true
+      },
+      {
+        "name": "aissa ",
+        "e4xpenseRatio": 0.25,
+        "selected": true
+      },
+      {
+        "name": "sekou",
+        "e4xpenseRatio": 0.25,
+        "selected": true
+      }
+    ],
+    "payer": "aissa ",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T22:10:34.400Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "648252038cbebc0ddbafc33a"},
+    "_rev": "1_9c1c2347d60f85ac54e28a5d0e031476",
+    "amount": 23,
+    "categorie": "courses",
+    "createdAt": "2023-06-08T22:11:14.586Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T22:10:45.957Z",
+    "id": 650,
+    "name": "courses lidl",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.3333333333333333,
+        "selected": true
+      },
+      {
+        "name": "aissa ",
+        "e4xpenseRatio": 0.3333333333333333,
+        "selected": true
+      },
+      {
+        "name": "sekou",
+        "e4xpenseRatio": 0.3333333333333333,
+        "selected": true
+      }
+    ],
+    "payer": "aissa ",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T22:11:14.586Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "64825af08cbebc0ddbafc5f2"},
+    "_rev": "2_baac61e81d1e557c7bcbf07c10995c3d",
+    "amount": 127,
+    "categorie": "logement",
+    "createdAt": "2023-06-08T22:49:19.510Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T22:47:38.902Z",
+    "id": 651,
+    "name": "camping alx",
+    "payees": [
+      {
+        "name": "alx",
+        "e4xpenseRatio": 0.6422655202334937,
+        "selected": true
+      },
+      {
+        "name": "elyan",
+        "e4xpenseRatio": 0.036601719649759404,
+        "selected": true
+      },
+      {
+        "name": "suzie",
+        "e4xpenseRatio": 0.32113276011674685,
+        "selected": true
+      }
+    ],
+    "payer": "alx",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T22:50:42.512Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "64825c0a8cbebc0ddbafcb63"},
+    "_rev": "1_681b02153c5cda57db7685a28d3ea442",
+    "amount": 380,
+    "categorie": "logement",
+    "createdAt": "2023-06-08T22:54:01.236Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T22:51:24.732Z",
+    "id": 652,
+    "name": "camping mymy",
+    "payees": [
+      {
+        "name": "cam",
+        "e4xpenseRatio": 0.04802631578947368,
+        "selected": true
+      },
+      {
+        "name": "elyan",
+        "e4xpenseRatio": 0.09492105263157895,
+        "selected": true
+      },
+      {
+        "name": "jeffmile",
+        "e4xpenseRatio": 0.32139473684210523,
+        "selected": true
+      },
+      {
+        "name": "leslie",
+        "e4xpenseRatio": 0.32139473684210523,
+        "selected": true
+      },
+      {
+        "name": "mymy",
+        "e4xpenseRatio": 0.21426315789473685,
+        "selected": true
+      }
+    ],
+    "payer": "mymy",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T22:54:01.236Z",
+    "updatedBy": "Dju"
+  },
+  {
+    "_id": {"$oid": "64825cf58cbebc0ddbafce1d"},
+    "_rev": "1_114a9b3326a06660a94da2ad131b3823",
+    "amount": 354,
+    "categorie": "logement",
+    "createdAt": "2023-06-08T22:57:54.289Z",
+    "createdBy": "Dju",
+    "date": "2023-06-08T22:54:59.545Z",
+    "id": 653,
+    "name": "camping ju",
+    "payees": [
+      {
+        "name": "dju ",
+        "e4xpenseRatio": 0.345360970505896,
+        "selected": true
+      },
+      {
+        "name": "aissa ",
+        "e4xpenseRatio": 0.17266634618103668,
+        "selected": true
+      },
+      {
+        "name": "annecha",
+        "e4xpenseRatio": 0.10850323784746768,
+        "selected": true
+      },
+      {
+        "name": "cam",
+        "e4xpenseRatio": 0.09229986143709526,
+        "selected": true
+      },
+      {
+        "name": "maxk",
+        "e4xpenseRatio": 0.10850323784746768,
+        "selected": true
+      },
+      {
+        "name": "sekou",
+        "e4xpenseRatio": 0.17266634618103668,
+        "selected": true
+      }
+    ],
+    "payer": "dju ",
+    "tripId": 85,
+    "type": "expense",
+    "updatedAt": "2023-06-08T22:57:54.289Z",
+    "updatedBy": "Dju"
+  }
+]

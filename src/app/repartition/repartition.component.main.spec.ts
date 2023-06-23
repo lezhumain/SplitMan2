@@ -98,13 +98,13 @@ describe('RepartitionComponentMain', () => {
   });
 
   it('should get Marseille repartition properly BUG', () => {
-    expect(component).toBeTruthy();
+      expect(component).toBeTruthy();
 
-    const exp = getExpensesMarseille();
+      const exp = getExpensesMarseille();
 
-    const i = 3;
+      const i = 3;
 
-    // for(let i = 1; i < exp.length; ++i) {
+     `` // for(let i = 1; i < exp.length; ++i) {
       console.log("i: " + i);
 
       component.expenses = exp.slice(0, Math.min(i, exp.length)); // FIXME remove slice

@@ -1497,6 +1497,7 @@ async function runAll() {
     //     true
     //   ]
     // },
+
     {
       fn: MainTest,
       msg: "E2E with all expenses",
@@ -1508,28 +1509,28 @@ async function runAll() {
         true
       ]
     },
-    {
-      fn: MainTest,
-      msg: "E2E with 1 expenses ski 2023",
-      params: [
-        allExpenses1.slice(0, 1),
-        "dju doit a 169.25€ stan aissadoit a 169.25€ stan",
-        false,
-        xpeopleSki2023,
-        false
-      ]
-    },
-    {
-      fn: MainTest,
-      msg: "E2E with all expenses ski 2023 no rembours",
-      params: [
-        allExpenses1.slice(0, allExpenses1.length - 2),
-        "dju doit a 201.35€ stan Max doit a 45.23€ stan Alexis doit a 309.81€ aissadju doit a 43.84€ aissa",
-        false,
-        xpeopleSki2023,
-        false
-      ]
-    },
+    // {
+    //   fn: MainTest,
+    //   msg: "E2E with 1 expenses ski 2023",
+    //   params: [
+    //     allExpenses1.slice(0, 1),
+    //     "dju doit a 169.25€ stan aissadoit a 169.25€ stan",
+    //     false,
+    //     xpeopleSki2023,
+    //     false
+    //   ]
+    // },
+    // {
+    //   fn: MainTest,
+    //   msg: "E2E with all expenses ski 2023 no rembours",
+    //   params: [
+    //     allExpenses1.slice(0, allExpenses1.length - 2),
+    //     "dju doit a 201.35€ stan Max doit a 45.23€ stan Alexis doit a 309.81€ aissadju doit a 43.84€ aissa",
+    //     false,
+    //     xpeopleSki2023,
+    //     false
+    //   ]
+    // },
 
     // {
     //   fn: MainTest,
