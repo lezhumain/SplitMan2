@@ -31,6 +31,11 @@ stages:
           - checkout: self
 
           - script: |
+              npm ci -f
+              npm run build:prod
+            displayName: 'build'
+
+          - script: |
               docker build -t splitman2androidbase -f Dockerfile_android .
             displayName: 'Create base docker image'
 
