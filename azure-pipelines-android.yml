@@ -41,6 +41,10 @@ stages:
 
           - script: |
               docker build -t splitman2android -f Dockerfile_android1 .
+
+              id=$(docker create splitman2android)
+              docker cp $id:/app/apks/splitman2.apk - > ./splitman2.apk
+              docker rm -v $id
             displayName: 'Create docker image'
 
           - script: |
@@ -51,10 +55,20 @@ stages:
               docker save "splitman2android" -o "$(Build.ArtifactStagingDirectory)/splitman2android.tar"
             displayName: 'Generate tar archive'
 
-          - publish: '$(Build.ArtifactStagingDirectory)/splitman2androidbase.apk'
+          - script: |
+              id=$(docker create splitman2android)
+              docker cp $id:/app/apks/splitman2.apk - > ./splitman2.apk
+              docker rm -v $id
+            displayName: 'Get APK from image'
+
+          - publish: '$(Build.ArtifactStagingDirectory)/splitman2androidbase.tar'
             displayName: 'Publish base archive'
             artifact: androidbase
 
-          - publish: '$(Build.ArtifactStagingDirectory)/splitman2android.apk'
+          - publish: '$(Build.ArtifactStagingDirectory)/splitman2android.tar'
             displayName: 'Publish archive'
             artifact: android
+
+          - publish: 'splitman2.apk'
+            displayName: 'Publish apk'
+            artifact: androidapk
