@@ -4,3 +4,4 @@
 ![example workflow](https://github.com/lezhumain/SplitMan2/actions/workflows/e2e.yml/badge.svg)
 ![example workflow](https://github.com/lezhumain/SplitMan2/actions/workflows/puppeteer_version.yml/badge.svg)
 
+spliman2
