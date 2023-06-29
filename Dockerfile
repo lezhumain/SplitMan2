@@ -17,6 +17,7 @@ COPY . .
 # TODO?
 RUN apk --update add openssh-client
 RUN apk --update add git
+RUN apk add --no-cache bash
 
 RUN ["npm", "install", "-g", "npm@latest"]
 
@@ -25,7 +26,7 @@ RUN ls | grep install
 
 # TODO remove me  when using npm packages for splitwise repart
 RUN chmod +x ./install_ssh_eky.sh \
-    && sh ./install_ssh_eky.sh
+    && bash ./install_ssh_eky.sh
 
 RUN cd /dist/src/app && npm ci --force && npm run cp-libs
 

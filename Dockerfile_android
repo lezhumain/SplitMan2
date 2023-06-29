@@ -1,0 +1,17 @@
+#FROM ubuntu:latest
+FROM debian:buster
+
+RUN apt update && apt install -y dos2unix vim jq curl default-jdk unzip zip
+
+RUN curl -sL https://deb.nodesource.com/setup_18.x | bash -
+RUN apt install -y nodejs
+
+WORKDIR /app
+
+COPY ./prepare_android.sh .
+
+RUN chmod +x /app/*.sh && dos2unix /app/*.sh
+
+RUN bash /app/prepare_android.sh
+
+#docker build -t splitman2androidbase -f Dockerfile_android .
