@@ -14,4 +14,4 @@ RUN export PATH="$PATH:$(cat /path_add_1):$(cat /path_add_2)" && export ANDROID_
     && chmod +x /app/buildCordovaApp.sh && dos2unix /app/buildCordovaApp.sh \
     && bash /app/buildCordovaApp.sh "SplitMan2"
 
-#docker build -t splitman2android -f Dockerfile_android1 .
+#npm run build:prod && docker build -t splitman2android -f Dockerfile_android1 .
