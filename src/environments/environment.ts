@@ -2,11 +2,15 @@
 // `ng build` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
-export const environment = {
+import {IEnv} from "./environment.interface";
+
+export const environment: IEnv = {
   production: false,
   app: "http://127.0.0.1:4200",
-  api: "http://127.0.0.1:8080"
-  // api: "https://PROD_IP/api"
+  api: "http://127.0.0.1:8080",
+  addCookie: () => {
+    document.cookie = "Spliman_Session=";
+  }
 };
 
 /*
