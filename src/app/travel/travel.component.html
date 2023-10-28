@@ -32,19 +32,28 @@
   </ul>
   <div class="tab-content" id="myTabContent">
     <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+      <br>
+      <app-expense-filter [expenses]="allExpenses" (filtered)="doFilter($event)"></app-expense-filter>
       <h3>Expenses</h3>
       <div *ngFor="let ex of expenses">
         <div class="expense-card">
           <app-expense-card [expense]="ex"></app-expense-card>
         </div>
       </div>
+      <ng-container *ngIf="getTotalData() as totalData">
+        <div>
+          Total&nbsp;&nbsp;: {{sanitize(totalData.total)}}
+<!--          <br>-->
+<!--          Total/j: {{sanitize(totalData.total / getDays(totalData))}}-->
+        </div>
+      </ng-container>
       <button type="button" class="btn btn-primary mb-3" (click)="newExpense()"
               [attr.disabled]="!travelHasParticipants() || null">Add expense</button>
       <span class="partic-message" *ngIf="!travelHasParticipants()">Add some people first</span>
     </div>
     <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-      <app-repartition [expenses]="expenses" [connectedUser]="(connectedUser$ | async)"
-        [travelParticipants]="travel.participants"></app-repartition>
+      <app-repartition [expenses]="allExpenses" [connectedUser]="(connectedUser$ | async)"
+                       [travelParticipants]="travel.participants"></app-repartition>
     </div>
     <div class="tab-pane fade" id="profile1" role="tabpanel" aria-labelledby="profile-tab1">
       <h3>Participants:</h3>
@@ -74,7 +83,7 @@
   <div>
 <!--    TODO put in navbar-->
     <button type="button" class="btn btn-primary mb-3" (click)="downloadAsCSV()"
-      *ngIf="expenses.length > 0">Download CSV</button>
+      *ngIf="allExpenses.length > 0">Download CSV</button>
     <div class="mb-3">
       <label for="formFile" class="form-label">Load CSV</label>
       <input class="form-control" type="file" id="formFile" (change)="csvFileChanged($event)">

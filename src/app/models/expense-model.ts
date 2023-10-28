@@ -191,4 +191,8 @@ export class ExpenseModel {
 
     return pay;
   }
+
+  hasID(iid: string): boolean {
+    return this._id === iid || (this._id as IMongoID)?.$oid === iid;
+  }
 }

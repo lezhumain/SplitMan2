@@ -29,6 +29,7 @@ import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {AutocompleteLibModule} from "angular-ng-autocomplete";
 import { BalanceComponent } from './balance/balance.component';
 import { BalanceItemComponent } from './balance-item/balance-item.component';
+import { ExpenseFilterComponent } from './expense-filter/expense-filter.component';
 
 @NgModule({
   declarations: [
@@ -53,7 +54,8 @@ import { BalanceItemComponent } from './balance-item/balance-item.component';
     TestEndpointComponent,
     ToastComponent,
     BalanceComponent,
-    BalanceItemComponent
+    BalanceItemComponent,
+    ExpenseFilterComponent
   ],
   imports: [
     BrowserModule,
