@@ -26,4 +26,4 @@ RUN bash /app/prepare_android.sh
 
 #docker build -t splitman2androidbase -f Dockerfile_android .
 
-CMD java --version && node -v
+CMD java --version && node -v && find / -name "path_add_*"

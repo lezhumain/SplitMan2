@@ -227,6 +227,7 @@ export class SplitwiseHelper {
 
   static getBalance(reparts: IRepartitionItem[]): IBalanceItem[] {
     return reparts.reduce((res: IBalanceItem[], item: IRepartitionItem) => {
+      // what I owe
       const target = res.find(r => r.name === item.person);
       if(!target) {
         const targetO = { name: item.person, amount: item.amount };
@@ -236,6 +237,7 @@ export class SplitwiseHelper {
         target.amount += item.amount;
       }
 
+      // minus what I'm owed
       const target1 = res.find(r => r.name === item.owesTo);
       if(!target1) {
         const targetO = { name: item.owesTo, amount: item.amount * -1 };

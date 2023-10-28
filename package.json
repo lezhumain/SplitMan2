@@ -54,7 +54,7 @@
     "karma-jasmine-html-reporter": "~2.0.0",
     "log-timestamp": "^0.3.0",
     "make-dir-cli": "^3.0.0",
-    "puppeteer": "^20.7.3",
+    "puppeteer": "^21.4.1",
     "rimraf": "^5.0.0",
     "ts-node": "^10.9.1",
     "tsickle": "^0.46.3",

@@ -15,6 +15,7 @@ import {filter, first, map, takeWhile, tap} from "rxjs/operators";
 import {ToastComponent} from "../toast/toast.component";
 import {ToastType} from "../toast/toast.shared";
 import {BaseService} from "../base-service.service";
+import {IFilterData} from "../expense-filter/expense-filter.component";
 // import {File} from "@angular/compiler-cli/src/ngtsc/file_system/testing/src/mock_file_system";
 
 @Component({
@@ -27,6 +28,8 @@ export class TravelComponent implements OnInit {
   connectedUser$: BehaviorSubject<UserModel | null> = new BehaviorSubject<UserModel | null>(null);
 
   travel: TravelModel = new TravelModel();
+
+  allExpenses: ExpenseModel[] = [];
   expenses: ExpenseModel[] = [];
 
   whoAmi: string = "";
@@ -35,6 +38,7 @@ export class TravelComponent implements OnInit {
   private connectedUserInvite$: Observable<InviteDate | null> = of(null);
 
   file: File | null = null;
+  private idsToFilter?: IFilterData;
 
   constructor(private readonly travelService: TravelService,
               private readonly expenseService: ExpenseService,
@@ -101,7 +105,7 @@ export class TravelComponent implements OnInit {
           }
         }
 
-        this.expenses = expenses.map(e => ExpenseModel.fromExpense(e));
+        this.setExpenses(expenses.map(e => ExpenseModel.fromExpense(e)));
       });
 
       // this.connectedUser$.subscribe((u) => {
@@ -193,11 +197,11 @@ export class TravelComponent implements OnInit {
   }
 
   private expensesToCSV(): string {
-    return this.expenses[0].toCSV();
+    return this.allExpenses[0].toCSV();
   }
 
   downloadAsCSV() {
-    const textToSave: string = ExpenseModel.toCSV(this.expenses);
+    const textToSave: string = ExpenseModel.toCSV(this.allExpenses);
 
     const hiddenElement = document.createElement('a');
     hiddenElement.href = 'data:attachment/text,' + encodeURI(textToSave);
@@ -240,7 +244,7 @@ export class TravelComponent implements OnInit {
         }
         const elems = ExpenseModel.fromCSV(res);
 
-        const all = this.expenses.slice();
+        const all = this.allExpenses.slice();
         for(let el of elems) {
           el.tripId = this.travel.id;
           const index = all.findIndex(o => o.id === el.id);
@@ -261,7 +265,7 @@ export class TravelComponent implements OnInit {
 
     em$.subscribe((all: ExpenseModel[]) => {
       console.log("done");
-      this.expenses = all.slice();
+      this.setExpenses(all.slice());
     });
   }
 
@@ -274,6 +278,47 @@ export class TravelComponent implements OnInit {
   }
 
   hasExpenses(name: string): boolean {
-    return this.expenses.some(e => e.payer === name || e.payees.some(ep => ep.name === name));
+    return this.allExpenses.some(e => e.payer === name || e.payees.some(ep => ep.name === name));
   }
+
+  doFilter(ids: IFilterData = {filter: "", data: []}) {
+    this.idsToFilter = ids;
+    let theRes = this.allExpenses.slice();
+	  // if((ids.data.length || 0) > 0 && ids.filter) {
+		if(ids && ids.filter) {
+      // theRes = theRes.filter((r: ExpenseModel) => ids.includes((r._id || "").toString()));
+      theRes = theRes.filter((r: ExpenseModel) => ids.data.find(iid => r.hasID(iid)));
+    }
+    this.expenses = theRes;
+  }
+
+  private setExpenses(all: ExpenseModel[]) {
+    this.allExpenses = all.slice();
+    // this.expenses = this.allExpenses;
+    this.doFilter();
+  }
+
+  getTotalData(): {total: number, min: Date, max: Date} {
+    const total = this.expenses.reduce((res: {total: number, min?: Date, max?: Date}, item) => {
+      if(res.min === undefined || (item.createdAt as Date).getTime() < res.min.getTime()) {
+        res.min = item.createdAt as Date;
+      }
+      if(res.max === undefined || (item.createdAt as Date).getTime() > res.max.getTime()) {
+        res.max = item.createdAt as Date;
+      }
+      res.total = res.total + item.amount;
+
+      return res;
+    }, {total: 0, min: undefined, max: undefined});
+
+    return total as {total: number, min: Date, max: Date};
+  }
+
+	sanitize(total: number): string {
+	  return total.toFixed(2);
+	}
+
+	getDays(totalData: {total: number, min: Date, max: Date}) {
+		return (totalData.max.getTime() - totalData.min.getTime()) / 1000 / 60 / 60 / 24;
+	}
 }

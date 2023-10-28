@@ -2,6 +2,9 @@
 
 set -e
 
+#export ANDROID_HOME="/c/Program Files (x86)/Android/android-sdk"
+#export PATH="$PATH:$(ls -d /c/Gradle/gradle-7.6/bin)"
+
 if [ -z "$ANDROID_HOME"  ] || [[ "$PATH" != *"radle"* ]]; then
   echo "Need to export ANDROID_HOME and add gradle to PATH"
   exit 1
@@ -30,7 +33,7 @@ unzip "$LIFEMAN"/cordova_react_test.zip > /dev/null
 
 TARGET="/tmp/cordova_react_test"
 if [ ! -d "$TARGET" ]; then
-    echo "Folder cordova_react_test doesn't exist."
+    echo "Err:  Folder cordova_react_test doesn't exist."
     exit 1
 fi
 
@@ -84,6 +87,7 @@ ls -ald build
 #npm run build_cordova_android
 echo "running run_cordova_android"
 npm run build_cordova_android
+#npm run run_cordova_android
 echo "run_cordova_android done"
 popd
 

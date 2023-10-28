@@ -12,6 +12,10 @@ h6 {
   background-color: aliceblue;
 }
 
+.container.isOurExpense {
+  background-color: lavender;
+}
+
 .col-right {
   text-align: end;
 }

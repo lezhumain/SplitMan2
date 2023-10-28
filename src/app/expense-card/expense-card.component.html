@@ -4,11 +4,17 @@
 <!--  <i class="fa fa-edit" (click)="openExpenseEdit(expense.id)"></i>-->
 <!--</div>-->
 
-<div class="container" (click)="openExpense()">
+<div class="container" (click)="openExpense()" [class.isOurExpense]="isOurExpense">
   <div class="row">
     <h6 class="col">
       {{expense.name}}
     </h6>
+    <div class="col col-categ">
+      <ng-container *ngIf="expense.categorie">
+        <span class="badge rounded-pill"
+          [style.background-color]="getBackgroundColorFor(expense.categorie)">{{expense.categorie}}</span>
+      </ng-container>
+    </div>
     <div class="col col-amount col-right">
       {{expense.amount}}€
     </div>
