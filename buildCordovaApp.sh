@@ -86,8 +86,8 @@ pwd
 ls -ald build
 #npm run build_cordova_android
 echo "running run_cordova_android"
-#npm run build_cordova_android
-npm run run_cordova_android
+npm run build_cordova_android
+#npm run run_cordova_android
 echo "run_cordova_android done"
 popd
 
