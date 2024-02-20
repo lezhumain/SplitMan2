@@ -246,14 +246,17 @@ export class RepartitionComponent implements OnInit {
   }
 
   private handleRepartitionSplitWise(current?: IRepartitionItem[]): IRepartitionItem[] {
-    // let gvbdf0: IRepartitionItem[] = current || [];
-    //
-    // if(gvbdf0.length === 0) {
-    //   gvbdf0 = this.getInitialRepartition();
+    const rep: IRepartitionItem[] = SplitwiseHelper.split(this._expenses.filter(e => !e.isRemboursement));
+
+    // TODO substract remboursements
+    // const rembs: ExpenseModel[] = this._expenses.filter(e => e.isRemboursement);
+    // for(const remb of rembs) {
+    //   const targetRep = rep.find((r: IRepartitionItem) => {
+    //     return r.owesTo === remb.payer && remb.payees.some(rp => rp.name === r.person)
+    //   });
     // }
-    //
-    // return SplitwiseHelper.splitFromRepart(gvbdf0);
-    return SplitwiseHelper.split(this._expenses);
+
+    return rep;
   }
 
   private getWhoSpent() {

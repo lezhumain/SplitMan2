@@ -19,6 +19,7 @@ export class Expense extends BaseItem {
     u.updatedAt = model.updatedAt;
     u.updatedBy = model.updatedBy;
     u.categorie = model.categorie;
+    u.isRemboursement = model.isRemboursement;
 
     return u;
   }
@@ -38,6 +39,7 @@ export class Expense extends BaseItem {
   updatedAt: Date | string | null  = null;
   updatedBy: string = "";
   categorie?: string;
+  isRemboursement: boolean = false;
 
   toString(): string {
     return `${this.name} ${this.amount} ${this.date} ${this.payer}`;
