@@ -30,6 +30,7 @@ import {AutocompleteLibModule} from "angular-ng-autocomplete";
 import { BalanceComponent } from './balance/balance.component';
 import { BalanceItemComponent } from './balance-item/balance-item.component';
 import { ExpenseFilterComponent } from './expense-filter/expense-filter.component';
+import {JoinComponent} from "./join/join.component";
 
 @NgModule({
   declarations: [
@@ -55,7 +56,8 @@ import { ExpenseFilterComponent } from './expense-filter/expense-filter.componen
     ToastComponent,
     BalanceComponent,
     BalanceItemComponent,
-    ExpenseFilterComponent
+    ExpenseFilterComponent,
+    JoinComponent
   ],
   imports: [
     BrowserModule,
