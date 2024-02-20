@@ -1,6 +1,6 @@
 <div class="container">
   <div class="row">
-    <div class="col-6" style="color: red; text-align: -webkit-right;">
+    <div class="col-6 balanceRight" style="color: red;">
       <div class="w3-light-grey">
         <div class="w3-container w3-green w3-center"
              style="width:{{getPerc()}}%; background-color: lightcoral" *ngIf="(item?.amount || 0) < 0; else showName">{{(item?.amount || 0).toFixed(1)}}

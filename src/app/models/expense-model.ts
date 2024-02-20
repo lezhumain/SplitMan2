@@ -10,6 +10,7 @@ export class ExpenseModel {
   tripId: number = -1;
   name: string = "";
   amount: number = 0;
+  isRemboursement: boolean = false;
   get amountStr(): string {
     return this.amount === 0 ? "" : this.amount.toString();
   };
@@ -75,24 +76,13 @@ export class ExpenseModel {
     m.updatedAt = ExpenseModel.dateFromISO(t.updatedAt);
     m.updatedBy = t.updatedBy;
     m.categorie = t.categorie;
+    m.isRemboursement = t.isRemboursement;
 
     return m;
   }
 
   static fromJson(t: any): ExpenseModel {
     const m = new ExpenseModel();
-    // m.id = t.id;
-    // m.name = t.name;
-    // m.date = ExpenseModel.dateFromISO(t.date);
-    // m.amount = t.amount;
-    // m.payees = t.payees;
-    // m.payer = t.payer;
-    // m.tripId = t.tripId;
-    // m.createdAt = ExpenseModel.dateFromISO(t.createdAt);
-    // m.createdBy = t.createdBy;
-    // m.updatedAt = ExpenseModel.dateFromISO(t.updatedAt);
-    // m.updatedBy = t.updatedBy;
-
     m.assignFromObj(t);
 
     return m;
