@@ -26,6 +26,7 @@ import {HttpClientModule} from "@angular/common/http";
 import { TestEndpointComponent } from './test-endpoint/test-endpoint.component';
 import { ToastComponent } from './toast/toast.component';
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import { OspMapComponent } from './osp-map/osp-map.component';
 import {AutocompleteLibModule} from "angular-ng-autocomplete";
 import { BalanceComponent } from './balance/balance.component';
 import { BalanceItemComponent } from './balance-item/balance-item.component';
@@ -54,6 +55,7 @@ import {JoinComponent} from "./join/join.component";
     UserEditComponent,
     TestEndpointComponent,
     ToastComponent,
+    OspMapComponent,
     BalanceComponent,
     BalanceItemComponent,
     ExpenseFilterComponent,
