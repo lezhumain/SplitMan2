@@ -141,12 +141,12 @@ async function testCommonTravels(pages: puppeteer.Page[]) {
   for(const travel of intersec) {
     // open travel
     await Promise.all(
-      pages.map(page => page.waitForXPath(`//app-travel-card//h6[contains(text(), '${travel}')]`, {visible: true})
+      pages.map(page => page.waitForSelector(`xpath/.//app-travel-card//h6[contains(text(), '${travel}')]`, {visible: true})
         .then((e: ElementHandle) => e ? Promise.all([e.click(), page.waitForNavigation({timeout: 10000})]) : null))
     );
 
     await Promise.all(
-      pages.map(page => page.waitForXPath("//h3[contains(text(), 'Expenses')]"))
+      pages.map(page => page.waitForSelector("xpath/.//h3[contains(text(), 'Expenses')]"))
     );
 
     // get expenses
@@ -193,7 +193,7 @@ async function handleLogout(pag: Page) {
     await userIcon.click();
     await waitForTimeout(300);
 
-    await pag.waitForXPath("//a[contains(text(), 'Log out')]", {visible: true})
+    await pag.waitForSelector("xpath/.//a[contains(text(), 'Log out')]", {visible: true})
       .then((e: ElementHandle) => e ? Promise.all([e.click(), pag.waitForNavigation({timeout: 10000}).then(() => waitForTimeout(1000))]) : null);
 
     await waitForTimeout(1000);
@@ -247,7 +247,7 @@ async function handleLogin(pag: Page, userData: { pass: string; email: string; u
 
   await waitForTimeout(500);
 
-  const elm: ElementHandle = await pag.waitForXPath("//button[contains(text(), 'Login')]", {visible: true}) as ElementHandle;
+  const elm: ElementHandle = await pag.waitForSelector("xpath/.//button[contains(text(), 'Login')]", {visible: true}) as ElementHandle;
   const timeout = 40000;
   const clickAndNavProm = Promise.all([
       elm.click(),
@@ -468,12 +468,12 @@ async function checkTravelCount(number: number, page: Page) {
   expect(travelElems.length).to.equal(number);
   await travelElems[0].click();
 
-  await page.waitForXPath("//h3[contains(text(), 'Expenses')]");
+  await page.waitForSelector("xpath/.//h3[contains(text(), 'Expenses')]");
 
   await page.waitForSelector("div.iconWrapper > i.fa-arrow-left")
     .then((e: ElementHandle) => e ? Promise.all([e.click(), page.waitForNavigation({timeout: 10000})]) : null);
 
-  await page.waitForTimeout(1000);
+  await waitForTimeout(1000)
 
   const travelElems1 = await page.$$(".travel-card");
   expect(travelElems1.length).to.equal(number, "Wrong travel count.");
@@ -536,7 +536,7 @@ async function testInvite(pages: Page[]) {
     ]
   );
 
-  await page0.waitForXPath(`//h6[contains(text(), '${inviteTravelName}')]`, {visible: true, timeout: 10000});
+  await page0.waitForSelector(`xpath/.//h6[contains(text(), '${inviteTravelName}')]`, {visible: true, timeout: 10000});
 
   inviteGetCount = 2;
   await Promise.all([
@@ -547,7 +547,7 @@ async function testInvite(pages: Page[]) {
   debugger;
 
   await Promise.all([
-    page0.waitForXPath(`//h6[contains(text(), '${inviteTravelName}')]`, {visible: true, timeout: 10000}),
+    page0.waitForSelector(`xpath/.//h6[contains(text(), '${inviteTravelName}')]`, {visible: true, timeout: 10000}),
     page1.waitForSelector("i.notif", {visible: true, timeout: 5000})
   ]);
 
@@ -558,8 +558,8 @@ async function testInvite(pages: Page[]) {
   ]);
 
   await Promise.all([
-    page0.waitForXPath(`//h6[contains(text(), '${inviteTravelName}')]`, {visible: true, timeout: 10000}),
-    page1.waitForXPath(`//h6[contains(text(), '${inviteTravelName}')]`, {visible: true, timeout: 10000})
+    page0.waitForSelector(`xpath/.//h6[contains(text(), '${inviteTravelName}')]`, {visible: true, timeout: 10000}),
+    page1.waitForSelector(`xpath/.//h6[contains(text(), '${inviteTravelName}')]`, {visible: true, timeout: 10000})
   ]);
 
   const [handler0, handler1] = handlers;
@@ -737,7 +737,7 @@ function getTravelName() {
 
 async function addTravel(pag: Page): Promise<string> {
   const xpath = "//button[contains(text(), 'Add travel')]";
-  const elm: ElementHandle | null = await pag.waitForXPath(xpath, {visible: true}).then((e: ElementHandle) => e, () => null);
+  const elm: ElementHandle | null = await pag.waitForSelector("xpath/." + xpath, {visible: true}).then((e: ElementHandle) => e, () => null);
   if (!elm) {
     throw "Couldn't get button";
   }
@@ -757,7 +757,7 @@ async function addTravel(pag: Page): Promise<string> {
   await pag.waitForSelector("#description", {visible: true})
     .then((e: ElementHandle) => e ? e.type("E2E test travel", {delay: 40}) : null);
 
-  const saveBtn: ElementHandle = <ElementHandle> await pag.waitForXPath("//button[contains(text(), 'Save Travel')]", {visible: true})
+  const saveBtn: ElementHandle = <ElementHandle> await pag.waitForSelector("xpath/.//button[contains(text(), 'Save Travel')]", {visible: true})
   // await Promise.all([
   //   saveBtn.click(), pag.waitForNavigation({timeout: 10000}).then(() => waitForTimeout(1000))
   // ]);
@@ -786,7 +786,7 @@ async function AddPeople(pag: Page, allPeople?: { name: string, dayCount: number
     await pag.waitForSelector("#profile-tab1", {visible: true, timeout: 10000})
       .then((e: ElementHandle) => e ? e.click() : null);
 
-    const btn = await pag.waitForXPath(
+    const btn = await pag.waitForSelector("xpath/." +
       "//button[contains(text(), 'Add people')]", {visible: true}) as ElementHandle;
     await waitForTimeout(300);
     await btn.click();
@@ -804,10 +804,10 @@ async function AddPeople(pag: Page, allPeople?: { name: string, dayCount: number
 
     const saveBtnXPath = "//button[contains(text(), 'Save')]";
     console.log("getting save btn");
-    await pag.waitForXPath(saveBtnXPath, {visible: true})
+    await pag.waitForSelector("xpath/." + saveBtnXPath, {visible: true})
       .then((e: ElementHandle) => e ? Promise.all([e.click(), pag.waitForNavigation({timeout: 10000, waitUntil: "networkidle2"})]) : null);
     console.log("waiting for save to disappear");
-    await pag.waitForXPath(saveBtnXPath, {visible: false});
+    await pag.waitForSelector("xpath/." + saveBtnXPath, {visible: false});
     console.log("continuing");
 
     await pag.waitForSelector("#payer", {timeout: 10000});
@@ -824,8 +824,8 @@ async function AddPeople(pag: Page, allPeople?: { name: string, dayCount: number
   await waitForTimeout(1000);
 
   const targetXXpath = "//h3[contains(text(), 'Participants')]//following-sibling::div//div[contains(@class, 'row')]";
-  await pag.waitForXPath(targetXXpath);
-  const allPeopleRes: ElementHandle[] = await pag.$x(targetXXpath) as ElementHandle[];
+  await pag.waitForSelector("xpath/." + targetXXpath);
+  const allPeopleRes: ElementHandle[] = await pag.$$("xpath/." + targetXXpath) as ElementHandle[];
   expect(allPeopleRes.length).to.equal(allPeople.length);
 
 }
@@ -834,7 +834,7 @@ async function SaveWhoWeAre(page: Page, dju: string) {
   const sel = "#payer";
   await select(sel, dju, page);
 
-  await page.waitForTimeout(300);
+  await waitForTimeout(300);
 
   const selSave = "#savePayer";
   await page.waitForSelector(selSave, {visible: true})
@@ -851,7 +851,7 @@ async function AddExpenses(pag: Page, expenses: Expense[]) {
     await waitForTimeout(1000);
 
     const addExpBtn: ElementHandle =
-      await pag.waitForXPath("//button[contains(text(), 'Add expense')]", {visible: true}) as ElementHandle;
+      await pag.waitForSelector("xpath/.//button[contains(text(), 'Add expense')]", {visible: true}) as ElementHandle;
 
     await scrollAndClick(addExpBtn, pag);
     await pag.waitForNavigation({timeout: 10000}).then(() => waitForTimeout(1000));
@@ -878,10 +878,10 @@ async function AddExpenses(pag: Page, expenses: Expense[]) {
       .then((e: ElementHandle) => e ? e.type(expense.payer, {delay: 30}) : null);
 
     for (const payee of expense.payees) {
-      const line = await pag.waitForXPath(`//span[contains(text(), '${payee.name}')]//ancestor::div[contains(@class, 'form-check')]`,
+      const line = await pag.waitForSelector(`xpath/.//span[contains(text(), '${payee.name}')]//ancestor::div[contains(@class, 'form-check')]`,
         {visible: true});
 
-      await line?.$x(".//span[contains(@class, 'perc-sign')]//preceding-sibling::input")
+      await line?.$$("xpath/.//span[contains(@class, 'perc-sign')]//preceding-sibling::input")
         .then((e: ElementHandle[]) => e.length > 0 ? e[0].type(payee.e4xpenseRatio.toString(), {delay: 30}) : null);
     }
 
@@ -891,7 +891,7 @@ async function AddExpenses(pag: Page, expenses: Expense[]) {
       await categ.press('Enter'); // Enter Key
     }
 
-    await pag.waitForXPath("//button[contains(text(), 'Save Expense')]", {visible: true})
+    await pag.waitForSelector("xpath/.//button[contains(text(), 'Save Expense')]", {visible: true})
       .then((e: ElementHandle) => e ? Promise.all([scrollAndClick(e, pag), pag.waitForNavigation({timeout: 10000}).then(() => waitForTimeout(1000))]) : null);
 
     // await pag.waitForNavigation();
@@ -912,16 +912,16 @@ async function EditLast(pag: Page, expenses: Expense[], newVal = 34.23) {
   // debugger;
   const lastExpense = expenses[expenses.length - 1];
   const lastTitle = lastExpense.name;
-  await pag.waitForXPath(`//div[contains(@class, 'expense-card')]//h6[contains(text(), '${lastTitle}')]`, {visible: true})
+  await pag.waitForSelector(`xpath/.//div[contains(@class, 'expense-card')]//h6[contains(text(), '${lastTitle}')]`, {visible: true})
     // .then((e: ElementHandle) => e ? Promise.all([scrollAndClick(e, pag), pag.waitForNavigation({timeout: 10000}).then(() => waitForTimeout(1000))]) : null);
     .then((e: ElementHandle) => e ? Promise.all([scrollAndClick(e, pag), pag.waitForNavigation({timeout: 10000, waitUntil:"networkidle2"}).then(() => waitForTimeout(1000))]) : null);
 
   await waitForTimeout(300);
   //
-  // await pag.waitForXPath("//button[contains(text(), 'Edit expense')]", {visible: true})
+  // await pag.waitForSelector("xpath/.//button[contains(text(), 'Edit expense')]", {visible: true})
   //   .then((e: ElementHandle) => e ? Promise.all([scrollAndClick(e, pag), pag.waitForNavigation({timeout: 10000}).then(() => waitForTimeout(1000))]) : null);
 
-  const editExp = <ElementHandle>await pag.waitForXPath("//button[contains(text(), 'Edit expense')]", {visible: true});
+  const editExp = <ElementHandle>await pag.waitForSelector("xpath/.//button[contains(text(), 'Edit expense')]", {visible: true});
   await waitForTimeout(500);
   await Promise.all([
     scrollAndClick(editExp, pag),
@@ -939,7 +939,7 @@ async function EditLast(pag: Page, expenses: Expense[], newVal = 34.23) {
     await waitForValue(pag, inp, lastExpense.categorie.trim(), 2000);
   }
 
-  await pag.waitForXPath("//button[contains(text(), 'Save Expense')]")
+  await pag.waitForSelector("xpath/.//button[contains(text(), 'Save Expense')]")
     .then((e: ElementHandle) => e ? scrollAndClick(e, pag) : null);
 }
 
@@ -959,7 +959,7 @@ async function DoInvite(pag: Page, email: string) {
   };
   pag.on('request', theHandler);
 
-  const inviteBtn: ElementHandle = await pag.waitForXPath(
+  const inviteBtn: ElementHandle = await pag.waitForSelector("xpath/." +
     "//button[contains(text(), 'Invite')]", {visible: true}) as ElementHandle;
   await Promise.all([
     pag.waitForNavigation({waitUntil: "networkidle2"}).then(() => waitForTimeout(1000)),
@@ -972,7 +972,7 @@ async function DoInvite(pag: Page, email: string) {
   // await sel.select(email);
   await select("#payer", email, pag);
 
-  await pag.waitForXPath("//button[contains(text(), 'Save')]", {visible: true})
+  await pag.waitForSelector("xpath/.//button[contains(text(), 'Save')]", {visible: true})
     .then((e: ElementHandle) => e ? scrollAndClick(e, pag) : null);
 
   const tosterMsg: string = await pag.waitForSelector("#toast", {visible: true, timeout: 20000})
@@ -988,7 +988,7 @@ async function DoInvite(pag: Page, email: string) {
 }
 
 async function doRegister(pag: Page) {
-  await pag.waitForXPath("//button[contains(text(), 'Register')]", {visible: true})
+  await pag.waitForSelector("xpath/.//button[contains(text(), 'Register')]", {visible: true})
     .then((e: ElementHandle) => e ? Promise.all([e.click(), pag.waitForNavigation({timeout: 10000}).then(() => waitForTimeout(1000))]) : null);
 
   const tstamp = (new Date()).getTime();
@@ -1006,7 +1006,7 @@ async function doRegister(pag: Page) {
   await pag.waitForSelector("#password1", {visible: true, timeout: 20000})
     .then((e: ElementHandle) => e ? e.type(pass) : null);
 
-  await pag.waitForXPath("//button[contains(text(), 'Register')]", {visible: true})
+  await pag.waitForSelector("xpath/.//button[contains(text(), 'Register')]", {visible: true})
     .then((e: ElementHandle) => e ? Promise.all([
       e.click(),
       pag.waitForNavigation({timeout: 50000, waitUntil: "networkidle2"}),
@@ -1254,7 +1254,7 @@ async function MainTest(params: any[]) {
     await page.screenshot({path: "p1travel.png"});
     // debugger;
     const travelEl: ElementHandle =
-      await page1.waitForXPath(`//h6[contains(text(), '${travelNAme}')]`, {visible: true}) as ElementHandle;
+      await page1.waitForSelector(`xpath/.//h6[contains(text(), '${travelNAme}')]`, {visible: true}) as ElementHandle;
     console.log("Got travel " + travelNAme);
 
     await Promise.all([
@@ -1305,7 +1305,7 @@ async function runMiny(_: string[]) {
 
   await pa.goto("https://puppeteer.github.io/puppeteer/");
 
-  await pa.waitForXPath("//h1[contains(text(), 'Puppeteer')]", {visible: true, timeout: 10000});
+  await pa.waitForSelector("xpath/.//h1[contains(text(), 'Puppeteer')]", {visible: true, timeout: 10000});
 }
 
 
@@ -1531,7 +1531,7 @@ async function runAll() {
     //     false
     //   ]
     // },
-
+    //
     // {
     //   fn: MainTest,
     //   msg: "E2E with all expenses ski 2023 (bug to fix)",

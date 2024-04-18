@@ -1,3 +1,3 @@
 <div *ngFor="let pers of balance">
-    <app-balance-item [item]="pers" [max]="max"></app-balance-item>
+    <app-balance-item [item]="pers" [max]="max" *ngIf="pers.amount.toFixed(2) !== '0.00'"></app-balance-item>
 </div>

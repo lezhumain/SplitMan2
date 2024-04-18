@@ -6,7 +6,7 @@
   <div>
     <h4>Repartition</h4>
     <div *ngFor="let s of allDeps" class="repart">
-      <app-repartition-card [expense]="s" [connectedUser]="connectedUser"></app-repartition-card>
+      <app-repartition-card [expense]="s" [connectedUser]="connectedUser" *ngIf="s.amount.toFixed(2) !== '0.00'"></app-repartition-card>
     </div>
     <br>
     <div id="spendWrapper">
