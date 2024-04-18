@@ -283,6 +283,7 @@ export const allExpenses: { name: string, amount: number, payer: string, payees:
     "createdAt": "2021-11-12T01:30:08.709Z",
     "createdBy": "a",
     "updatedAt": "2021-11-13T16:27:17.320Z",
-    "updatedBy": "a"
+    "updatedBy": "a",
+    "categorie": "remboursement"
   }
 ] as { name: string, amount: number, payer: string, payees: any[] }[])

@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { RepartitionCardComponent } from './repartition-card.component';
 import {getBaseActivatedTestRoute, getBaseTestStuff} from "../../../e2e/baseTestStuff";
-import {TravelEditComponent} from "../travel-edit/travel-edit.component";
 
 describe('RepartitionCardComponent', () => {
   let component: RepartitionCardComponent;

@@ -2,12 +2,12 @@
 # Build a Docker image
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
-pr:
-  branches:
-    include:
-      - '*'  # must quote since "*" is a YAML reserved character; we want a string
+#pr:
+#  branches:
+#    include:
+#      - '*'  # must quote since "*" is a YAML reserved character; we want a string
 
-# pr: none
+pr: none
 
 trigger:
   branches:
@@ -18,7 +18,11 @@ resources:
   - repo: self
 
 variables:
-  tag: '$(Build.BuildId)'
+  - group: var_groupe
+  - name: IMAGE
+    value: splitman2e2e
+  - name: tag
+    value: '$(Build.BuildId)'
 
 stages:
   - stage: Run_E2E
@@ -29,15 +33,41 @@ stages:
         pool:
           vmImage: ubuntu-latest
         steps:
+
+          - task: DownloadSecureFile@1
+            name: rsaGithub
+            displayName: 'Download key'
+            inputs:
+              secureFile: 'id_devops'
+
+          - script: |
+              cd "$SREPO"
+              # chmod +x install_ssh_eky.sh
+              sudo cp "$SSH_KEY" ./id_rsa # TODO remove me
+              #./install_ssh_eky.sh
+            env:
+              HOST_IP: $(DEBIAN_IP)
+              SSH_KEY: $(rsaGithub.secureFilePath)
+            displayName: 'Add SSH priv key to agent'
+
           - task: Docker@2
             inputs:
               command: build
               dockerfile: '**/Dockerfile_e2e'
               tags: |
                 $(tag)
-              arguments: '--build-arg IP="splitman2.fr:8081" -t splitman2_e2e'
-            displayName: Build E2E image
+              arguments: '--build-arg IP="$(DEBIAN_IP):8081" -t $(IMAGE)'
+            env:
+              DEBIAN_IP: $(DEBIAN_IP)
+            displayName: "Build E2E image"
 
           - script: |
-              docker run splitman2_e2e
-            displayName: 'Run E2E image'
+              du -sh ./*
+              docker images
+              docker save "$IMAGE" -o "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
+              #cp "SplitMan2-run/setup_azure_ssh.sh" "$(Build.ArtifactStagingDirectory)/"
+            displayName: 'Save E2E image'
+
+          - publish: '$(Build.ArtifactStagingDirectory)/$(IMAGE).tar'
+            displayName: 'Publish tar image'
+            artifact: $(IMAGE)_tar

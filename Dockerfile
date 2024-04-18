@@ -3,7 +3,7 @@
 # Which version of Node image to use depends on project dependencies
 # This is needed to build and compile our code
 # while generating the docker image
-FROM node:16.13.1-alpine AS build
+FROM node:20-alpine AS build
 # Create a Virtual directory inside the docker image
 WORKDIR /dist/src/app
 #WORKDIR /app
@@ -14,18 +14,31 @@ RUN npm cache clean --force
 # Copy files from local machine to virtual directory in docker image
 COPY . .
 
-RUN ["npm", "install", "-g", "npm@8.1.2"]
+# TODO?
+RUN apk --update add openssh-client
+RUN apk --update add git
+RUN apk add --no-cache bash
+
+RUN ["npm", "install", "-g", "npm@latest"]
 
 #RUN cd /app && npm i && npm run cp-libs
-RUN ls
-RUN cd /dist/src/app && npm ci && npm run cp-libs
+RUN ls | grep install
+
+# TODO remove me  when using npm packages for splitwise repart
+RUN dos2unix ./install_ssh_eky.sh \
+    && chmod +x ./install_ssh_eky.sh \
+    && bash ./install_ssh_eky.sh
+
+RUN cd /dist/src/app && npm ci --force && npm run cp-libs
 
 ARG IP
 ARG API
+ARG VERSION
 RUN echo "API: $IP $API $(cat api.tmp)" \
     && cat src/environments/environment.prod.ts \
     && sed -i.bak -e "s|PROD_IP|$IP|g" src/environments/environment.prod.ts \
     && sed -i.bak -e "s|/api|$(cat /dist/src/app/api.tmp)|g" src/environments/environment.prod.ts \
+    && sed -i.bak -E "s|(\"version\": \")[^\"]+\"|\1$VERSION\"|" package.json \
     && chmod +x ./*.sh
 
 RUN ["npm", "run", "build:prod"]

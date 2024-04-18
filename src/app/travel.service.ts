@@ -4,7 +4,7 @@ import {Travel} from "./models/travel";
 import {BaseService} from "./base-service.service";
 import {TravelModel} from "./models/travel-model";
 import {User} from "./models/user";
-import {flatMap} from "rxjs/internal/operators";
+import {mergeMap} from "rxjs";
 import {map} from "rxjs/operators";
 
 import {Participant, ParticipantModel} from "./models/participants";
@@ -39,7 +39,7 @@ export class TravelService extends BaseService{
 
     if(data.id === -1) {
       obs = this.getNewId().pipe(
-        flatMap((newId: number) => {
+        mergeMap((newId: number) => {
           data.id = newId;
           travel.id = data.id;
           return this._apiService.saveInDb(data);
@@ -49,7 +49,7 @@ export class TravelService extends BaseService{
 
     if(userService) {
       obs = obs.pipe(
-        flatMap(() => {
+        mergeMap(() => {
           return userService.addTravelToConnectedUser(data);
         })
       );
@@ -81,7 +81,7 @@ export class TravelService extends BaseService{
 
   saveParticipant(participantModel: ParticipantModel, travelID: number, originalTravelName?: string | null): Observable<null> {
     return this.getTravelByID(travelID).pipe(
-      flatMap((travl: Travel | null ) => {
+      mergeMap((travl: Travel | null ) => {
         if(travl == null) {
           return of(null);
         }
@@ -122,11 +122,13 @@ export class TravelService extends BaseService{
 
   deleteParticipant(name: string, travelID: number): Observable<null> {
     return this.getTravelByID(travelID).pipe(
-      flatMap((p) => {
+      mergeMap((p: Travel | null) => {
         if(!p) {
           return of(null);
         }
-        p.participants = p?.participants?.filter(p => p.name !== name) || [];
+        if(p && p.participants !== undefined) {
+          p.participants = p.participants.filter((pp: Participant) => pp.name !== name) || [];
+        }
         return this.saveTravel(p);
       }),
       map(() => null)

@@ -1,0 +1,74 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+#pr:
+#  branches:
+#    include:
+#    - '*'  # must quote since "*" is a YAML reserved character; we want a string
+
+pr: none
+
+trigger:
+  branches:
+    include:
+      - master
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+- group: var_groupe
+- name: IMAGE
+  value: splitman2
+
+stages:
+  - stage: Generate_APK_base
+    jobs:
+      - job: Generate_APK_base
+        steps:
+          - checkout: self
+
+          - script: |
+              npm ci -f
+              npm run build:prod
+            displayName: 'build'
+
+          - script: |
+              docker build -t splitman2androidbase -f Dockerfile_android .
+            displayName: 'Create base docker image'
+
+          - script: |
+              docker build -t splitman2android -f Dockerfile_android1 .
+
+              id=$(docker create splitman2android)
+              docker cp $id:/app/apks/splitman2.apk - > ./splitman2.apk
+              docker rm -v $id
+            displayName: 'Create docker image'
+
+          - script: |
+              docker save "splitman2androidbase" -o "$(Build.ArtifactStagingDirectory)/splitman2androidbase.tar"
+            displayName: 'Generate base tar archive'
+
+          - script: |
+              docker save "splitman2android" -o "$(Build.ArtifactStagingDirectory)/splitman2android.tar"
+            displayName: 'Generate tar archive'
+
+          - script: |
+              id=$(docker create splitman2android)
+              docker cp $id:/app/apks/splitman2.apk - > ./splitman2.apk
+              docker rm -v $id
+            displayName: 'Get APK from image'
+
+          - publish: '$(Build.ArtifactStagingDirectory)/splitman2androidbase.tar'
+            displayName: 'Publish base archive'
+            artifact: androidbase
+
+          - publish: '$(Build.ArtifactStagingDirectory)/splitman2android.tar'
+            displayName: 'Publish archive'
+            artifact: android
+
+          - publish: 'splitman2.apk'
+            displayName: 'Publish apk'
+            artifact: androidapk

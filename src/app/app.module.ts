@@ -27,6 +27,11 @@ import { TestEndpointComponent } from './test-endpoint/test-endpoint.component';
 import { ToastComponent } from './toast/toast.component';
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import { OspMapComponent } from './osp-map/osp-map.component';
+import {AutocompleteLibModule} from "angular-ng-autocomplete";
+import { BalanceComponent } from './balance/balance.component';
+import { BalanceItemComponent } from './balance-item/balance-item.component';
+import { ExpenseFilterComponent } from './expense-filter/expense-filter.component';
+import {JoinComponent} from "./join/join.component";
 
 @NgModule({
   declarations: [
@@ -50,14 +55,19 @@ import { OspMapComponent } from './osp-map/osp-map.component';
     UserEditComponent,
     TestEndpointComponent,
     ToastComponent,
-    OspMapComponent
+    OspMapComponent,
+    BalanceComponent,
+    BalanceItemComponent,
+    ExpenseFilterComponent,
+    JoinComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
     HttpClientModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    AutocompleteLibModule
   ],
   providers: [AuthGuard],
   bootstrap: [AppComponent]

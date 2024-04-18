@@ -3,7 +3,7 @@ import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {BehaviorSubject, from, Observable, of} from "rxjs";
 import {BaseItem} from "./models/baseItem";
 import {catchError, debounceTime, filter, first, map, tap} from "rxjs/operators";
-import {flatMap} from "rxjs/internal/operators";
+import {mergeMap} from "rxjs";
 import {environment} from "../environments/environment";
 import {ToastComponent} from "./toast/toast.component";
 import {ToastType} from "./toast/toast.shared";
@@ -120,7 +120,7 @@ export class ApiService {
 
     return (fromCache ? of(res) : this.pGetAll().pipe(first())).pipe(
       first(),
-      flatMap((r: BaseItem[] | null) => {
+      mergeMap((r: BaseItem[] | null) => {
         const nreR: BaseItem[] | null = r;
 
         if (!fromCache) {
@@ -167,7 +167,7 @@ export class ApiService {
 
   saveInDb(obj: any, isRegister = false): Observable<null> {
     return this.httpPost(environment.api + (isRegister ? "/register" : "/saveOne"), obj,"json", "application/json", !isRegister).pipe(
-      flatMap((fullObj: any) => {
+      mergeMap((fullObj: any) => {
         const currentAll = this._allItems$.getValue() || [];
         const currentAllStr = JSON.stringify(currentAll);
         const newValues = currentAll.slice();
@@ -220,7 +220,7 @@ export class ApiService {
   updateItem(model: any, isRegister = false): Observable<any> {
     // TODO refactor with add
     // return this.getAll().pipe(
-    //   flatMap((existing: BaseItem[]) => {
+    //   mergeMap((existing: BaseItem[]) => {
     //     // const existing: User[] = JSON.parse(localStorage.getItem(this._tableKey) || "[]");
     //     // const data = new User(model);
     //

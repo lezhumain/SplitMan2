@@ -3,6 +3,7 @@
   <div *ngIf="!isEditing; else editMode">
     <div class="mb-3">{{user.email}}</div>
     <div class="mb-3">{{user.username}}></div>
+    <div class="mb-3">IBAN: {{user.iban}}</div>
 
     <!--  <div class="mb-3">-->
     <!--    <label for="email" class="form-label">Email address</label>-->
@@ -30,6 +31,15 @@
         <label for="username" class="form-label">Username</label>
         <input type="text" class="form-control" id="username"
                [(ngModel)]="user.username" >
+      </div>
+      <div class="mb-3">
+        <!--        TODO validate IBAN on change-->
+        <label for="iban" class="form-label">IBAN</label>
+        <input type="text" id="iban" class="form-control"
+               [class.invalid]="!!user.iban && !ibanValid"
+               [class.valid]="!!user.iban && ibanValid"
+               (ngModelChange)="checkIBAN()"
+               [(ngModel)]="user.iban" >
       </div>
 
       <div class="col-auto">

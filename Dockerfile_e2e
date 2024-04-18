@@ -1,12 +1,17 @@
-FROM node:16.13.1-alpine AS build
+FROM node:20-alpine AS build
 
 RUN apk add chromium
+
+RUN apk --update add openssh-client
+RUN apk add git
 
 WORKDIR /app
 
 RUN npm cache clean --force
 COPY . .
-RUN npm ci
+RUN chmod +x ./install_ssh_eky.sh \
+    && sh ./install_ssh_eky.sh
+RUN npm ci --force
 
 ARG IP
 RUN echo "npm run e2e -- --headless=true --host=\"$IP\" --docker=true" > /app/run.sh

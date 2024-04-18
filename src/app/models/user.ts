@@ -30,6 +30,7 @@ export class User extends BaseItem {
     u.id = this.id;
     u._id = this._id;
     u._rev = this._rev;
+    u.iban = this.iban;
 
     return u;
   }
@@ -42,6 +43,7 @@ export class User extends BaseItem {
   username: string = "";
   password: string = "";
   invites: InviteDate[] = [];
+  iban?: string;
 
 
   toString(): string {

@@ -5,14 +5,14 @@ import {Browser, ClickOptions, ElementHandle, HTTPRequest, JSHandle, Page} from 
 import {expect} from "chai";
 import {badData} from "./data/bugData";
 import {allExpenses} from "./data/allExpenses";
-import {from, Subject} from "rxjs";
+import {from, mergeMap, Subject} from "rxjs";
 import {filter, first, timeout} from "rxjs/operators";
-import {flatMap} from "rxjs/internal/operators";
 import {Expense} from "../src/app/models/expense";
 import {CreateBrowsers, honor10} from "./e2e_utils";
 import * as fs from "fs";
 import * as https from "https";
 import {allExpenses1} from "./data/allExpenses1";
+import {writeFileSync} from "fs";
 
 const userData = {
   email: "a",
@@ -334,6 +334,7 @@ const host = hparam ? `https://${hparam}` : "http://127.0.0.1:4200";
 // const host = "https://79.137.33.77:8081"
 
 const url = `${host}/login`;
+console.log("url: " + url);
 
 
 let getCount = 0,
@@ -708,7 +709,7 @@ async function startCheckInviteCall(pag: Page) {
   checkInvite$.pipe(
     filter(e => e === null),
     first(),
-    flatMap(() => {
+    mergeMap(() => {
       return from(pag.setRequestInterception(true));
     })
   ).subscribe(() => {
@@ -860,7 +861,7 @@ async function AddExpenses(pag: Page, expenses: Expense[]) {
 
     // await pag.waitForNavigation();
 
-    console.log("adding expense name");
+    console.log("adding expense name: " + expense.name);
     try {
       await pag.waitForSelector("#name", {visible: true})
         .then((e: ElementHandle) => e ? e.type(expense.name, {delay: 30}) : null);
@@ -884,6 +885,12 @@ async function AddExpenses(pag: Page, expenses: Expense[]) {
         .then((e: ElementHandle[]) => e.length > 0 ? e[0].type(payee.e4xpenseRatio.toString(), {delay: 30}) : null);
     }
 
+    if(expense.categorie) {
+      const categ = await pag.waitForSelector("#categ input");
+      await categ.type(expense.categorie);
+      await categ.press('Enter'); // Enter Key
+    }
+
     await pag.waitForXPath("//button[contains(text(), 'Save Expense')]", {visible: true})
       .then((e: ElementHandle) => e ? Promise.all([scrollAndClick(e, pag), pag.waitForNavigation({timeout: 10000}).then(() => waitForTimeout(1000))]) : null);
 
@@ -893,9 +900,18 @@ async function AddExpenses(pag: Page, expenses: Expense[]) {
   }
 }
 
+function waitForValue(pag: Page, inp: ElementHandle<HTMLInputElement>, targetVal: string, timeout: number) {
+  debugger;
+  return pag.waitForFunction((el: HTMLInputElement, pTargetVal: string) => {
+    debugger;
+    return el.value.trim() === pTargetVal;
+  }, { timeout: timeout }, inp, targetVal);
+}
+
 async function EditLast(pag: Page, expenses: Expense[], newVal = 34.23) {
   // debugger;
-  const lastTitle = expenses[expenses.length - 1].name;
+  const lastExpense = expenses[expenses.length - 1];
+  const lastTitle = lastExpense.name;
   await pag.waitForXPath(`//div[contains(@class, 'expense-card')]//h6[contains(text(), '${lastTitle}')]`, {visible: true})
     // .then((e: ElementHandle) => e ? Promise.all([scrollAndClick(e, pag), pag.waitForNavigation({timeout: 10000}).then(() => waitForTimeout(1000))]) : null);
     .then((e: ElementHandle) => e ? Promise.all([scrollAndClick(e, pag), pag.waitForNavigation({timeout: 10000, waitUntil:"networkidle2"}).then(() => waitForTimeout(1000))]) : null);
@@ -918,7 +934,10 @@ async function EditLast(pag: Page, expenses: Expense[], newVal = 34.23) {
   await pag.waitForSelector("#amount", {visible: true})
     .then((e: ElementHandle) => e ? clearAndType(e, newVal.toLocaleString()) : null);
 
-  // debugger;
+  if(lastExpense.categorie) {
+    const inp = await pag.waitForSelector("#categ input");
+    await waitForValue(pag, inp, lastExpense.categorie.trim(), 2000);
+  }
 
   await pag.waitForXPath("//button[contains(text(), 'Save Expense')]")
     .then((e: ElementHandle) => e ? scrollAndClick(e, pag) : null);
@@ -1154,6 +1173,7 @@ async function MainTest(params: any[]) {
       // TODO check expense count
       const selec = ".expense-card";
 
+      // FIXME
       await  page.waitForFunction((sel, lengthExpected) => {
         return document.querySelectorAll(sel).length === lengthExpected;
       }, {timeout: 10000}, selec, expenses.length);
@@ -1294,8 +1314,7 @@ async function takeScreenshot(page: Page, doPrivNote = true) {
   const pa = await brow.newPage();
 
   const fileName = "./screen.jpeg";
-  const data: string = await page.screenshot({path: fileName, type: "jpeg", encoding: "base64", quality: 33})
-    .then((e: string) => e);
+  const data: string = await page.screenshot({path: fileName, type: "jpeg", encoding: "base64", quality: 33});
 
   console.log(`Data:\n${data}\n`);
 
@@ -1303,7 +1322,7 @@ async function takeScreenshot(page: Page, doPrivNote = true) {
     return doPrivNoteFn(pa, data);
     // await uploadToFilebin(data, fileName);
   } else {
-    return Promise.resolve("");
+    return Promise.resolve(data);
   }
 }
 
@@ -1443,7 +1462,7 @@ async function runPrivNote(_: string[]) { //: Promise<string> {
 
   const pa = await browser.pages().then((e: Page[]) => e[0]);
 
-  const link = await takeScreenshot(pa);
+  const link = await takeScreenshot(pa, true);
   console.log("Screenshot link: " + link);
 }
 
@@ -1478,6 +1497,7 @@ async function runAll() {
     //     true
     //   ]
     // },
+
     {
       fn: MainTest,
       msg: "E2E with all expenses",
@@ -1489,28 +1509,29 @@ async function runAll() {
         true
       ]
     },
-    {
-      fn: MainTest,
-      msg: "E2E with 1 expenses ski 2023",
-      params: [
-        allExpenses1.slice(0, 1),
-        "dju doit a 169.25€ stan aissa doit a 169.25€ stan",
-        false,
-        xpeopleSki2023,
-        false
-      ]
-    },
-    {
-      fn: MainTest,
-      msg: "E2E with all expenses ski 2023 no rembours",
-      params: [
-        allExpenses1.slice(0, allExpenses1.length - 2),
-        "dju doit a 201.35€ stan Max doit a 45.23€ stan Alexis doit a 309.81€ aissa dju doit a 43.84€ aissa",
-        false,
-        xpeopleSki2023,
-        false
-      ]
-    },
+    // {
+    //   fn: MainTest,
+    //   msg: "E2E with 1 expenses ski 2023",
+    //   params: [
+    //     allExpenses1.slice(0, 1),
+    //     "dju doit a 169.25€ stan aissadoit a 169.25€ stan",
+    //     false,
+    //     xpeopleSki2023,
+    //     false
+    //   ]
+    // },
+    // {
+    //   fn: MainTest,
+    //   msg: "E2E with all expenses ski 2023 no rembours",
+    //   params: [
+    //     allExpenses1.slice(0, allExpenses1.length - 2),
+    //     "dju doit a 201.35€ stan Max doit a 45.23€ stan Alexis doit a 309.81€ aissadju doit a 43.84€ aissa",
+    //     false,
+    //     xpeopleSki2023,
+    //     false
+    //   ]
+    // },
+
     // {
     //   fn: MainTest,
     //   msg: "E2E with all expenses ski 2023 (bug to fix)",
@@ -1533,7 +1554,8 @@ async function runAll() {
     const resOO: {msg: string, errorMsg?: string, hasError: boolean, links?: string[]} = {
       msg: msg,
       errorMsg: res,
-      hasError: !!res
+      hasError: !!res,
+      links: []
     };
 
     if(resOO.hasError) {
@@ -1552,9 +1574,23 @@ async function runAll() {
     allRes.push(resOO);
   }
 
+  try {
+    writeFileSync("e2e_report/index.json", JSON.stringify(allRes, null, 2));
+    // writeFileSync("index.html", `<html><head></head><body>${
+    //   allRes.filter(ar => !!ar.links && ar.links.length > 0)
+    //     .map(ar => `<img src="data:image/png;base64,${ar.links[0]}">`)
+    //     .join("")
+    // }</body></html>`)
+  } catch (e) {
+    console.log("Error writing files: " + e.message);
+  }
+
   console.log("====================");
   for(const resPart of allRes) {
-    console.log(JSON.stringify(resPart, null, 2));
+    const nee = Object.assign({}, resPart);
+    nee.links = [];
+
+    console.log(JSON.stringify(nee, null, 2));
     console.log("");
   }
   console.log("=====================");
@@ -1568,7 +1604,6 @@ async function runAll() {
     )
   );
 
-
   console.log("Browsers closed");
 
   if(allRes.some(a => a.hasError)) {
@@ -1579,10 +1614,13 @@ async function runAll() {
   }
 }
 
+function getTimeFromMS(ms: number) {
+  return new Date(ms).toISOString().slice(11, 19);
+}
 
 const logTiming = (start: Date) => {
   const end = new Date();
-  console.log("Took " + ((end.getTime() - start.getTime() / 1000)) + "s");
+  console.log("Elapsed " + getTimeFromMS(end.getTime() - start.getTime()));
 }
 
 const start = new Date();

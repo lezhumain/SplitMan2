@@ -24,11 +24,6 @@
     </select>
   </div>
   <div class="mb-3">
-    <label for="payees" class="form-label">Payees:</label>
-    <input type="text" class="form-control" id="payees"
-           [value]="expenseModel.allPayees" disabled>
-  </div>
-  <div class="mb-3">
     <div>
       <label class="form-label">Payees:</label>
 <!--      <input type="text" class="form-control amount-input" aria-label="Amount (to the nearest dollar)" [(ngModel)]="user.e4xpenseRatio" (ngModelChange)="setSelectedUser(user)">-->
@@ -53,6 +48,43 @@
       </div>
     </div>
   </div>
+<!--  <div class="mb-3">-->
+<!--    <label for="payees" class="form-label">Payees:</label>-->
+<!--    <input type="text" class="form-control" id="payees"-->
+<!--           [value]="expenseModel.allPayees" disabled>-->
+<!--  </div>-->
+  <div class="mb-3">
+    <label for="categ" class="form-label">Categorie:</label>
+    <div class="ng-autocomplete">
+      <!--  TODO use this for categorie-->
+      <ng-autocomplete
+        [data]="ac.data"
+        [searchKeyword]="'name'"
+        placeholder="Select category"
+        (selected)='ac.selectEvent($event)'
+        (inputChanged)='ac.onChangeSearch($event)'
+        (inputFocused)='ac.onFocused($event)'
+        [itemTemplate]="itemTemplate"
+        [notFoundTemplate]="notFoundTemplate"
+        (inputCleared)="ac.autocompleteCleared()"
+        [(ngModel)]="ac.autoCompleteValue1"
+        [initialValue]="expenseModel.categorie"
+        id="categ"
+        class="form-control categ-input"
+      >
+      </ng-autocomplete>
+      <ng-template #itemTemplate let-item>
+        <!--    <a [innerHTML]="item"></a>-->
+        <a [innerHTML]="item.name"></a>
+      </ng-template>
+
+      <ng-template #notFoundTemplate let-notFound>
+        <div [innerHTML]="notFound"></div>
+      </ng-template>
+
+<!--      <button (click)="ac.test()">TEST</button>-->
+    </div>
+  </div>
 
   <div class="col-auto">
     <button type="button" class="btn btn-primary mb-3" (click)="saveExpense()">
@@ -64,3 +96,4 @@
     </button>
   </div>
 </div>
+

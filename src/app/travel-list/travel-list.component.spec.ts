@@ -9,7 +9,7 @@ import {Travel} from "../models/travel";
 
 import travs from "./data/travels.json";
 import user from "./data/user.json";
-import {of} from "rxjs";
+import {lastValueFrom, of} from "rxjs";
 import {RouterTestingModule} from "@angular/router/testing";
 import {TravelCardComponent} from "../travel-card/travel-card.component";
 
@@ -59,7 +59,7 @@ describe('TravelListComponent', () => {
   it('should create', async () => {
     expect(component).toBeTruthy();
 
-    const all = await fakeTravelService.getTravels().toPromise();
+    const all = await lastValueFrom(fakeTravelService.getTravels());
     const tot = all.length;
     const allCards = fixture.nativeElement.querySelectorAll("app-travel-card");
     expect(allCards.length).toEqual(tot);

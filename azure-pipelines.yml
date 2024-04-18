@@ -41,16 +41,15 @@ stages:
           - checkout: MyGitHub_splitman2run
 
           - task: DownloadSecureFile@1
-            name: sslCert
-            displayName: 'Download cert'
-            inputs:
-              secureFile: 'example.crt'
-
-          - task: DownloadSecureFile@1
-            name: sslKey
+            name: rsaGithub
             displayName: 'Download key'
             inputs:
-              secureFile: 'example.key'
+              secureFile: 'id_devops'
+
+          - task: NodeTool@0
+            inputs:
+              versionSource: 'spec'
+              versionSpec: '20.x'
 
           - script: |
               if [ -z "$IMAGE" ]; then
@@ -60,102 +59,40 @@ stages:
 
           - script: |
               cd "$SREPO"
-              TARGET_DIR="/home/$(whoami)/.ssl"
-              echo "TARGET_DIR: $TARGET_DIR"
-              mkdir -p "$TARGET_DIR"
-              sudo cp $(sslCert.secureFilePath) "$TARGET_DIR/example.crt"
-              sudo cp $(sslKey.secureFilePath) "$TARGET_DIR/example.key"
-              sudo chown -R "$(whoami)" "$TARGET_DIR"
-              chmod 600 "$TARGET_DIR"/*
-            displayName: 'Prepare SSL key and cert'
+              chmod +x ./install_ssh_eky.sh
+              sudo cp "$SSH_KEY" ./id_rsa # TODO remove me
+              ./install_ssh_eky.sh
+            env:
+              HOST_IP: $(DEBIAN_IP)
+              SSH_KEY: $(rsaGithub.secureFilePath)
+            displayName: 'Add SSH priv key to agent'
 
           - script: |
               cd "$SREPO"
-              bash ../SplitMan2-run/run_docker_e2e.sh "$DEBIAN_IP" "https" "$SREPO"
+              bash ../SplitMan2-run/run_docker_e2e.sh "https" "$SREPO"
               docker save "$IMAGE" -o "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
+              echo "Saved tar:"
+              ls -ald "$(Build.ArtifactStagingDirectory)/$IMAGE.tar"
             env:
-              MONGO_USER: $(MONGO_USER)
-              MONGO_PASS: $(MONGO_PASS)
-              DEBIAN_IP: $(DEBIAN_IP)
+              HOST_IP: $(DEBIAN_IP)
+              SSH_KEY: $(rsaGithub.secureFilePath)
             displayName: 'Build containers'
 
-          - task: DownloadSecureFile@1
-            name: sshKey
-            displayName: 'Download SSH key'
-            inputs:
-              secureFile: 'id_releaseUser'
-
           - script: |
-              chmod +x SplitMan2-run/*.sh
-              bash SplitMan2-run/prepare_azure_ssh.sh "$(sshKey.secureFilePath)"
-            displayName: 'Prepare SSH key'
+              cp "SplitMan2-run/prepare_azure_ssh.sh" "$(Build.ArtifactStagingDirectory)/"
+              cp "SplitMan2-run/setup_azure_ssh.sh" "$(Build.ArtifactStagingDirectory)/"
+              echo "Saved scripts"
+              ls -alh "$(Build.ArtifactStagingDirectory)/"
+            displayName: 'Copy SSH script to  artifacts'
 
-          - script: |
-              . SplitMan2-run/setup_azure_ssh.sh
-              cat "$HOME/.ssh/config"
-            env:
-              DEBIAN_USER: $(DEBIAN_USER)
-              DEBIAN_IP: $(DEBIAN_IP_REAL)
-            displayName: 'Setup SSH access'
+          - publish: '$(Build.ArtifactStagingDirectory)/$(IMAGE).tar'
+            displayName: 'Publish tar image'
+            artifact: $(IMAGE)_tar
 
-          - script: |
-              scp "$(Build.ArtifactStagingDirectory)/$IMAGE.tar" "ovhVM_rel:${DEBIAN_PATH}"
-            env:
-              DEBIAN_PATH: $(DEBIAN_PATH)
-            displayName: 'Save containers'
+          - publish: '$(Build.ArtifactStagingDirectory)/prepare_azure_ssh.sh'
+            displayName: 'Publish prepare script'
+            artifact: prepare_azure_ssh
 
-
-  - stage: Deploy
-    jobs:
-      - job: Deploy_Docker_Containers
-        steps:
-          - checkout: self
-          - checkout: MyGitHub_splitman2run
-
-          - task: DownloadSecureFile@1
-            name: sshKey
-            displayName: 'Download SSH key'
-            inputs:
-              secureFile: 'id_releaseUser'
-
-          - script: |
-              chmod +x SplitMan2-run/*.sh
-              bash SplitMan2-run/prepare_azure_ssh.sh "$(sshKey.secureFilePath)"
-            displayName: 'Prepare SSH key'
-
-          - script: |
-              cat SplitMan2-run/setup_azure_ssh.sh
-              . SplitMan2-run/setup_azure_ssh.sh
-              cat "$HOME/.ssh/config"
-            env:
-              DEBIAN_USER: $(DEBIAN_USER)
-              DEBIAN_IP: $(DEBIAN_IP_REAL)
-            displayName: 'Setup SSH access'
-
-          - script: |
-              bash SplitMan2-run/backup_current.sh
-            env:
-              DEBIAN_PATH: $(DEBIAN_PATH)
-            displayName: 'Backup current'
-
-          - script: |
-              ssh -oBatchMode=yes "ovhVM_rel" bash << EOF
-                cd "$DEBIAN_PATH"
-                docker ps
-                docker images
-                docker load -i "$IMAGE.tar"
-                docker images
-                docker ps
-              EOF
-            env:
-              DEBIAN_PATH: $(DEBIAN_PATH)
-            displayName: 'Update containers'
-
-          - script: |
-              cd SplitMan2-run
-              bash run_containers.sh
-            env:
-              MONGO_USER: $(MONGO_USER)
-              MONGO_PASS: $(MONGO_PASS)
-              DEBIAN_PATH: $(DEBIAN_PATH)
-            displayName: 'Run containers'
+          - publish: '$(Build.ArtifactStagingDirectory)/setup_azure_ssh.sh'
+            displayName: 'Publish SSH script'
+            artifact: setup_azure_ssh

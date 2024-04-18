@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ExpenseComponent } from './expense.component';
 import {getBaseTestStuff} from "../../../e2e/baseTestStuff";
-import {ExpenseCardComponent} from "../expense-card/expense-card.component";
 
 describe('ExpenseComponent', () => {
   let component: ExpenseComponent;

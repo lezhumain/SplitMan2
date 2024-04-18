@@ -3,7 +3,7 @@ import {AppRoutingModule} from "../src/app/app-routing/app-routing.module";
 import {HttpClientTestingModule} from "@angular/common/http/testing";
 import {TravelEditComponent} from "../src/app/travel-edit/travel-edit.component";
 
-export function getBaseTestStuff(componenets: any[], values?: {[paramID: string]: number}): any {
+export function getBaseTestStuff(componenets: any[], values?: {[paramID: string]: number | string}): any {
   const fakeActivatedRoute = values ? getBaseActivatedTestRoute(values) : null;
 
   const provs = [
@@ -30,7 +30,7 @@ export function getBaseTestStuffService() {
   }
 }
 
-export function getBaseActivatedTestRoute(values: {[paramID: string]: number}) {
+export function getBaseActivatedTestRoute(values: {[paramID: string]: number | string}) {
   return <any>{
     snapshot: {
       data: {},

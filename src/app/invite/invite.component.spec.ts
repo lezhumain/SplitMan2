@@ -2,9 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { InviteComponent } from './invite.component';
 import {getBaseTestStuff} from "../../../e2e/baseTestStuff";
-import {ActivatedRoute} from "@angular/router";
-import {ExpenseEditComponent} from "../expense-edit/expense-edit.component";
-import {TravelCardComponent} from "../travel-card/travel-card.component";
 
 describe('InviteComponent', () => {
   let component: InviteComponent;

@@ -20,5 +20,5 @@ if(window.cordova) {
   });
 }
 else {
-  bootstrapAngular();
+  bootstrapAngular(); // build
 }
