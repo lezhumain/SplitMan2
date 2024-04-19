@@ -271,11 +271,12 @@ async function checkRepartition(thePage: Page, repart: string) {
 
   const res0 = await thePage.$("app-repartition > div > div:last-child")
 
-  const res1: ElementHandle[] = await thePage.$$("app-repartition > div > div").then((allLines: ElementHandle[]) => {
-    return allLines.filter((l: ElementHandle, lIndex: number) => {
-      return lIndex < allLines.length - 1; // remove last
-    });
-  });
+  // const res1: ElementHandle[] = await thePage.$$("app-repartition > div > div").then((allLines: ElementHandle[]) => {
+  //   return allLines.filter((l: ElementHandle, lIndex: number) => {
+  //     return lIndex < allLines.length - 1; // remove last
+  //   });
+  // });
+  const res1: ElementHandle[] = await thePage.$$("app-repartition-card");
 
   const res: string = await Promise.all(
     res1.map(e => {
@@ -1504,22 +1505,23 @@ async function runAll() {
       params: [
         allExpenses.slice(),
         "Elyan doit a 17.30€ Dju",
+        // "Elyan doit a 17.30€ Dju Elyan doit a 0.00€ Suzie Max doit a 0.00€ Suzie",
         false,
         xpeopleMarseille,
         true
       ]
     },
-    // {
-    //   fn: MainTest,
-    //   msg: "E2E with 1 expenses ski 2023",
-    //   params: [
-    //     allExpenses1.slice(0, 1),
-    //     "dju doit a 169.25€ stan aissadoit a 169.25€ stan",
-    //     false,
-    //     xpeopleSki2023,
-    //     false
-    //   ]
-    // },
+    {
+      fn: MainTest,
+      msg: "E2E with 1 expenses ski 2023",
+      params: [
+        allExpenses1.slice(0, 1),
+        "dju doit a 169.25€ stan aissa doit a 169.25€ stan",
+        false,
+        xpeopleSki2023,
+        false
+      ]
+    },
     // {
     //   fn: MainTest,
     //   msg: "E2E with all expenses ski 2023 no rembours",
