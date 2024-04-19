@@ -342,4 +342,68 @@ describe('RepartitionComponent', () => {
     RepartitionUtils.checkBalanceRepart(component.expenses, component.allDeps);
     expect(content).toEqual("Dju10.700.00 /jMax10.700.00 /jElyan10.700.00 /jSuzie10.700.00 /j");
   });
+
+  it('should not display 0', () => {
+    expect(component).toBeTruthy();
+
+    component.expenses = [
+      <any>{
+        payer: "d",
+        amount: 1,
+        name: "name",
+        payees: [
+          ExpenseParticipantModel.from({
+            name: "B",
+            e4xpenseRatio: 0.5
+          }),
+          ExpenseParticipantModel.from({
+            name: "d",
+            e4xpenseRatio: 0.5
+          })
+        ]
+      } as ExpenseModel
+    ];
+    fixture.detectChanges();
+
+    let targets = fixture.debugElement.nativeElement.querySelectorAll("app-repartition-card");
+    expect(targets.length).toEqual(1);
+
+
+    component.expenses = [
+      <any>{
+        payer: "d",
+        amount: 1,
+        name: "name",
+        payees: [
+          ExpenseParticipantModel.from({
+            name: "B",
+            e4xpenseRatio: 0.5
+          }),
+          ExpenseParticipantModel.from({
+            name: "d",
+            e4xpenseRatio: 0.5
+          })
+        ]
+      } as ExpenseModel,
+      <any>{
+        payer: "B",
+        amount: 1,
+        name: "name",
+        payees: [
+          ExpenseParticipantModel.from({
+            name: "B",
+            e4xpenseRatio: 0.5
+          }),
+          ExpenseParticipantModel.from({
+            name: "d",
+            e4xpenseRatio: 0.5
+          })
+        ]
+      } as ExpenseModel
+    ];
+    fixture.detectChanges();
+
+    targets = fixture.debugElement.nativeElement.querySelectorAll("app-repartition-card");
+    expect(targets.length).toEqual(0);
+  });
 });
