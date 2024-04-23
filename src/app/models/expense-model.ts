@@ -96,19 +96,6 @@ export class ExpenseModel {
   toCSV(): string {
     const thisObj: any = Object.assign({}, this);
 
-    // delete thisObj.payees;
-
-    // const objs: any[] = Object.keys(thisObj).map(k => {
-    //   if(!thisObj.hasOwnProperty(k)) {
-    //     return "";
-    //   }
-    //   const val = k !== "payees"
-    //     ? (Utils.isDate(thisObj[k]) ? thisObj[k].toISOString() : thisObj[k].toString())
-    //     : this.payees.map(p => `${p.name}:${p.e4xpenseRatio}`).join("-");
-    //   return val.replace(/,/g, " ");
-    // });
-    //
-    // const objsRes = objs.map(o => o.toString()).join(",");
     let aaaaa = [];
     for(let i = 0; i < this.payees.length; ++i) {
       const objs: any[] = Object.keys(thisObj).map(k => {
@@ -157,26 +144,7 @@ export class ExpenseModel {
     const keys = allLines[0].split(",");
     const lines = allLines.slice(1);
 
-    // lines.forEach((line: string) => {
-    //   const model = new ExpenseModel();
-    //   const modelObj: any = {} as ExpenseModel;
-    //   const values = line.split(",");
-    //   values.forEach((value: string, index: number) => {
-    //     const key: string = keys[index];
-    //     if(model.hasOwnProperty(key)) {
-    //       modelObj[key] = value;
-    //     }
-    //   });
-    //
-    //   model.assignFromObj(modelObj);
-    //   // TODO dates + payees
-    //
-    //   models.push(model);
-    // });
-
     while(lines.length > 0) {
-      // for(let i = 0; i < lines.length; ++i) {
-      // lines.forEach((line: string) => {
       const line: string | undefined = lines.pop();
       const model = new ExpenseModel();
       const modelObj: any = {} as ExpenseModel;

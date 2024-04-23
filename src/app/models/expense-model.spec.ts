@@ -1,6 +1,4 @@
 import {ExpenseModel} from "../models/expense-model";
-// import Expected = jasmine.Expected;
-// import {expect} from "chai";
 
 export function getExpenses(): ExpenseModel[] {
   return [
@@ -154,11 +152,6 @@ describe('ExpenseModel', () => {
       const actualItem = actual[i];
       const linesAct = actualItem.split("\n");
 
-      // const expIndex = expected0.findIndex(e0 => e0.)
-      // const linesExp = expected0[i].split("\n");
-      // console.log("fgh");
-      // const fails = linesAct.filter(la => !linesExp.includes(la));
-
       // null if ok
       const present: (string | null)[] = linesAct.map((liAct) => {
         return expected0.some((liExp: string) => liExp.includes(liAct))
@@ -168,8 +161,8 @@ describe('ExpenseModel', () => {
 
       const fails = present.filter(p => p);
       allFails.push(...fails);
-      debugger;
     }
+    expect(allFails.length).toEqual(0);
     // TODO check payees
   });
 });
