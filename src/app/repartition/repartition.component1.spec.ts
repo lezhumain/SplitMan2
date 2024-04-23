@@ -162,12 +162,14 @@ describe('RepartitionComponent1', () => {
     // tricount
     const allTricount: IRepartitionItem[] = getRepartsFromString("dju doit a 97.92€ stan Alexis doit a 314.78€ aissa Max doit a 126.44€ stan dju doit a 146.28€ aissa");
 
-    RepartitionUtils.checkBalanceRepart(deps, reps);
-    RepartitionUtils.checkBalanceRepart(deps, allCurrent);
-
+    const res: any[] = RepartitionUtils.checkBalanceRepart(deps, reps, false);
+    const res1: any[] = RepartitionUtils.checkBalanceRepart(deps, allCurrent, false);
     // FIXME investigate on the one from Tricount
     // RepartitionUtils.checkBalanceRepart(deps, allUnknown);
-    // RepartitionUtils.checkBalanceRepart(deps, allTricount);
+    const resTricount: any[] = RepartitionUtils.checkBalanceRepart(deps, allTricount, false);
+
+    expect(res.every(rrr => rrr.eq)).toEqual(true);
+    expect(res1.every(rrr => rrr.eq)).toEqual(true);
 
     const balReps = SplitwiseHelper.getBalance(reps);
     const balCurrent = SplitwiseHelper.getBalance(allCurrent);
