@@ -276,6 +276,7 @@ export class RepartitionComponent implements OnInit {
   }
 
   howMuchSpent(pers: string): number {
+    // TODO here
     // return this.expenses.filter(e => e.payees.some(ep => ep.name === pers)).reduce((res: number, item: ExpenseModel), 0)
     return this.expenses.filter(e => e.payees.some(ep => ep.name === pers && !!ep.e4xpenseRatio)).reduce((res: number, item: ExpenseModel) => {
       const target = item.payees.find(ip => ip.name === pers);

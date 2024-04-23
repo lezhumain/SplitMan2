@@ -6,6 +6,26 @@ import {RepartitionCardComponent} from "../repartition-card/repartition-card.com
 import {ActivatedRoute} from "@angular/router";
 import {checkArray, RepartitionUtils, sanityCheck} from "../../test-data/test_utils";
 import {getExpensesBug} from "../../test-data/getEzxpenses";
+import {allExpenses1} from "../../../e2e/data/allExpenses1";
+import {APP_BASE_HREF} from "@angular/common";
+import {BalanceComponent} from "../balance/balance.component";
+import {BalanceItemComponent} from "../balance-item/balance-item.component";
+import {IBalanceItem, SplitwiseHelper} from "../utilities/splitwiseHelper";
+
+function getRepartsFromString(str: string) {
+  // const str: string = "dju doit a 201.35€ stan Max doit a 45.23€ stan Alexis doit a 309.81€ aissa dju doit a 43.84€ aissa"
+  const strMini: string[] = str.replace(/ doit a /g, "").replace(/€ /g, "").split(" ");
+  // let [_, pers, amount, doitA][]
+  let res: any[][] = strMini.map(stini => /([A-Za-z]+)(\d+\.\d+)([A-Za-z]+)/.exec(stini) || []);
+  let allll: IRepartitionItem[] = res.map((items: any[]) => {
+    return {
+      person: items[1],
+      owesTo: items[3],
+      amount: Number(items[2])
+    } as IRepartitionItem
+  });
+  return allll;
+}
 
 describe('RepartitionComponent1', () => {
   let component: RepartitionComponent;
@@ -49,7 +69,7 @@ describe('RepartitionComponent1', () => {
     await TestBed.configureTestingModule({
       // imports: [ RouterTestingModule ],
       declarations: [
-        RepartitionComponent, RepartitionCardComponent
+        RepartitionComponent, RepartitionCardComponent, BalanceComponent, BalanceItemComponent
       ],
       providers: [
         {provide: ActivatedRoute, useValue: fakeActivatedRoute}
@@ -126,4 +146,39 @@ describe('RepartitionComponent1', () => {
       sanityCheck(component.allDeps, component.expenses, expected);
     }
   });
+
+  it('should have correct thing TODO TODO', () => {
+    const deps: ExpenseModel[] = allExpenses1.slice(0, allExpenses1.length - 2).map(f => ExpenseModel.fromJson(f));
+    component.expenses = deps;
+    fixture.detectChanges();
+
+    const reps: IRepartitionItem[] = component.allDeps.slice();
+    const resClone = reps.map(r => Object.assign({}, r));
+
+    // current 23/04/2024
+    const allCurrent: IRepartitionItem[] = getRepartsFromString("dju doit a 223.37€ stan Alexis doit a 309.81€ aissa Max doit a 128.43€ aissa dju doit a 21.83€ aissa");
+    // unknown
+    const allUnknown: IRepartitionItem[] = getRepartsFromString("dju doit a 201.35€ stan Alexis doit a 309.81€ aissa Max doit a 45.23€ stan dju doit a 43.84€ aissa");
+    // tricount
+    const allTricount: IRepartitionItem[] = getRepartsFromString("dju doit a 97.92€ stan Alexis doit a 314.78€ aissa Max doit a 126.44€ stan dju doit a 146.28€ aissa");
+
+    RepartitionUtils.checkBalanceRepart(deps, reps);
+    RepartitionUtils.checkBalanceRepart(deps, allCurrent);
+
+    // FIXME investigate on the one from Tricount
+    // RepartitionUtils.checkBalanceRepart(deps, allUnknown);
+    // RepartitionUtils.checkBalanceRepart(deps, allTricount);
+
+    const balReps = SplitwiseHelper.getBalance(reps);
+    const balCurrent = SplitwiseHelper.getBalance(allCurrent);
+
+    const comp = SplitwiseHelper.compareBalances(balReps, balCurrent);
+    const fails = comp.filter((compItem: IBalanceItem) => {
+      // return Math.abs(compItem.owed).toFixed(2) !== "0.00" || Math.abs(compItem.owes).toFixed(2) !== "0.00";
+      return Math.abs(compItem.owed).toFixed(1) !== "0.0" || Math.abs(compItem.owes).toFixed(1) !== "0.0"; // `1` is important
+    });
+
+    expect(fails.length).toEqual(0);
+    console.log("vd");
+  })
 });

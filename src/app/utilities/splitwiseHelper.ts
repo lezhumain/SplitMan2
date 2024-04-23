@@ -25,7 +25,12 @@ export interface SplitwiseInputItem {
 //   }
 // }
 
-export interface IBalanceItem {name: string, amount: number}
+export interface IBalanceItem {
+  owes: number;
+  owed: number;
+  name: string,
+  amount: number
+}
 
 export class SplitwiseHelper {
   private static expenseToInput(expenses: ExpenseModel[]): SplitwiseInputItem[] {
@@ -225,26 +230,56 @@ export class SplitwiseHelper {
     return expenses;
   }
 
+  static compareBalances(balActual: IBalanceItem[], balExpected: IBalanceItem[]): IBalanceItem[] {
+    const monSet: Set<string> = new Set();
+
+    const namesActual = balActual.map(b => b.name);
+    const namesExp = balExpected.map(b => b.name);
+
+    for(const key of namesActual.concat(namesExp)) {
+      monSet.add(key);
+    }
+
+    const res: IBalanceItem[] = Array.from(monSet).reduce((res: IBalanceItem[], itemName: string) => {
+      const itemAct = balActual.find(b => b.name === itemName);
+      const itemExp = balExpected.find(b => b.name === itemName);
+
+      const newItem: IBalanceItem = {
+        name: itemName,
+        amount: (itemExp?.amount || -1) - (itemAct?.amount || -1),
+        owed: (itemExp?.owed || -1) - (itemAct?.owed || -1),
+        owes: (itemExp?.owes || -1) - (itemAct?.owes || -1)
+      }
+      res.push(newItem);
+
+      return res;
+    }, []);
+
+    return res;
+  }
+
   static getBalance(reparts: IRepartitionItem[]): IBalanceItem[] {
     return reparts.reduce((res: IBalanceItem[], item: IRepartitionItem) => {
       // what I owe
       const target = res.find(r => r.name === item.person);
       if(!target) {
-        const targetO = { name: item.person, amount: item.amount };
+        const targetO = { name: item.person, amount: item.amount, owes: item.amount, owed: 0 };
         res.push(targetO);
       }
       else {
         target.amount += item.amount;
+        target.owes += item.amount;
       }
 
       // minus what I'm owed
       const target1 = res.find(r => r.name === item.owesTo);
       if(!target1) {
-        const targetO = { name: item.owesTo, amount: item.amount * -1 };
+        const targetO = { name: item.owesTo, amount: item.amount * -1, owes: 0, owed: item.amount };
         res.push(targetO);
       }
       else {
         target1.amount -= item.amount;
+        target1.owed += item.amount;
       }
 
       return res;
