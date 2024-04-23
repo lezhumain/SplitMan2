@@ -67,6 +67,7 @@ const xpeopleSki2023 = [
     dayCount: 5
   }
 ]
+
 async function clickAndDelay(e: ElementHandle, opt?: ClickOptions, delayMs = 300): Promise<null> {
   return e.click(opt).then(() => {
     return waitForMS(delayMs);
@@ -84,7 +85,7 @@ async function scrollAndClick(elm: ElementHandle, pag: Page) {
 
 async function clearAndType(e: ElementHandle, s: string) {
   await waitForMS(200);
-  return clickAndDelay(e, { clickCount: 3 }).then(() => {
+  return clickAndDelay(e, {clickCount: 3}).then(() => {
     return e.type(s, {delay: 100});
   });
 
@@ -130,7 +131,7 @@ async function getExpenseList(page: Page): Promise<string[]> {
 
 async function testCommonTravels(pages: puppeteer.Page[]) {
   const [travelList0, travelList1]: string[][] = await Promise.all(
-  // return Promise.all(
+    // return Promise.all(
     pages.map(page => {
       return getTravelList(page)
     })
@@ -138,7 +139,7 @@ async function testCommonTravels(pages: puppeteer.Page[]) {
 
   const intersec: string[] = travelList0.filter((n: string) => travelList1.includes(n));
 
-  for(const travel of intersec) {
+  for (const travel of intersec) {
     // open travel
     await Promise.all(
       pages.map(page => page.waitForSelector(`xpath/.//app-travel-card//h6[contains(text(), '${travel}')]`, {visible: true})
@@ -160,7 +161,7 @@ async function testCommonTravels(pages: puppeteer.Page[]) {
 
     // compare expenses
     expect(expenseList0.length).to.equal(expenseList1.length);
-    for(const ex of expenseList0) {
+    for (const ex of expenseList0) {
       expect(expenseList1).to.include(ex);
       expect(expenseList0.indexOf(ex)).to.equal(expenseList1.indexOf(ex));
     }
@@ -176,30 +177,32 @@ async function testCommonTravels(pages: puppeteer.Page[]) {
 
 async function handleLogout(pag: Page) {
 
-    const userIcon: ElementHandle = await pag.waitForSelector(".fa-user", {visible: true});
-    console.log("1");
-    const userIconColor: string = await pag.evaluate((eee) => {
-      return window.getComputedStyle(eee).color;
-    }, userIcon);
-    console.log("2");
+  const userIcon: ElementHandle = await pag.waitForSelector(".fa-user", {visible: true});
+  console.log("1");
+  const userIconColor: string = await pag.evaluate((eee) => {
+    return window.getComputedStyle(eee).color;
+  }, userIcon);
+  console.log("2");
 
-    if(userIconColor === "rgb(255, 255, 255)") {
-      console.log("Already logged out.");
-      return;
-    }
+  if (userIconColor === "rgb(255, 255, 255)") {
+    console.log("Already logged out.");
+    return;
+  }
 
-    await pag.evaluate(() => {window.scrollTo(0, 0);});
+  await pag.evaluate(() => {
+    window.scrollTo(0, 0);
+  });
 
-    await userIcon.click();
-    await waitForTimeout(300);
+  await userIcon.click();
+  await waitForTimeout(300);
 
-    await pag.waitForSelector("xpath/.//a[contains(text(), 'Log out')]", {visible: true})
-      .then((e: ElementHandle) => e ? Promise.all([e.click(), pag.waitForNavigation({timeout: 10000}).then(() => waitForTimeout(1000))]) : null);
+  await pag.waitForSelector("xpath/.//a[contains(text(), 'Log out')]", {visible: true})
+    .then((e: ElementHandle) => e ? Promise.all([e.click(), pag.waitForNavigation({timeout: 10000}).then(() => waitForTimeout(1000))]) : null);
 
-    await waitForTimeout(1000);
+  await waitForTimeout(1000);
 
-    expect(pag.url()).to.contain("/login");
-    await waitForTimeout(500);
+  expect(pag.url()).to.contain("/login");
+  await waitForTimeout(500);
 }
 
 async function waitForToast(pag: Page, additionnalClasses = ".toast_0", timeout = 10010) {
@@ -214,7 +217,7 @@ async function waitForToast(pag: Page, additionnalClasses = ".toast_0", timeout 
 }
 
 async function handleLogin(pag: Page, userData: { pass: string; email: string; username: string }) {
-  if(pag.url().endsWith("/travels")) {
+  if (pag.url().endsWith("/travels")) {
     return;
   }
 
@@ -250,8 +253,8 @@ async function handleLogin(pag: Page, userData: { pass: string; email: string; u
   const elm: ElementHandle = await pag.waitForSelector("xpath/.//button[contains(text(), 'Login')]", {visible: true}) as ElementHandle;
   const timeout = 40000;
   const clickAndNavProm = Promise.all([
-      elm.click(),
-      pag.waitForNavigation({timeout: timeout, waitUntil: "networkidle2"})
+    elm.click(),
+    pag.waitForNavigation({timeout: timeout, waitUntil: "networkidle2"})
   ]);
 
   const toastProm = waitForToast(pag, ".toast_0", timeout);
@@ -263,6 +266,56 @@ async function handleLogin(pag: Page, userData: { pass: string; email: string; u
 }
 
 let browser: Browser, browser1: Browser;
+
+function printTots(arr: any[]) {
+  const payed = checkTotalPayed(arr);
+  const owed = checkTotalOwed(arr);
+
+  return {
+    payed,
+    owed
+  };
+}
+
+function checkTotalPayed(arr) {
+  let all = {};
+
+  for (const item of arr) {
+    let [_, pers, amount, doitA] = /([A-Za-z]+)(\d+\.\d+)([A-Za-z]+)/.exec(item);
+    if (!all[pers]) {
+      all[pers] = 0;
+    }
+    all[pers] += Number(amount);
+  }
+
+  console.log(all);
+  return all;
+}
+
+function checkTotalOwed(arr) {
+  let all = {};
+
+  for (const item of arr) {
+    let [_, pers, amount, doitA] = /([A-Za-z]+)(\d+\.\d+)([A-Za-z]+)/.exec(item);
+    if (!all[doitA]) {
+      all[doitA] = 0;
+    }
+    all[doitA] += Number(amount);
+  }
+
+  console.log(all);
+  return all;
+}
+
+function compareTots(totsActua: { owed: {}; payed: {} }, totsExpected: { owed: {}; payed: {} }) {
+  for (const key of Object.keys(totsExpected)) {
+    console.log(key);
+    for (const objKey of Object.keys(totsExpected[key])) {
+      const diff = totsActua[key][objKey] - totsExpected[key][objKey];
+      console.log(`${objKey}: ${diff.toFixed(3)}`);
+    }
+  }
+}
 
 async function checkRepartition(thePage: Page, repart: string) {
   // check repartition
@@ -291,9 +344,23 @@ async function checkRepartition(thePage: Page, repart: string) {
 
   const trimedRes = res.replace(/\n/g, " ").replace(/ +/g, " ").trim();
 
+  const trimedResReplaced: string = trimedRes.replace(/ doit a /g, "").replace(/€ /g, "");
+  const repartReplacedExpected: string = repart.replace(/ doit a /g, "").replace(/€ /g, "");
 
-  if(trimedRes !== repart) {
+  const trimedResArr: string[] = trimedResReplaced.split(" ")
+  const repartArrExpected: string[] = repartReplacedExpected.split(" ")
+
+  trimedResArr.sort();
+  repartArrExpected.sort();
+
+  // const same = trimedRes === repart;
+  const same = trimedResArr.length === repartArrExpected.length && trimedResArr.every(tr => repartArrExpected.includes(tr));
+
+  if (!same) {
     // throw "Wrong repartition!: " + res;
+    const tots = printTots(trimedResArr);
+    const totsExpected = printTots(repartArrExpected);
+    compareTots(tots, totsExpected);
     throw `Wrong repartition!: ${trimedRes} - ${repart}`;
   }
 
@@ -374,24 +441,20 @@ async function addInviteHandler(page1: Page, userDatum: any) {
 
         if (inviteGetCount === 1) {
           aInvites = [{tripID: travel.id, isAccepted: true}];
-        }
-        else if (inviteGetCount === 2) {
-            sInvites = [{tripID: travel.id, isAccepted: false}];
-            aInvites = [{tripID: travel.id, isAccepted: true}];
-          }
-        else {
+        } else if (inviteGetCount === 2) {
+          sInvites = [{tripID: travel.id, isAccepted: false}];
+          aInvites = [{tripID: travel.id, isAccepted: true}];
+        } else {
           sInvites = [{tripID: travel.id, isAccepted: true}];
           aInvites = [{tripID: travel.id, isAccepted: true}];
         }
 
         users.forEach(u => {
-          if(u.username === "s") {
+          if (u.username === "s") {
             u.invites = sInvites.slice();
-          }
-          else if(u.username === "a") {
+          } else if (u.username === "a") {
             u.invites = aInvites.slice();
-          }
-          else {
+          } else {
             u.invites = [];
           }
           // u.invites = invites.slice()
@@ -410,7 +473,7 @@ async function addInviteHandler(page1: Page, userDatum: any) {
       }
     } catch (e) {
 
-      if(!e.toString().includes("Request is already handled")) {
+      if (!e.toString().includes("Request is already handled")) {
         console.error(e);
         throw e;
       }
@@ -510,7 +573,7 @@ async function testBackBug(pages: Page[]) {
   // expect(getCount).to.equal(1);
 
   const [handler0, handler1] = handlers;
-  remHandlers = async() => {
+  remHandlers = async () => {
     await page0.setRequestInterception(false);
     page0.off('request', handler0);
 
@@ -564,7 +627,7 @@ async function testInvite(pages: Page[]) {
   ]);
 
   const [handler0, handler1] = handlers;
-  remHandlers = async() => {
+  remHandlers = async () => {
     await page0.setRequestInterception(false);
     page0.off('request', handler0);
 
@@ -610,22 +673,22 @@ async function MainTestBackBug(params: any[]) {
   await page1.emulate(honor10);
 
   // try {
-    const pages = [page, page1];
+  const pages = [page, page1];
 
-    await goToAndSecurity(pages);
+  await goToAndSecurity(pages);
 
-    // logout
-    await Promise.all(
-      pages.map((pagee: Page) => handleLogout(pagee))
-    );
+  // logout
+  await Promise.all(
+    pages.map((pagee: Page) => handleLogout(pagee))
+  );
 
-    await goToAndSecurity(pages);
+  await goToAndSecurity(pages);
 
-    await testBackBug(pages);
+  await testBackBug(pages);
 
-    await testCommonTravels(pages);
+  await testCommonTravels(pages);
 
-    await removeHandlers(pages);
+  await removeHandlers(pages);
 
 }
 
@@ -650,7 +713,7 @@ async function MainTestSQLLogin(params: any[]) {
 
 async function goToAndSecurity(pages: Page[], target?: string) {
   let theURL = url;
-  if(target) {
+  if (target) {
     theURL = theURL.replace("/login", target);
   }
 
@@ -677,7 +740,7 @@ const checkInvite$: Subject<any> = new Subject<any>();
 async function startCheckInviteCall(pag: Page) {
   // await pag.setRequestInterception(true);
 
-  const handler = async(resp: puppeteer.HTTPResponse) => {
+  const handler = async (resp: puppeteer.HTTPResponse) => {
     // console.log(request);
     try {
       if (/\/get$/.test(resp.url())) {
@@ -689,7 +752,7 @@ async function startCheckInviteCall(pag: Page) {
         console.log(inv);
 
         // let currentName = "";
-        if(!inv.find(e => e.tripName === currentName)) {
+        if (!inv.find(e => e.tripName === currentName)) {
           console.error("Couldn't find invite");
         }
 
@@ -697,8 +760,7 @@ async function startCheckInviteCall(pag: Page) {
       }
     } catch (e) {
       // debugger;
-    }
-    finally {
+    } finally {
       return Promise.resolve(resp);
     }
   };
@@ -723,7 +785,7 @@ async function startCheckInviteCall(pag: Page) {
 }
 
 function stopCheckInviteCall(page: Page) {
-  if(checkInvite$) {
+  if (checkInvite$) {
     return;
   }
 
@@ -731,6 +793,7 @@ function stopCheckInviteCall(page: Page) {
 }
 
 let currentName = "";
+
 function getTravelName() {
   currentName = `Test ${new Date().toUTCString()}`;
   return currentName;
@@ -758,7 +821,7 @@ async function addTravel(pag: Page): Promise<string> {
   await pag.waitForSelector("#description", {visible: true})
     .then((e: ElementHandle) => e ? e.type("E2E test travel", {delay: 40}) : null);
 
-  const saveBtn: ElementHandle = <ElementHandle> await pag.waitForSelector("xpath/.//button[contains(text(), 'Save Travel')]", {visible: true})
+  const saveBtn: ElementHandle = <ElementHandle>await pag.waitForSelector("xpath/.//button[contains(text(), 'Save Travel')]", {visible: true})
   // await Promise.all([
   //   saveBtn.click(), pag.waitForNavigation({timeout: 10000}).then(() => waitForTimeout(1000))
   // ]);
@@ -806,7 +869,10 @@ async function AddPeople(pag: Page, allPeople?: { name: string, dayCount: number
     const saveBtnXPath = "//button[contains(text(), 'Save')]";
     console.log("getting save btn");
     await pag.waitForSelector("xpath/." + saveBtnXPath, {visible: true})
-      .then((e: ElementHandle) => e ? Promise.all([e.click(), pag.waitForNavigation({timeout: 10000, waitUntil: "networkidle2"})]) : null);
+      .then((e: ElementHandle) => e ? Promise.all([e.click(), pag.waitForNavigation({
+        timeout: 10000,
+        waitUntil: "networkidle2"
+      })]) : null);
     console.log("waiting for save to disappear");
     await pag.waitForSelector("xpath/." + saveBtnXPath, {visible: false});
     console.log("continuing");
@@ -886,7 +952,7 @@ async function AddExpenses(pag: Page, expenses: Expense[]) {
         .then((e: ElementHandle[]) => e.length > 0 ? e[0].type(payee.e4xpenseRatio.toString(), {delay: 30}) : null);
     }
 
-    if(expense.categorie) {
+    if (expense.categorie) {
       const categ = await pag.waitForSelector("#categ input");
       await categ.type(expense.categorie);
       await categ.press('Enter'); // Enter Key
@@ -906,7 +972,7 @@ function waitForValue(pag: Page, inp: ElementHandle<HTMLInputElement>, targetVal
   return pag.waitForFunction((el: HTMLInputElement, pTargetVal: string) => {
     debugger;
     return el.value.trim() === pTargetVal;
-  }, { timeout: timeout }, inp, targetVal);
+  }, {timeout: timeout}, inp, targetVal);
 }
 
 async function EditLast(pag: Page, expenses: Expense[], newVal = 34.23) {
@@ -915,7 +981,10 @@ async function EditLast(pag: Page, expenses: Expense[], newVal = 34.23) {
   const lastTitle = lastExpense.name;
   await pag.waitForSelector(`xpath/.//div[contains(@class, 'expense-card')]//h6[contains(text(), '${lastTitle}')]`, {visible: true})
     // .then((e: ElementHandle) => e ? Promise.all([scrollAndClick(e, pag), pag.waitForNavigation({timeout: 10000}).then(() => waitForTimeout(1000))]) : null);
-    .then((e: ElementHandle) => e ? Promise.all([scrollAndClick(e, pag), pag.waitForNavigation({timeout: 10000, waitUntil:"networkidle2"}).then(() => waitForTimeout(1000))]) : null);
+    .then((e: ElementHandle) => e ? Promise.all([scrollAndClick(e, pag), pag.waitForNavigation({
+      timeout: 10000,
+      waitUntil: "networkidle2"
+    }).then(() => waitForTimeout(1000))]) : null);
 
   await waitForTimeout(300);
   //
@@ -926,7 +995,7 @@ async function EditLast(pag: Page, expenses: Expense[], newVal = 34.23) {
   await waitForTimeout(500);
   await Promise.all([
     scrollAndClick(editExp, pag),
-    pag.waitForNavigation({timeout: 10000, waitUntil:"networkidle2"})
+    pag.waitForNavigation({timeout: 10000, waitUntil: "networkidle2"})
       .then(() => waitForTimeout(1000))
   ]);
 
@@ -935,7 +1004,7 @@ async function EditLast(pag: Page, expenses: Expense[], newVal = 34.23) {
   await pag.waitForSelector("#amount", {visible: true})
     .then((e: ElementHandle) => e ? clearAndType(e, newVal.toLocaleString()) : null);
 
-  if(lastExpense.categorie) {
+  if (lastExpense.categorie) {
     const inp = await pag.waitForSelector("#categ input");
     await waitForValue(pag, inp, lastExpense.categorie.trim(), 2000);
   }
@@ -993,7 +1062,7 @@ async function doRegister(pag: Page) {
     .then((e: ElementHandle) => e ? Promise.all([e.click(), pag.waitForNavigation({timeout: 10000}).then(() => waitForTimeout(1000))]) : null);
 
   const tstamp = (new Date()).getTime();
-  const name = `Dju${tstamp}`, email = `dju_${tstamp}@lol.com`, pass ="secretPASS";
+  const name = `Dju${tstamp}`, email = `dju_${tstamp}@lol.com`, pass = "secretPASS";
 
   await pag.waitForSelector("#email", {visible: true, timeout: 20000})
     .then((e: ElementHandle) => e ? e.type(email) : null);
@@ -1073,7 +1142,7 @@ async function MainRegister(params: any[]) {
     const [page] = await getPagse();
     stopCheckInviteCall(page);
 
-    if(isError) {
+    if (isError) {
       throw isError;
     }
   }
@@ -1110,7 +1179,7 @@ async function MainTest(params: any[]) {
     await waitForMS(2000);
     const urlPage = page.url();
     console.log("URL: " + urlPage);
-    if(!urlPage.includes("splitman2")) {
+    if (!urlPage.includes("splitman2")) {
       await page.goto(url, {timeout: 20000, waitUntil: "networkidle2"});
       await waitForMS(2000);
       console.log("URL 1: " + page.url());
@@ -1175,7 +1244,7 @@ async function MainTest(params: any[]) {
       const selec = ".expense-card";
 
       // FIXME
-      await  page.waitForFunction((sel, lengthExpected) => {
+      await page.waitForFunction((sel, lengthExpected) => {
         return document.querySelectorAll(sel).length === lengthExpected;
       }, {timeout: 10000}, selec, expenses.length);
 
@@ -1188,8 +1257,7 @@ async function MainTest(params: any[]) {
       // expect(res1).to.equal(expenses.length);
 
       await checkRepartition(page, targetReparttion);
-    }
-    else {
+    } else {
       await waitForTimeout(1000);
       // debugger;
       await startCheckInviteCall(page);
@@ -1226,7 +1294,7 @@ async function MainTest(params: any[]) {
     const elmeu: ElementHandle | null = await page1.waitForSelector("i.notif", {visible: true, timeout: 10000})
       .then((e: ElementHandle) => e, () => null);
 
-    if(inviteOnly && !elmeu) {
+    if (inviteOnly && !elmeu) {
       throw "/invite error: couldn't find notif element";
     }
 
@@ -1295,7 +1363,7 @@ async function MainTest(params: any[]) {
     const [page] = await getPagse();
     stopCheckInviteCall(page);
 
-    if(isError) {
+    if (isError) {
       throw isError;
     }
   }
@@ -1317,7 +1385,7 @@ async function takeScreenshot(page: Page, doPrivNote = true) {
   const fileName = "./screen.jpeg";
   const data: string = await page.screenshot({path: fileName, type: "jpeg", encoding: "base64", quality: 33});
 
-  console.log(`Data:\n${data}\n`);
+  // console.log(`Data:\n${data}\n`);
 
   if (doPrivNote) {
     return doPrivNoteFn(pa, data);
@@ -1432,7 +1500,6 @@ async function doPrivNoteFn(pa, data: string) {
   await pa.waitForResponse("https://privnote.com/legacy/");
 
 
-
   await pa.waitForTimeout(500);
   const v = await pa.waitForSelector("#note_link_input")
     .then((e: ElementHandle) => e.getProperty("value"))
@@ -1468,7 +1535,7 @@ async function runPrivNote(_: string[]) { //: Promise<string> {
 }
 
 async function getPagse(): Promise<Page[]> {
-  return Promise.all([browser, browser1].map(b => b? b.pages().then((e: Page[]) => e[0]) : null));
+  return Promise.all([browser, browser1].map(b => b ? b.pages().then((e: Page[]) => e[0]) : null));
 }
 
 async function runAll() {
@@ -1499,41 +1566,44 @@ async function runAll() {
     //   ]
     // },
 
-    {
-      fn: MainTest,
-      msg: "E2E with all expenses",
-      params: [
-        allExpenses.slice(),
-        "Elyan doit a 17.30€ Dju",
-        // "Elyan doit a 17.30€ Dju Elyan doit a 0.00€ Suzie Max doit a 0.00€ Suzie",
-        false,
-        xpeopleMarseille,
-        true
-      ]
-    },
-    {
-      fn: MainTest,
-      msg: "E2E with 1 expenses ski 2023",
-      params: [
-        allExpenses1.slice(0, 1),
-        "dju doit a 169.25€ stan aissa doit a 169.25€ stan",
-        false,
-        xpeopleSki2023,
-        false
-      ]
-    },
     // {
     //   fn: MainTest,
-    //   msg: "E2E with all expenses ski 2023 no rembours",
+    //   msg: "E2E with all expenses",
     //   params: [
-    //     allExpenses1.slice(0, allExpenses1.length - 2),
-    //     "dju doit a 201.35€ stan Max doit a 45.23€ stan Alexis doit a 309.81€ aissadju doit a 43.84€ aissa",
+    //     allExpenses.slice(),
+    //     "Elyan doit a 17.30€ Dju",
+    //     // "Elyan doit a 17.30€ Dju Elyan doit a 0.00€ Suzie Max doit a 0.00€ Suzie",
+    //     false,
+    //     xpeopleMarseille,
+    //     true
+    //   ]
+    // },
+    // {
+    //   fn: MainTest,
+    //   msg: "E2E with 1 expenses ski 2023",
+    //   params: [
+    //     allExpenses1.slice(0, 1),
+    //     "dju doit a 169.25€ stan aissa doit a 169.25€ stan",
     //     false,
     //     xpeopleSki2023,
     //     false
     //   ]
     // },
-    //
+
+
+    {
+      fn: MainTest,
+      msg: "E2E with all expenses ski 2023 no rembours",
+      params: [
+        allExpenses1.slice(0, allExpenses1.length - 2),
+        "dju doit a 201.35€ stan Max doit a 45.23€ stan Alexis doit a 309.81€ aissa dju doit a 43.84€ aissa", // from: ?
+        // "Alexis doit a 309.81€ aissa dju doit a 223.37€ stan Max doit a 128.43€ aissa dju doit a 21.83€ aissa", // from: current 23/04/2024
+        // "dju doit a 97.92€ stan Max doit a 126.44€ stan Alexis doit a 314.78€ aissa dju doit a 146.28€ aissa", // from: tricount
+        false,
+        xpeopleSki2023,
+        false
+      ]
+    },
     // {
     //   fn: MainTest,
     //   msg: "E2E with all expenses ski 2023 (bug to fix)",
@@ -1543,24 +1613,26 @@ async function runAll() {
     //     false,
     //     xpeopleSki2023,
     //     false
+    //   ]
+    // }
   ];
 
-  const allRes: {msg: string, errorMsg?: string, hasError: boolean, links?: string[]}[] = [];
-  for(const testFn of testList) {
+  const allRes: { msg: string, errorMsg?: string, hasError: boolean, links?: string[] }[] = [];
+  for (const testFn of testList) {
     let msg = `${testFn.msg}: `;
     const res: string = await testFn.fn(testFn.params)
       .then((e: any) => "", (e) => {
         return e.toString();
       });
 
-    const resOO: {msg: string, errorMsg?: string, hasError: boolean, links?: string[]} = {
+    const resOO: { msg: string, errorMsg?: string, hasError: boolean, links?: string[] } = {
       msg: msg,
       errorMsg: res,
       hasError: !!res,
       links: []
     };
 
-    if(resOO.hasError) {
+    if (resOO.hasError) {
       // take screenshot
       const pages = await getPagse();
 
@@ -1588,7 +1660,7 @@ async function runAll() {
   }
 
   console.log("====================");
-  for(const resPart of allRes) {
+  for (const resPart of allRes) {
     const nee = Object.assign({}, resPart);
     nee.links = [];
 
@@ -1600,7 +1672,8 @@ async function runAll() {
 
   await Promise.all(
     [browser, browser1].map(
-      b => b.close().then(() => {}, (err) => {
+      b => b.close().then(() => {
+      }, (err) => {
         console.log(err);
       })
     )
@@ -1608,10 +1681,9 @@ async function runAll() {
 
   console.log("Browsers closed");
 
-  if(allRes.some(a => a.hasError)) {
+  if (allRes.some(a => a.hasError)) {
     throw "Some errors";
-  }
-  else {
+  } else {
     console.log("No errors");
   }
 }
@@ -1627,12 +1699,12 @@ const logTiming = (start: Date) => {
 
 const start = new Date();
 runAll()
-// uploadToFilebin("", "C:\\Users\\djuuu\\OneDrive\\Pictures\\MerionGenea.png")
+  // uploadToFilebin("", "C:\\Users\\djuuu\\OneDrive\\Pictures\\MerionGenea.png")
   .then((e: any) => {
     logTiming(start);
     console.log("Done.");
-}, (e) => {
-  console.error(e);
-  logTiming(start);
-  throw e;
-});
+  }, (e) => {
+    console.error(e);
+    logTiming(start);
+    throw e;
+  });

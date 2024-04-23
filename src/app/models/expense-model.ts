@@ -2,6 +2,7 @@ import {Expense} from "./expense";
 import {ExpenseParticipantModel} from "./expenseParticipants";
 import {Utils} from "../utilities/utils";
 import {IMongoID} from "./imongoid";
+import {takeWhile} from "rxjs/operators";
 
 export class ExpenseModel {
   _id?: String | IMongoID;
@@ -95,54 +96,31 @@ export class ExpenseModel {
   toCSV(): string {
     const thisObj: any = Object.assign({}, this);
 
-    // delete thisObj.payees;
+    let aaaaa = [];
+    for(let i = 0; i < this.payees.length; ++i) {
+      const objs: any[] = Object.keys(thisObj).map(k => {
+        if (!thisObj.hasOwnProperty(k)) {
+          return "";
+        }
+        const val = k !== "payees"
+          ? (Utils.isDate(thisObj[k]) ? thisObj[k].toISOString() : thisObj[k].toString())
+          : `${this.payees[i].name}---${this.payees[i].e4xpenseRatio}`;
 
-    const objs: any[] = Object.keys(thisObj).map(k => {
-      if(!thisObj.hasOwnProperty(k)) {
-        return "";
-      }
-      const val = k !== "payees"
-        ? (Utils.isDate(thisObj[k]) ? thisObj[k].toISOString() : thisObj[k].toString())
-        : this.payees.map(p => `${p.name}:${p.e4xpenseRatio}`).join("-");
-      return val.replace(/,/g, " ");
-    });
+        return val.replace(/,/g, " ").replace(/---/g, ",");
+      });
 
-    return objs.map(o => o.toString()).join(",");
+      const objsRes = objs.map(o => o.toString()).join(",");
+      aaaaa.push(objsRes);
+    }
+    return aaaaa.join("\n");
   }
 
   static toCSV(all: ExpenseModel[]): string {
-    const keys = Object.keys(all[0]).join(",") + "\n";
+    const keys = (Object.keys(all[0]).join(",") + "\n").replace("payees", "payee,payeePerc");
     return keys + all.reduce((res: string, item) => {
       res += item.toCSV() + "\n";
       return res;
     }, "");
-  }
-
-  static fromCSV(csv: string): ExpenseModel[] {
-    const models: ExpenseModel[] = [];
-
-    const allLines = csv.split("\n").filter(c => !!c);
-    const keys = allLines[0].split(",");
-    const lines = allLines.slice(1);
-
-    lines.forEach((line: string) => {
-      const model = new ExpenseModel();
-      const modelObj: any = {} as ExpenseModel;
-      const values = line.split(",");
-      values.forEach((value: string, index: number) => {
-        const key: string = keys[index];
-        if(model.hasOwnProperty(key)) {
-          modelObj[key] = value;
-        }
-      });
-
-      model.assignFromObj(modelObj);
-      // TODO dates + payees
-
-      models.push(model);
-    });
-
-    return models;
   }
 
   private assignFromObj(modelObj: any) {
@@ -157,6 +135,86 @@ export class ExpenseModel {
     this.id = Number(modelObj.id);
     this.tripId = Number(modelObj.tripId);
     this.amount = Number(modelObj.amount);
+  }
+
+  static fromCSV(csv: string): ExpenseModel[] {
+    const models: ExpenseModel[] = [];
+
+    const allLines = csv.split("\n").filter(c => !!c);
+    const keys = allLines[0].split(",");
+    const lines = allLines.slice(1);
+
+    while(lines.length > 0) {
+      const line: string | undefined = lines.pop();
+      const model = new ExpenseModel();
+      const modelObj: any = {} as ExpenseModel;
+      const values: string[] | undefined = line?.split(",");
+
+      if (values) {
+        values.forEach((value: string, index: number) => {
+          const key: string = keys[index];
+          if (model.hasOwnProperty(key)) {
+            modelObj[key] = value;
+          }
+        });
+
+        // TODO payees
+        const otherLines: string[] | null = line ? lines.filter(l => l.startsWith(`${values[0]},${values[1]},${values[2]},${values[3]}`)) : null;
+        if(!otherLines) {
+          // TODO
+          continue;
+        }
+        else {
+          const indexes: number[] = otherLines.map(ol => lines.indexOf(ol));
+          indexes.sort((a, b) => b - a); // desc
+
+          for(const index of indexes) {
+            if(index === -1) {
+              continue;
+            }
+            lines.splice(index, 1);
+          }
+        }
+
+        const aaaallll: string[] = [line].concat(otherLines).map((aLine) => {
+          const bits = aLine?.split(/, */);
+
+          if(bits === undefined) {
+            // TODO
+            return null;
+          }
+
+          const payee = bits[7];
+          const perc = bits[8];
+          const line = `${payee}:${perc}`;
+
+          return line;
+        }).filter(tt => tt !== null) as string[];
+
+        const together = aaaallll.join("-");
+        modelObj["payees"] = together;
+
+        const key = modelObj.id + modelObj.tripId + modelObj.name + modelObj.amount;
+        modelObj["key"] = key;
+
+        model.assignFromObj(modelObj);
+        // TODO dates + payees
+
+        const existing = models.find(m => ((m as any)["key"] as string) === key);
+        if(!existing) {
+          models.push(model);
+        }
+        else {
+          debugger;
+        }
+      }
+    }
+
+    models.forEach((item: any) => {
+      delete item["key"];
+    });
+
+    return models;
   }
 
   private initPayees(payees: ExpenseParticipantModel[] | string): ExpenseParticipantModel[] {

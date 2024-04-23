@@ -20,7 +20,23 @@ describe('BalanceComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('should display if not 0', () => {
+    expect(component).toBeTruthy();
+    let els = fixture.debugElement.nativeElement.querySelectorAll("app-balance-item");
+    expect(els).toBeTruthy();
+    expect(els.length).toEqual(1);
+
+    component.balance = [{
+      name: "dju",
+      amount: 1.00
+    } as IBalanceItem]
+    fixture.detectChanges();
+    els = fixture.debugElement.nativeElement.querySelectorAll("app-balance-item");
+    expect(els.length).toEqual(1);
+
+  });
+
+  it('should not display if 0', () => {
     expect(component).toBeTruthy();
     let els = fixture.debugElement.nativeElement.querySelectorAll("app-balance-item");
     expect(els).toBeTruthy();

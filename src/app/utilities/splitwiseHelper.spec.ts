@@ -62,16 +62,16 @@ describe('SplitwiseHelperBase_balance', () => {
 
   it('test balance', () => {
     const bal: IBalanceItem[] = [
-      { name: "Aissa", amount: 1.67 },
-      { name: "Alx", amount: 17.10 },
-      { name: "Anne-Cha", amount: -10.85 },
-      { name: "Cam", amount: -20.22 },
-      { name: "Dju", amount: 280.74 },
-      { name: "Ely", amount: 2.73 },
-      { name: "Jeff", amount: 96.39 },
-      { name: "Leslie", amount: -253.83 },
-      { name: "MaxK", amount: -179.86 },
-      { name: "Mymy", amount: 66.15 }
+      { name: "Aissa", amount: 1.67 } as IBalanceItem,
+      { name: "Alx", amount: 17.10 } as IBalanceItem,
+      { name: "Anne-Cha", amount: -10.85 } as IBalanceItem,
+      { name: "Cam", amount: -20.22 } as IBalanceItem,
+      { name: "Dju", amount: 280.74 } as IBalanceItem,
+      { name: "Ely", amount: 2.73 } as IBalanceItem,
+      { name: "Jeff", amount: 96.39 } as IBalanceItem,
+      { name: "Leslie", amount: -253.83 } as IBalanceItem,
+      { name: "MaxK", amount: -179.86 } as IBalanceItem,
+      { name: "Mymy", amount: 66.15 } as IBalanceItem
     ];
 
     testBalance(bal);

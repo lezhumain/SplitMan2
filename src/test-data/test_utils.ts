@@ -195,7 +195,8 @@ export class RepartitionUtils {
 
     return myTravaelCostExpense === myTravaelCostRep;
   }
-  static checkBalanceRepart(expenses: any, allDeps: IRepartitionItem[]) {
+  static checkBalanceRepart(expenses: any, allDeps: IRepartitionItem[], doThrow = true) {
+    // TODO type for expenses
     const getSumOwedFor = (getFor: string, wereOwed = true): number => {
       return allDeps.filter((p: IRepartitionItem) => wereOwed ? p.owesTo === getFor : p.person === getFor).reduce((res: number, item: IRepartitionItem) => {
         return res + item.amount
@@ -223,6 +224,7 @@ export class RepartitionUtils {
       return ii;
     });
 
+    const allObj = [];
     for(const user of users) {
       const sortiePoche = expenses.filter((ex: ExpenseModel) => ex.payer === user)
         .reduce((res: number, item: ExpenseModel) => res + item.amount, 0);
@@ -244,18 +246,40 @@ export class RepartitionUtils {
       );
       const costListSum = costList.reduce((res: number, it: any) => res + it.a * it.e4xpenseRatio, 0);
 
-      const eqData = sortiePoche > totalCost
-        ? [getSumOwedFor(user), sortiePoche - totalCost]
-        : [getSumOwedFor(user, false), Math.abs(sortiePoche - totalCost)];
+      const wereOwed = sortiePoche > totalCost;
+      const owedInRepart = getSumOwedFor(user, wereOwed);
+      const owedInRepartCorrect = wereOwed ? owedInRepart : (owedInRepart * -1);
+      const eqData = [owedInRepart, Math.abs(sortiePoche - totalCost)];
 
       const eq = Utils.checkAmounts(eqData[0], eqData[1], 1);
 
       console.log(`${user} ${eq} %o`, eqData);
+
+      let errMsg = "";
       if(!eq) {
         if(Math.abs(eqData[0] - eqData[1]) > 1) {
-          throw new Error(`Wrong amount check: ${eqData[0]} !== ${eqData[1]}`);
+          if (doThrow) {
+            throw new Error(`Wrong amount check: ${eqData[0]} !== ${eqData[1]}`); // TODO don't throw (if used in app)
+          }
+          errMsg = `Wrong amount check: ${eqData[0]} !== ${eqData[1]}`;
         }
       }
+
+      const oobj: any = {
+        user,
+        sortiePoche: Number(sortiePoche.toFixed(1)),
+        totalCost: Number(totalCost.toFixed(1)),
+        costListSum: Number(costListSum.toFixed(1)),
+        eq,
+        owedInRepart: Number(owedInRepartCorrect.toFixed(1)),
+        errMsg
+      };
+      oobj.owed = oobj.sortiePoche - oobj.totalCost;
+      oobj.totalCostCalc = oobj.sortiePoche + (oobj.owedInRepart * -1);
+      oobj.totalOK = oobj.totalCost.toFixed(1) === oobj.totalCostCalc.toFixed(1);
+      allObj.push(oobj);
     }
+
+    return allObj;
   }
 }
