@@ -162,6 +162,9 @@ describe('RepartitionComponent1', () => {
 
     const res: any[] = RepartitionUtils.checkBalanceRepart(deps, reps, false);
 
+    expect(res.every(rrr => rrr.eq)).toEqual(true);
+    expect(res.every(rrr => !rrr.errMsg)).toEqual(true);
+
     checkBalanceReportResult(res);
 
     console.log("vd");
