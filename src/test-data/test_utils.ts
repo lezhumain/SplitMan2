@@ -201,6 +201,17 @@ export class RepartitionUtils {
       return allDeps.filter((p: IRepartitionItem) => wereOwed ? p.owesTo === getFor : p.person === getFor).reduce((res: number, item: IRepartitionItem) => {
         return res + item.amount
       }, 0);
+
+      // we're owed
+      // const allOwed: number = allDeps.filter((p: IRepartitionItem) => p.owesTo === getFor).reduce((res: number, item: IRepartitionItem) => {
+      //   return res + item.amount
+      // }, 0);
+      //
+      // const allWeOwe: number = allDeps.filter((p: IRepartitionItem) => p.person === getFor).reduce((res: number, item: IRepartitionItem) => {
+      //   return res + item.amount
+      // }, 0);
+      //
+      // return allOwed - allWeOwe;
     };
 
     const users: string[] = expenses.reduce((res: string[], item: ExpenseModel) => {
@@ -275,6 +286,7 @@ export class RepartitionUtils {
         errMsg
       };
       oobj.owed = oobj.sortiePoche - oobj.totalCost;
+      // oobj.totalCostCalc = oobj.sortiePoche + oobj.owedInRepart;
       oobj.totalCostCalc = oobj.sortiePoche + (oobj.owedInRepart * -1);
       oobj.totalOK = oobj.totalCost.toFixed(1) === oobj.totalCostCalc.toFixed(1);
       allObj.push(oobj);

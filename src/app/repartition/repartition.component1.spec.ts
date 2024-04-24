@@ -27,6 +27,12 @@ function getRepartsFromString(str: string) {
   return allll;
 }
 
+function checkBalanceReportResult(res: any[]) {
+  expect(res.every(rrr => rrr.eq)).toEqual(true);
+  expect(res.every(rrr => rrr.totalCostCalc.toFixed(1) === rrr.totalCost.toFixed(1))).toEqual(true);
+  expect(res.every(rrr => rrr.owed.toFixed(1) === rrr.owedInRepart.toFixed(1))).toEqual(true);
+}
+
 describe('RepartitionComponent1', () => {
   let component: RepartitionComponent;
   let fixture: ComponentFixture<RepartitionComponent>;
@@ -147,6 +153,20 @@ describe('RepartitionComponent1', () => {
     }
   });
 
+  it('should have correct repartition', () => {
+    const deps: ExpenseModel[] = allExpenses1.slice(0, allExpenses1.length - 2).map(f => ExpenseModel.fromJson(f));
+    component.expenses = deps;
+    fixture.detectChanges();
+
+    const reps: IRepartitionItem[] = component.allDeps.slice();
+
+    const res: any[] = RepartitionUtils.checkBalanceRepart(deps, reps, false);
+
+    checkBalanceReportResult(res);
+
+    console.log("vd");
+  })
+
   it('should have correct thing TODO TODO', () => {
     const deps: ExpenseModel[] = allExpenses1.slice(0, allExpenses1.length - 2).map(f => ExpenseModel.fromJson(f));
     component.expenses = deps;
@@ -167,6 +187,7 @@ describe('RepartitionComponent1', () => {
     // FIXME investigate on the one from Tricount
     // RepartitionUtils.checkBalanceRepart(deps, allUnknown);
     const resTricount: any[] = RepartitionUtils.checkBalanceRepart(deps, allTricount, false);
+    const resTricountFailed: any[] = resTricount.filter(e => e.errMsg.length > 0);
 
     expect(res.every(rrr => rrr.eq)).toEqual(true);
     expect(res1.every(rrr => rrr.eq)).toEqual(true);
