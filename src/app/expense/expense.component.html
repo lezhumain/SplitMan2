@@ -7,7 +7,7 @@
   <div>
     Paid for
     <ul>
-      <li *ngFor="let payee of expense.payees">{{payee}} {{(expense.amount * payee.e4xpenseRatio).toFixed(2)}}€</li>
+      <li *ngFor="let payee of expense.payees">{{payee}} {{((expense.amount || 0) * (payee.e4xpenseRatio || 0)).toFixed(2)}}€</li>
     </ul>
   </div>
   <div>Categorie: {{expense.categorie}}</div>
