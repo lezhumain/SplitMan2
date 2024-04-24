@@ -287,7 +287,7 @@ export class RepartitionUtils {
       };
       oobj.owed = oobj.sortiePoche - oobj.totalCost;
       // oobj.totalCostCalc = oobj.sortiePoche + oobj.owedInRepart;
-      oobj.totalCostCalc = oobj.sortiePoche + (oobj.owedInRepart * -1);
+      oobj.totalCostCalc = oobj.sortiePoche - oobj.owedInRepart;
       oobj.totalOK = oobj.totalCost.toFixed(1) === oobj.totalCostCalc.toFixed(1);
       allObj.push(oobj);
     }
