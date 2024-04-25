@@ -198,9 +198,21 @@ export class RepartitionUtils {
   static checkBalanceRepart(expenses: any, allDeps: IRepartitionItem[], doThrow = true) {
     // TODO type for expenses
     const getSumOwedFor = (getFor: string, wereOwed = true): number => {
-      return allDeps.filter((p: IRepartitionItem) => wereOwed ? p.owesTo === getFor : p.person === getFor).reduce((res: number, item: IRepartitionItem) => {
+      // return allDeps.filter((p: IRepartitionItem) => wereOwed ? p.owesTo === getFor : p.person === getFor).reduce((res: number, item: IRepartitionItem) => {
+      //   return res + item.amount
+      // }, 0);
+
+      // we're owed
+      const allOwed: number = allDeps.filter((p: IRepartitionItem) => p.owesTo === getFor).reduce((res: number, item: IRepartitionItem) => {
         return res + item.amount
       }, 0);
+
+      // we owe
+      const allWeOwe: number = allDeps.filter((p: IRepartitionItem) => p.person === getFor).reduce((res: number, item: IRepartitionItem) => {
+        return res + item.amount
+      }, 0);
+
+      return allOwed - allWeOwe;
     };
 
     const users: string[] = expenses.reduce((res: string[], item: ExpenseModel) => {
@@ -248,20 +260,26 @@ export class RepartitionUtils {
 
       const wereOwed = sortiePoche > totalCost;
       const owedInRepart = getSumOwedFor(user, wereOwed);
-      const owedInRepartCorrect = wereOwed ? owedInRepart : (owedInRepart * -1);
-      const eqData = [owedInRepart, Math.abs(sortiePoche - totalCost)];
+      // const owedInRepartCorrect = wereOwed ? owedInRepart : (owedInRepart * -1);
+      const owedInRepartCorrect = owedInRepart;
+      const eqData = [Math.abs(owedInRepart), Math.abs(sortiePoche - totalCost)];
+      // const eqData = [owedInRepart, sortiePoche - totalCost];
 
-      const eq = Utils.checkAmounts(eqData[0], eqData[1], 1);
+      // const eq = Utils.checkAmounts(eqData[0], eqData[1], 1);
+      const eq = Math.trunc(eqData[0]) === Math.trunc(eqData[1]);
 
       console.log(`${user} ${eq} %o`, eqData);
 
+      const first = Number(eqData[0].toFixed(1));
+      const second = Number(eqData[1].toFixed(1));
+
       let errMsg = "";
       if(!eq) {
-        if(Math.abs(eqData[0] - eqData[1]) > 1) {
+        if(Math.abs(first - second) > 1) {
           if (doThrow) {
-            throw new Error(`Wrong amount check: ${eqData[0]} !== ${eqData[1]}`); // TODO don't throw (if used in app)
+            throw new Error(`Wrong amount check: ${first} !== ${second}`); // TODO don't throw (if used in app)
           }
-          errMsg = `Wrong amount check: ${eqData[0]} !== ${eqData[1]}`;
+          errMsg = `Wrong amount check: ${first} !== ${second}`;
         }
       }
 
@@ -274,9 +292,13 @@ export class RepartitionUtils {
         owedInRepart: Number(owedInRepartCorrect.toFixed(1)),
         errMsg
       };
-      oobj.owed = oobj.sortiePoche - oobj.totalCost;
-      oobj.totalCostCalc = oobj.sortiePoche + (oobj.owedInRepart * -1);
-      oobj.totalOK = oobj.totalCost.toFixed(1) === oobj.totalCostCalc.toFixed(1);
+      oobj.owed = Number((oobj.sortiePoche - oobj.totalCost).toFixed(1));
+      // oobj.totalCostCalc = oobj.sortiePoche + oobj.owedInRepart;
+      oobj.totalCostCalc = Number((oobj.sortiePoche - oobj.owedInRepart).toFixed(1));
+
+      // oobj.totalCostOK = oobj.totalCost.toFixed(1) === oobj.totalCostCalc.toFixed(1);
+      oobj.totalCostOK = Math.trunc(oobj.totalCost) === Math.trunc(oobj.totalCostCalc);
+
       allObj.push(oobj);
     }
 

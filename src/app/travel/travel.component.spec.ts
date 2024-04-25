@@ -1,15 +1,15 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TravelComponent } from './travel.component';
-import {ExpenseModel} from "../models/expense-model";
 import {AppRoutingModule} from "../app-routing/app-routing.module";
-import {Router} from "@angular/router";
 import {TravelService} from "../travel.service";
 import {ExpenseService} from "../expense.service";
 import {NavBarService} from "../nav-bar.service";
 import {UserServiceService} from "../user-service.service";
-import {getExpenses} from "../models/expense-model.spec";
 import {HttpClientTestingModule} from "@angular/common/http/testing";
+import {ExpenseFilterComponent} from "../expense-filter/expense-filter.component";
+import {ExpenseCardComponent} from "../expense-card/expense-card.component";
+import {RepartitionComponent} from "../repartition/repartition.component";
 
 // function getExpenses(): ExpenseModel[] {
 //   return [
@@ -72,7 +72,7 @@ describe('TravelComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ TravelComponent ],
+      declarations: [ TravelComponent, ExpenseFilterComponent, ExpenseCardComponent, RepartitionComponent ],
       providers: [TravelService, ExpenseService, NavBarService, UserServiceService],
       imports:[AppRoutingModule, HttpClientTestingModule]
     })
