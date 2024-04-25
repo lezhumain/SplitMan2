@@ -65,8 +65,12 @@ export async function CreateBrowsers(): Promise<[Browser, Browser]> {
     pupArgs.executablePath = '/usr/bin/chromium-browser';
   }
 
-  const browser = await puppeteer.launch(pupArgs),
-        browser1 = await puppeteer.launch(JSON.parse(JSON.stringify(pupArgs)));
+  const browser = await puppeteer.launch(pupArgs);
+
+  const b1Args = JSON.parse(JSON.stringify(pupArgs));
+  b1Args.args = b1Args.args.filter((e) => !e.includes("--window-size"));
+  b1Args.args.push('--window-size=360,770');
+  const browser1 = await puppeteer.launch(b1Args);
 
   return Promise.resolve([browser, browser1]);
 }
