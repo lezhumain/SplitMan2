@@ -317,12 +317,23 @@ function compareTots(totsActua: { owed: {}; payed: {} }, totsExpected: { owed: {
   }
 }
 
-async function checkRepartition(thePage: Page, repart: string) {
+async function checkBalance(thePage: Page, expectedText: string) {
+  const actualText: string = await thePage.$eval("app-balance", (el: HTMLElement) => el.textContent.trim());
+  expect(actualText).to.equal(expectedText);
+}
+
+async function checkRepartition(thePage: Page, repart: string, balanceContentText?: string) {
   // check repartition
   await thePage.waitForSelector("#profile-tab", {visible: true, timeout: 10000})
     .then((e: ElementHandle) => e ? scrollAndClick(e, thePage) : null);
 
-  const res0 = await thePage.$("app-repartition > div > div:last-child")
+  if (balanceContentText) {
+    console.log("Chcecking balance...");
+    await checkBalance(thePage, balanceContentText);
+    console.log("Balance OK");
+  }
+
+  const res0 = await thePage.$("app-repartition > div > div:last-child");
 
   // const res1: ElementHandle[] = await thePage.$$("app-repartition > div > div").then((allLines: ElementHandle[]) => {
   //   return allLines.filter((l: ElementHandle, lIndex: number) => {
@@ -1151,7 +1162,7 @@ async function MainRegister(params: any[]) {
 async function MainTest(params: any[]) {
   let isError = null;
 
-  const [targetExepense, targetReparttion, inviteOnly, participants, editLast] = params;
+  const [targetExepense, targetReparttion, inviteOnly, participants, editLast, balanceContentText] = params;
 
   let pages = [];
 
@@ -1256,7 +1267,7 @@ async function MainTest(params: any[]) {
       // console.log(res1);
       // expect(res1).to.equal(expenses.length);
 
-      await checkRepartition(page, targetReparttion);
+      await checkRepartition(page, targetReparttion, balanceContentText);
     } else {
       await waitForTimeout(1000);
       // debugger;
@@ -1596,12 +1607,14 @@ async function runAll() {
       msg: "E2E with all expenses ski 2023 no rembours",
       params: [
         allExpenses1.slice(0, allExpenses1.length - 2),
-        "dju doit a 201.35€ stan Max doit a 45.23€ stan Alexis doit a 309.81€ aissa dju doit a 43.84€ aissa", // from: ?
+        "Alexis doit a 314.78€ aissa dju doit a 224.36€ stan Max doit a 126.44€ aissa dju doit a 19.84€ aissa", // current 25/04/2024, balance ok with Tricount
+        // "dju doit a 201.35€ stan Max doit a 45.23€ stan Alexis doit a 309.81€ aissa dju doit a 43.84€ aissa", // from: ?
         // "Alexis doit a 309.81€ aissa dju doit a 223.37€ stan Max doit a 128.43€ aissa dju doit a 21.83€ aissa", // from: current 23/04/2024
         // "dju doit a 97.92€ stan Max doit a 126.44€ stan Alexis doit a 314.78€ aissa dju doit a 146.28€ aissa", // from: tricount
         false,
         xpeopleSki2023,
-        false
+        false,
+        "Alexis 314.8 -461.1  aissa  dju 244.2 -224.4  stan  Max 126.4" // same as Tricount
       ]
     },
     // {

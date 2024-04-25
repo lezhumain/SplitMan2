@@ -163,6 +163,7 @@ describe('RepartitionComponent1', () => {
   });
 
   it('should have correct repartition', () => {
+    // FIXME
     const deps: ExpenseModel[] = allExpenses1.slice(0, allExpenses1.length - 2).map(f => ExpenseModel.fromJson(f));
     component.expenses = deps;
     fixture.detectChanges();
@@ -253,5 +254,58 @@ describe('RepartitionComponent1', () => {
 
     expect(fails.length).toEqual(0);
     console.log("vd");
-  })
+  });
+
+  it('should have correct repartition 2 deps', () => {
+    const deps: ExpenseModel[] = allExpenses1.slice(0, 2).map(f => ExpenseModel.fromJson(f));
+    component.expenses = deps;
+    fixture.detectChanges();
+
+    const res: any[] = RepartitionUtils.checkBalanceRepart(deps, component.allDeps, false);
+
+    expect(res.every(rrr => rrr.eq)).toEqual(true);
+    expect(res.every(rrr => !rrr.errMsg)).toEqual(true);
+
+    checkBalanceReportResult(res);
+
+    // const failed = res.filter(rrr => !rrr.totalOK); // TODO
+
+    console.log("vd");
+  });
+
+  xit('should have correct repartition all deps', () => {
+    // FIXME
+    const base = allExpenses1.slice(0, allExpenses1.length - 2);
+    const deps: ExpenseModel[] = base.map(f => ExpenseModel.fromJson(f));
+    component.expenses = deps;
+    fixture.detectChanges();
+
+    const res: any[] = RepartitionUtils.checkBalanceRepart(deps, component.allDeps, false);
+
+    expect(res.every(rrr => rrr.eq)).toEqual(true);
+    expect(res.every(rrr => !rrr.errMsg)).toEqual(true);
+
+    checkBalanceReportResult(res);
+
+    // const failed = res.filter(rrr => !rrr.totalOK); // TODO
+
+    console.log("vd");
+  });
+
+  // duplicated
+  it('should display proper balance', () => {
+    expect(component).toBeTruthy();
+
+    const expecetd = "Alexis 314.8 -461.1  aissa  dju 244.2 -224.4  stan  Max 126.4"; // Tricount balance OK
+    // const expecetd = "Alexis 309.8 -460.1  aissa  dju 245.2 -223.4  stan  Max 128.4";
+
+    component.expenses = allExpenses1.slice(0, allExpenses1.length - 2).map(f => ExpenseModel.fromJson(f));
+    fixture.detectChanges();
+
+    const els: HTMLElement[] = fixture.debugElement.nativeElement.querySelectorAll("app-balance-item");
+    expect(els.length).toEqual(5);
+
+    const content: string | null = fixture.debugElement.nativeElement.querySelector("app-balance")?.textContent.trim() || null;
+    expect(content).toEqual(expecetd);
+  });
 });

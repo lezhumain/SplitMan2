@@ -11,7 +11,7 @@ export class ExpenseParticipantModel {
   }
 
   toString(): string {
-    return `${this.name} (${this.e4xpenseRatio?.toFixed(2)})`;
+    return `${this.name} (${this.e4xpenseRatio?.toFixed(2)}%)`;
   }
 }
 
