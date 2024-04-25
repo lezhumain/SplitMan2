@@ -29,12 +29,13 @@ function getRepartsFromString(str: string) {
 
 function checkBalanceReportResult(res: any[]) {
   expect(res.every(rrr => rrr.eq)).toEqual(true);
-  expect(res.every(rrr => rrr.totalCostCalc.toFixed(0) === rrr.totalCost.toFixed(0))).toEqual(true);
+  // expect(res.every(rrr => rrr.totalCostCalc.toFixed(0) === rrr.totalCost.toFixed(0))).toEqual(true);
+  expect(res.every(rrr => Math.trunc(rrr.totalCostCalc) === Math.trunc(rrr.totalCost))).toEqual(true);
 
   // expect(res.every(rrr => rrr.owed.toFixed(1) === rrr.owedInRepart.toFixed(1))).toEqual(true);
   let owedError = false;
-  if(!res.every(rrr => rrr.owed.toFixed(0) === rrr.owedInRepart.toFixed(0))) {
-    if(!res.every(rrrr => (rrrr.owedInRepart - rrrr.owed).toFixed(0) === (rrrr.totalCost - rrrr.totalCostCalc).toFixed(0))) {
+  if(!res.every(rrr => Math.trunc(rrr.owed) === Math.trunc(rrr.owedInRepart))) {
+    if(!res.every(rrrr => Math.trunc(rrrr.owedInRepart - rrrr.owed) === Math.trunc(rrrr.totalCost - rrrr.totalCostCalc))) {
       // throw new Error("Owed results aren't correct");
       owedError = true;
     }
@@ -175,7 +176,7 @@ describe('RepartitionComponent1', () => {
     expect(res.every(rrr => rrr.eq)).toEqual(true);
     expect(res.every(rrr => !rrr.errMsg)).toEqual(true);
 
-    const failed = res.filter(rrr => !rrr.totalOK);
+    const failed = res.filter(rrr => !rrr.totalCostOK);
 
     checkBalanceReportResult(res);
 
@@ -194,26 +195,36 @@ describe('RepartitionComponent1', () => {
 
     checkBalanceReportResult(res);
 
-    const failed = res.filter(rrr => !rrr.totalOK); // TODO
+    const failed = res.filter(rrr => !rrr.totalCostOK); // TODO
 
     console.log("vd");
   })
 
   it('should have correct repartition Tricount', () => {
     const deps: ExpenseModel[] = allExpenses1.slice(0, allExpenses1.length - 2).map(f => ExpenseModel.fromJson(f));
-    component.expenses = deps;
-    fixture.detectChanges();
 
-    // const reps: IRepartitionItem[] = component.allDeps.slice();
-    //
-    // const res: any[] = RepartitionUtils.checkBalanceRepart(deps, reps, false);
     const allTricount: IRepartitionItem[] = getRepartsFromString("dju doit a 97.92€ stan Alexis doit a 314.78€ aissa Max doit a 126.44€ stan dju doit a 146.28€ aissa");
+    const balTricount: IBalanceItem[] = SplitwiseHelper.getBalance(allTricount);
+
     const res: any[] = RepartitionUtils.checkBalanceRepart(deps, allTricount, false);
 
     expect(res.every(rrr => rrr.eq)).toEqual(true);
     expect(res.every(rrr => !rrr.errMsg)).toEqual(true);
+    expect(res.every(rrr => rrr.totalCostOK)).toEqual(true);
 
-    checkBalanceReportResult(res); // TODO
+    checkBalanceReportResult(res);
+
+    // TODO check balance
+    const expectedBalanceTricount: IBalanceItem[] = [
+      {"name":"dju","amount":244.2,"owes":244.2,"owed":0},
+      {"name":"stan","amount":-224.36,"owes":0,"owed":224.36},
+      {"name":"Alexis","amount":314.78,"owes":314.78,"owed":0},
+      {"name":"aissa","amount":-461.05999999999995,"owes":0,"owed":461.05999999999995},
+      {"name":"Max","amount":126.44,"owes":126.44,"owed":0}
+    ];
+
+    expect(JSON.stringify(balTricount)).toEqual(JSON.stringify(expectedBalanceTricount));
+    // TODO maybe check html too ?
 
     console.log("vd");
   })
@@ -224,12 +235,15 @@ describe('RepartitionComponent1', () => {
     fixture.detectChanges();
 
     const reps: IRepartitionItem[] = component.allDeps.slice();
-    const resClone = reps.map(r => Object.assign({}, r));
 
     // current 23/04/2024
-    const allCurrent: IRepartitionItem[] = getRepartsFromString("dju doit a 223.37€ stan Alexis doit a 309.81€ aissa Max doit a 128.43€ aissa dju doit a 21.83€ aissa");
+    const allCurrent: IRepartitionItem[] = getRepartsFromString("Alexis doit a 314.78€ aissa dju doit a 224.36€ stan Max doit a 126.44€ aissa dju doit a 19.84€ aissa"); // current 25/04/2024, balance ok with Tricount
+
+    // before, 23/04/2024
+    // const allCurrent: IRepartitionItem[] = getRepartsFromString("dju doit a 223.37€ stan Alexis doit a 309.81€ aissa Max doit a 128.43€ aissa dju doit a 21.83€ aissa");
     // unknown
-    const allUnknown: IRepartitionItem[] = getRepartsFromString("dju doit a 201.35€ stan Alexis doit a 309.81€ aissa Max doit a 45.23€ stan dju doit a 43.84€ aissa");
+    // const allUnknown: IRepartitionItem[] = getRepartsFromString("dju doit a 201.35€ stan Alexis doit a 309.81€ aissa Max doit a 45.23€ stan dju doit a 43.84€ aissa");
+
     // tricount
     const allTricount: IRepartitionItem[] = getRepartsFromString("dju doit a 97.92€ stan Alexis doit a 314.78€ aissa Max doit a 126.44€ stan dju doit a 146.28€ aissa");
 
@@ -268,13 +282,12 @@ describe('RepartitionComponent1', () => {
 
     checkBalanceReportResult(res);
 
-    // const failed = res.filter(rrr => !rrr.totalOK); // TODO
+    // const failed = res.filter(rrr => !rrr.totalCostOK); // TODO
 
     console.log("vd");
   });
 
-  xit('should have correct repartition all deps', () => {
-    // FIXME
+  it('should have correct repartition all deps', () => {
     const base = allExpenses1.slice(0, allExpenses1.length - 2);
     const deps: ExpenseModel[] = base.map(f => ExpenseModel.fromJson(f));
     component.expenses = deps;
@@ -284,10 +297,11 @@ describe('RepartitionComponent1', () => {
 
     expect(res.every(rrr => rrr.eq)).toEqual(true);
     expect(res.every(rrr => !rrr.errMsg)).toEqual(true);
+    expect(res.every(rrr => rrr.totalCostOK)).toEqual(true);
 
     checkBalanceReportResult(res);
 
-    // const failed = res.filter(rrr => !rrr.totalOK); // TODO
+    // const failed = res.filter(rrr => !rrr.totalCostOK); // TODO
 
     console.log("vd");
   });

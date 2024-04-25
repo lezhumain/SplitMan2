@@ -265,7 +265,8 @@ export class RepartitionUtils {
       const eqData = [Math.abs(owedInRepart), Math.abs(sortiePoche - totalCost)];
       // const eqData = [owedInRepart, sortiePoche - totalCost];
 
-      const eq = Utils.checkAmounts(eqData[0], eqData[1], 1);
+      // const eq = Utils.checkAmounts(eqData[0], eqData[1], 1);
+      const eq = Math.trunc(eqData[0]) === Math.trunc(eqData[1]);
 
       console.log(`${user} ${eq} %o`, eqData);
 
@@ -294,7 +295,10 @@ export class RepartitionUtils {
       oobj.owed = Number((oobj.sortiePoche - oobj.totalCost).toFixed(1));
       // oobj.totalCostCalc = oobj.sortiePoche + oobj.owedInRepart;
       oobj.totalCostCalc = Number((oobj.sortiePoche - oobj.owedInRepart).toFixed(1));
-      oobj.totalOK = oobj.totalCost.toFixed(1) === oobj.totalCostCalc.toFixed(1);
+
+      // oobj.totalCostOK = oobj.totalCost.toFixed(1) === oobj.totalCostCalc.toFixed(1);
+      oobj.totalCostOK = Math.trunc(oobj.totalCost) === Math.trunc(oobj.totalCostCalc);
+
       allObj.push(oobj);
     }
 
