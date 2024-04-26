@@ -544,7 +544,7 @@ export const allExpenses1: { name: string, amount: number, payer: string, payees
   {
     "_id": {"$oid": "642f131c6bdaff1458ce669d"},
     "_rev": "1_2b5f8f11b9f71d3454090caaae764bc9",
-    "amount": 201.35,
+    "amount": 224.36,
     "createdAt": "2023-03-21T03:09:59.753Z",
     "createdBy": "a",
     "date": "2023-04-17T00:00:00.000Z",
@@ -566,7 +566,7 @@ export const allExpenses1: { name: string, amount: number, payer: string, payees
   {
     "_id": {"$oid": "642f13476bdaff1458ce66e3"},
     "_rev": "1_81aaee297f109a7b377115b3a88e9d26",
-    "amount": 43.84,
+    "amount": 19.84,
     "createdAt": "2023-03-21T03:10:43.370Z",
     "createdBy": "a",
     "date": "2023-03-21T03:10:20.968Z",

@@ -1577,31 +1577,29 @@ async function runAll() {
     //   ]
     // },
 
-    // {
-    //   fn: MainTest,
-    //   msg: "E2E with all expenses",
-    //   params: [
-    //     allExpenses.slice(),
-    //     "Elyan doit a 17.30€ Dju",
-    //     // "Elyan doit a 17.30€ Dju Elyan doit a 0.00€ Suzie Max doit a 0.00€ Suzie",
-    //     false,
-    //     xpeopleMarseille,
-    //     true
-    //   ]
-    // },
-    // {
-    //   fn: MainTest,
-    //   msg: "E2E with 1 expenses ski 2023",
-    //   params: [
-    //     allExpenses1.slice(0, 1),
-    //     "dju doit a 169.25€ stan aissa doit a 169.25€ stan",
-    //     false,
-    //     xpeopleSki2023,
-    //     false
-    //   ]
-    // },
-
-
+    {
+      fn: MainTest,
+      msg: "E2E with all expenses",
+      params: [
+        allExpenses.slice(),
+        "Elyan doit a 17.30€ Dju",
+        // "Elyan doit a 17.30€ Dju Elyan doit a 0.00€ Suzie Max doit a 0.00€ Suzie",
+        false,
+        xpeopleMarseille,
+        true
+      ]
+    },
+    {
+      fn: MainTest,
+      msg: "E2E with 1 expenses ski 2023",
+      params: [
+        allExpenses1.slice(0, 1),
+        "dju doit a 169.25€ stan aissa doit a 169.25€ stan",
+        false,
+        xpeopleSki2023,
+        false
+      ]
+    },
     {
       fn: MainTest,
       msg: "E2E with all expenses ski 2023 no rembours",
@@ -1614,20 +1612,21 @@ async function runAll() {
         false,
         xpeopleSki2023,
         false,
-        "Alexis 314.8 -461.1  aissa  dju 244.2 -224.4  stan  Max 126.4" // same as Tricount
+        "Alexis 314.8 -461.1  aissa  dju 244.2 -224.4  stan  Max 126.4" // same as Tricount (balance)
       ]
     },
-    // {
-    //   fn: MainTest,
-    //   msg: "E2E with all expenses ski 2023 (bug to fix)",
-    //   params: [
-    //     allExpenses1.slice(),
-    //     "Max doit a 45.23€ stan Alexis doit a 309.81€ aissa",
-    //     false,
-    //     xpeopleSki2023,
-    //     false
-    //   ]
-    // }
+
+    {
+      fn: MainTest,
+      msg: "E2E with all expenses ski 2023 (bug fixed)",
+      params: [
+        allExpenses1.slice(),
+        "Alexis doit a 314.78€ aissa Max doit a 126.44€ aissa",
+        false,
+        xpeopleSki2023,
+        false
+      ]
+    }
   ];
 
   const allRes: { msg: string, errorMsg?: string, hasError: boolean, links?: string[] }[] = [];
