@@ -85,6 +85,7 @@ export class ExpenseModel {
   static fromJson(t: any): ExpenseModel {
     const m = new ExpenseModel();
     m.assignFromObj(t);
+    m.amount = Number(m.amount.toPrecision(4));
 
     return m;
   }

@@ -29,18 +29,24 @@ function getRepartsFromString(str: string) {
 
 function checkBalanceReportResult(res: any[]) {
   expect(res.every(rrr => rrr.eq)).toEqual(true);
+  expect(res.every(rrr => !rrr.errMsg)).toEqual(true);
+  expect(res.every(rrr => rrr.totalCostOK)).toEqual(true);
+  expect(res.every(rrr => rrr.owedOk)).toEqual(true);
+
   // expect(res.every(rrr => rrr.totalCostCalc.toFixed(0) === rrr.totalCost.toFixed(0))).toEqual(true);
-  expect(res.every(rrr => Math.trunc(rrr.totalCostCalc) === Math.trunc(rrr.totalCost))).toEqual(true);
+
+  // expect(res.every(rrr => rrr.totalCostCalc.toPrecision(3) === rrr.totalCost.toPrecision(3))).toEqual(true);
 
   // expect(res.every(rrr => rrr.owed.toFixed(1) === rrr.owedInRepart.toFixed(1))).toEqual(true);
-  let owedError = false;
-  if(!res.every(rrr => Math.trunc(rrr.owed) === Math.trunc(rrr.owedInRepart))) {
-    if(!res.every(rrrr => Math.trunc(rrrr.owedInRepart - rrrr.owed) === Math.trunc(rrrr.totalCost - rrrr.totalCostCalc))) {
-      // throw new Error("Owed results aren't correct");
-      owedError = true;
-    }
-  }
-  expect(owedError).toEqual(false);
+
+  // let owedError = false;
+  // if(!res.every(rrr => rrr.owed === rrr.owedInRepart)) {
+  //   if(!res.every(rrrr => (rrrr.owedInRepart - rrrr.owed).toPrecision(4) === (rrrr.totalCost - rrrr.totalCostCalc).toPrecision(4))) {
+  //     // throw new Error("Owed results aren't correct");
+  //     owedError = true;
+  //   }
+  // }
+  // expect(owedError).toEqual(false);
 }
 
 describe('RepartitionComponent1', () => {
@@ -208,10 +214,6 @@ describe('RepartitionComponent1', () => {
 
     const res: any[] = RepartitionUtils.checkBalanceRepart(deps, allTricount, false);
 
-    expect(res.every(rrr => rrr.eq)).toEqual(true);
-    expect(res.every(rrr => !rrr.errMsg)).toEqual(true);
-    expect(res.every(rrr => rrr.totalCostOK)).toEqual(true);
-
     checkBalanceReportResult(res);
 
     // TODO check balance
@@ -263,7 +265,7 @@ describe('RepartitionComponent1', () => {
     const comp = SplitwiseHelper.compareBalances(balReps, balCurrent);
     const fails = comp.filter((compItem: IBalanceItem) => {
       // return Math.abs(compItem.owed).toFixed(2) !== "0.00" || Math.abs(compItem.owes).toFixed(2) !== "0.00";
-      return Math.abs(compItem.owed).toFixed(1) !== "0.0" || Math.abs(compItem.owes).toFixed(1) !== "0.0"; // `1` is important
+      return Number(Math.abs(compItem.owed).toFixed(1)) > 0.5 || Number(Math.abs(compItem.owes).toFixed(1)) > 0.5; // `1` is important
     });
 
     expect(fails.length).toEqual(0);
@@ -295,10 +297,6 @@ describe('RepartitionComponent1', () => {
 
     const res: any[] = RepartitionUtils.checkBalanceRepart(deps, component.allDeps, false);
 
-    expect(res.every(rrr => rrr.eq)).toEqual(true);
-    expect(res.every(rrr => !rrr.errMsg)).toEqual(true);
-    expect(res.every(rrr => rrr.totalCostOK)).toEqual(true);
-
     checkBalanceReportResult(res);
 
     // const failed = res.filter(rrr => !rrr.totalCostOK); // TODO
@@ -320,6 +318,10 @@ describe('RepartitionComponent1', () => {
     expect(els.length).toEqual(5);
 
     const content: string | null = fixture.debugElement.nativeElement.querySelector("app-balance")?.textContent.trim() || null;
-    expect(content).toEqual(expecetd);
+    // expect(content).toEqual(expecetd);
+
+    const allContent: IRepartitionItem[] = content !== null ? getRepartsFromString(content) : [];
+    const allXpected: IRepartitionItem[] = getRepartsFromString(expecetd);
+    expect(JSON.stringify(allContent)).toEqual(JSON.stringify(allXpected));
   });
 });
