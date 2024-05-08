@@ -15,7 +15,8 @@
     "e2e": "npx ts-node e2e/main_e2e.ts",
     "clear-chromium": "clearChromium.sh",
     "fix_font_awesome": "sh ./fixFontAwesome.sh",
-    "cp-libs": "npx cp-cli node_modules/bootstrap/dist src/assets/bootstrap && npx make-dir-cli src/assets/font-awesome && npx cp-cli node_modules/font-awesome/css/ src/assets/font-awesome/css && npx cp-cli node_modules/font-awesome/fonts src/assets/font-awesome/fonts"
+    "cp-libs": "npx cp-cli node_modules/bootstrap/dist src/assets/bootstrap && npx make-dir-cli src/assets/font-awesome && npx cp-cli node_modules/font-awesome/css/ src/assets/font-awesome/css && npx cp-cli node_modules/font-awesome/fonts src/assets/font-awesome/fonts",
+    "splitwise-e2e": "npx ts-node e2e/splitwiseTest.ts"
   },
   "private": true,
   "dependencies": {
@@ -32,6 +33,8 @@
     "font-awesome": "^4.7.0",
     "fontawesome": "^5.6.3",
     "nodemailer": "^6.9.13",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
     "rxjs": "^7.8.1",
     "splitwise-js-map": "git+ssh://git@github.com/ahtrahdis7/node-splitwise-js.git",
     "tslib": "^2.6.2",
@@ -46,6 +49,7 @@
     "@types/jasmine": "~4.6.4",
     "@types/node": "^18.19.31",
     "@types/nodemailer": "^6.4.14",
+    "@types/random-useragent": "^0.3.3",
     "chai": "^4.4.1",
     "cp-cli": "^2.0.0",
     "jasmine-core": "~4.6.0",
@@ -57,6 +61,7 @@
     "log-timestamp": "^0.3.0",
     "make-dir-cli": "^3.1.0",
     "puppeteer": "^22.7.1",
+    "random-useragent": "^0.5.0",
     "rimraf": "^5.0.5",
     "ts-node": "^10.9.2",
     "tsickle": "^0.46.3",

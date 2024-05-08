@@ -16,6 +16,7 @@ import {ToastComponent} from "../toast/toast.component";
 import {ToastType} from "../toast/toast.shared";
 import {BaseService} from "../base-service.service";
 import {IFilterData} from "../expense-filter/expense-filter.component";
+import {FileWriter} from "../FileWriter";
 // import {File} from "@angular/compiler-cli/src/ngtsc/file_system/testing/src/mock_file_system";
 
 @Component({
@@ -200,14 +201,68 @@ export class TravelComponent implements OnInit {
     return this.allExpenses[0].toCSV();
   }
 
+  private writeFileCordova(path: string, filename: string, blob: any, mimeType: string): Promise<void> {
+    // return new Promise((resolve, reject) => {
+    //   // @ts-ignore
+    //   window["resolveLocalFileSystemURL"](cordova.file.externalRootDirectory, function (dirpar) {
+    //     dirpar.getDirectory(path, { create: true }, function (dir: any) {
+    //       dir.getFile(filename, { create: true, exclusive: false }, function (fileEntry: any) {
+    //         fileEntry.createWriter(function (fileWriter: any) {
+    //           fileWriter.onwriteend = resolve
+    //           fileWriter.onerror = reject
+    //           fileWriter.write(blob);
+    //         });
+    //       }, reject);
+    //     }, reject);
+    //   }, reject);
+    // });
+
+    var storageLocation = "";
+    // @ts-ignore
+    const deviceObj = window.device;
+
+    // @ts-ignore
+    const window_cordova = window.cordova;
+
+
+    switch (deviceObj.platform) {
+      case "Android":
+        // storageLocation = window_cordova.file.externalDataDirectory;
+        storageLocation = window_cordova.file.externalRootDirectory ;
+        break;
+
+      case "iOS":
+        storageLocation = window_cordova.file.documentsDirectory;
+        break;
+    }
+
+    return FileWriter.downloadFile(storageLocation, blob, filename, mimeType).then((res: string) => {
+      // displayMsg(res);
+      console.log("[FileWriter.downloadFile] succes");
+      console.log(res);
+    }, (e: Error) => {
+      console.log("[FileWriter.downloadFile] error");
+      console.log(e);
+    });
+  }
+
   downloadAsCSV() {
     const textToSave: string = ExpenseModel.toCSV(this.allExpenses);
 
-    const hiddenElement = document.createElement('a');
-    hiddenElement.href = 'data:attachment/text,' + encodeURI(textToSave);
-    hiddenElement.target = '_blank';
-    hiddenElement.download = `expenses_${this.travel.id}.csv`;
-    hiddenElement.click();
+    // @ts-ignore
+    const hasCordova = !!window.cordova;
+
+    const fileName = `expenses_${this.travel.id}.csv`;
+
+    if (!hasCordova) {
+      const hiddenElement = document.createElement('a');
+      hiddenElement.href = 'data:attachment/text,' + encodeURI(textToSave);
+      hiddenElement.target = '_blank';
+      hiddenElement.download = fileName;
+      hiddenElement.click();
+    } else {
+      this.writeFileCordova(".", fileName, textToSave, "text/csv");
+    }
   }
 
   uploadCSV(): void {
