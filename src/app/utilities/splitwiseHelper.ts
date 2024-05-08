@@ -33,6 +33,7 @@ export interface IBalanceItem {
 }
 
 export class SplitwiseHelper {
+
   private static expenseToInput(expenses: ExpenseModel[]): SplitwiseInputItem[] {
     return expenses.map((e: ExpenseModel, _index: number, all: ExpenseModel[]) => {
       return {

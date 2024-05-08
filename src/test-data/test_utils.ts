@@ -119,6 +119,57 @@ export function checkArray(allDeps: any[], expected: any[], doThrow = true): boo
   return hasError;
 }
 
+interface ICheckBalanceResult {
+  user: string
+  owedInRepart: number
+  sortiePoche: number
+  totalCost: number
+  costListSum: number
+  eq: boolean
+  errMsg: string
+}
+
+class CheckBalanceResult implements ICheckBalanceResult {
+  private readonly _owed: number;
+  private readonly _totalCostCalc: number;
+  private readonly _totalCostOK: boolean;
+  private readonly _owedOk: boolean;
+
+    get owed(): number {
+      return this._owed;
+    }
+
+    get totalCostCalc(): number {
+      return this._totalCostCalc;
+    }
+
+    get totalCostOK(): boolean {
+      return this._totalCostOK;
+    }
+
+    get owedOk(): boolean {
+      return this._owedOk;
+    }
+
+    user: string = "";
+    owedInRepart: number = 0;
+    sortiePoche: number = 0;
+    totalCost: number = 0;
+    costListSum: number = 0;
+    eq: boolean = false;
+    errMsg: string = "";
+
+    constructor(obj: ICheckBalanceResult) {
+      Object.assign(this, obj);
+
+      this._owed = RepartitionUtils.sortOutNumber(this.sortiePoche - this.totalCost);
+      this._totalCostCalc = RepartitionUtils.sortOutNumber(this.sortiePoche - this.owedInRepart);
+      // this.totalCostOK = RepartitionUtils.sortOutNumber(this.totalCostO - this.totalCostCalc);
+      this._totalCostOK = RepartitionUtils.checkResults([this.totalCost, this._totalCostCalc], "", false).eq;
+      this._owedOk = RepartitionUtils.checkResults([this.owedInRepart - this._owed, this.totalCost - this._totalCostCalc], "", false).eq;
+    }
+}
+
 export class RepartitionUtils {
   static getIPaidForOthers(allExp: ExpenseModel[], me: string): [number, number] {
     const targs = allExp.filter(ae => ae.payer === me);
@@ -195,7 +246,37 @@ export class RepartitionUtils {
 
     return myTravaelCostExpense === myTravaelCostRep;
   }
-  static checkBalanceRepart(expenses: any, allDeps: IRepartitionItem[], doThrow = true) {
+
+  /**
+   * Adjusts a number to the specified digit.
+   *
+   * @param {"round" | "floor" | "ceil"} type The type of adjustment.
+   * @param {number} value The number.
+   * @param {number} exp The exponent (the 10 logarithm of the adjustment base).
+   * @returns {number} The adjusted value.
+   */
+  static decimalAdjust(type: "round" | "floor" | "ceil", value: number, exp: number) {
+    // type = String(type);
+    if (!["round", "floor", "ceil"].includes(type)) {
+      throw new TypeError(
+        "The type of decimal adjustment must be one of 'round', 'floor', or 'ceil'.",
+      );
+    }
+    exp = Number(exp);
+    value = Number(value);
+    if (exp % 1 !== 0 || Number.isNaN(value)) {
+      return NaN;
+    } else if (exp === 0) {
+      return Math[type](value);
+    }
+    const [magnitude, exponent = 0] = value.toString().split("e");
+    const adjustedValue = Math[type](Number(`${magnitude}e${Number(exponent) - exp}`));
+    // Shift back
+    const [newMagnitude, newExponent = 0] = adjustedValue.toString().split("e");
+    return Number(`${newMagnitude}e${+newExponent + exp}`);
+  }
+
+  static checkBalanceRepart(expenses: any, allDeps: IRepartitionItem[], doThrow = true): CheckBalanceResult[] {
     // TODO type for expenses
     const getSumOwedFor = (getFor: string, wereOwed = true): number => {
       // return allDeps.filter((p: IRepartitionItem) => wereOwed ? p.owesTo === getFor : p.person === getFor).reduce((res: number, item: IRepartitionItem) => {
@@ -236,7 +317,7 @@ export class RepartitionUtils {
       return ii;
     });
 
-    const allObj = [];
+    const allObj: CheckBalanceResult[] = [];
     for(const user of users) {
       const sortiePoche = expenses.filter((ex: ExpenseModel) => ex.payer === user)
         .reduce((res: number, item: ExpenseModel) => res + item.amount, 0);
@@ -262,46 +343,90 @@ export class RepartitionUtils {
       const owedInRepart = getSumOwedFor(user, wereOwed);
       // const owedInRepartCorrect = wereOwed ? owedInRepart : (owedInRepart * -1);
       const owedInRepartCorrect = owedInRepart;
-      const eqData = [Math.abs(owedInRepart), Math.abs(sortiePoche - totalCost)];
-      // const eqData = [owedInRepart, sortiePoche - totalCost];
 
-      // const eq = Utils.checkAmounts(eqData[0], eqData[1], 1);
-      const eq = Math.trunc(eqData[0]) === Math.trunc(eqData[1]);
+      const eqData: [number, number] = [Math.abs(owedInRepart), Math.abs(sortiePoche - totalCost)];
+      const {eq, errMsg} = RepartitionUtils.checkResults(eqData, user, doThrow);
 
-      console.log(`${user} ${eq} %o`, eqData);
-
-      const first = Number(eqData[0].toFixed(1));
-      const second = Number(eqData[1].toFixed(1));
-
-      let errMsg = "";
-      if(!eq) {
-        if(Math.abs(first - second) > 1) {
-          if (doThrow) {
-            throw new Error(`Wrong amount check: ${first} !== ${second}`); // TODO don't throw (if used in app)
-          }
-          errMsg = `Wrong amount check: ${first} !== ${second}`;
-        }
-      }
-
-      const oobj: any = {
+      const oobj: ICheckBalanceResult = {
         user,
-        sortiePoche: Number(sortiePoche.toFixed(1)),
-        totalCost: Number(totalCost.toFixed(1)),
-        costListSum: Number(costListSum.toFixed(1)),
+
+        // sortiePoche: sortiePoche,
+        // totalCost: totalCost,
+        // costListSum: costListSum,
+
+        // owedInRepart: Number(owedInRepartCorrect.toPrecision(4)),
+        // sortiePoche: Number(sortiePoche.toPrecision(4)),
+        // totalCost: Number(totalCost.toPrecision(4)),
+        // costListSum: Number(costListSum.toPrecision(4)),
+
+        owedInRepart: RepartitionUtils.sortOutNumber(owedInRepartCorrect),
+        sortiePoche: RepartitionUtils.sortOutNumber(sortiePoche),
+        totalCost: RepartitionUtils.sortOutNumber(totalCost),
+        costListSum: RepartitionUtils.sortOutNumber(costListSum),
+
         eq,
-        owedInRepart: Number(owedInRepartCorrect.toFixed(1)),
         errMsg
       };
-      oobj.owed = Number((oobj.sortiePoche - oobj.totalCost).toFixed(1));
-      // oobj.totalCostCalc = oobj.sortiePoche + oobj.owedInRepart;
-      oobj.totalCostCalc = Number((oobj.sortiePoche - oobj.owedInRepart).toFixed(1));
 
-      // oobj.totalCostOK = oobj.totalCost.toFixed(1) === oobj.totalCostCalc.toFixed(1);
-      oobj.totalCostOK = Math.trunc(oobj.totalCost) === Math.trunc(oobj.totalCostCalc);
 
-      allObj.push(oobj);
+      // oobj.owed = Number((oobj.sortiePoche - oobj.totalCost).toFixed(1));
+      // // oobj.totalCostCalc = oobj.sortiePoche + oobj.owedInRepart;
+      // oobj.totalCostCalc = Number((oobj.sortiePoche - oobj.owedInRepart).toFixed(1));
+      //
+      // // oobj.totalCostOK = oobj.totalCost.toFixed(1) === oobj.totalCostCalc.toFixed(1);
+      // oobj.totalCostOK = Math.trunc(oobj.totalCost) === Math.trunc(oobj.totalCostCalc);
+
+      // oobj.owed = Number((oobj.sortiePoche - oobj.totalCost).toPrecision(4));
+      // // oobj.totalCostCalc = Number((oobj.sortiePoche - oobj.owedInRepart).toPrecision(4));
+      // oobj.totalCostCalc = Number(oobj.sortiePoche.toPrecision(4)) - oobj.owedInRepart;
+      // // oobj.totalCostOK = oobj.totalCost.toPrecision(3) === oobj.totalCostCalc.toPrecision(3);
+      // oobj.totalCostOK = RepartitionUtils.decimalAdjust("floor", oobj.totalCost, 0) === RepartitionUtils.decimalAdjust("floor", oobj.totalCostCalc, 0);
+
+      // oobj.owed = RepartitionUtils.sortOutNumber(oobj.sortiePoche - oobj.totalCost);
+      // oobj.totalCostCalc = RepartitionUtils.sortOutNumber(oobj.sortiePoche - oobj.owedInRepart);
+      // // oobj.totalCostOK = RepartitionUtils.sortOutNumber(oobj.totalCostO - oobj.totalCostCalc);
+      // oobj.totalCostOK = RepartitionUtils.checkResults([oobj.totalCost, oobj.totalCostCalc], "", false).eq;
+      // oobj.owedOk = RepartitionUtils.checkResults([oobj.owedInRepart - oobj.owed, oobj.totalCost - oobj.totalCostCalc], "", false).eq;
+      const myO = new CheckBalanceResult(oobj);
+
+      allObj.push(myO);
     }
 
     return allObj;
+  }
+
+  static sortOutNumber(number: number): number {
+    return Math.round((number) * 100) / 100
+  }
+
+  static checkResults(eqData: [number, number], user: string, doThrow: boolean, allowedOffset = 0.5) {
+    // const eqData = [owedInRepart, sortiePoche - totalCost];
+
+    // const eq = Utils.checkAmounts(eqData[0], eqData[1], 1);
+    // const eq = RepartitionUtils.decimalAdjust("floor", eqData[0], 0) === RepartitionUtils.decimalAdjust("floor", eqData[1], 0);
+    // const eq = Number(eqData[0].toPrecision(4)) === Number(eqData[1].toPrecision(4));
+    const first = RepartitionUtils.sortOutNumber(eqData[0]);
+    const second = RepartitionUtils.sortOutNumber(eqData[1]);
+    let eq = first === second;
+
+    console.log(`${user} ${eq} %o`, eqData);
+
+    let errMsg = "";
+    if(!eq) {
+      if(Math.abs(first - second) > allowedOffset) {
+        if (doThrow) {
+          throw new Error(`Wrong amount check: ${first} !== ${second}`); // TODO don't throw (if used in app)
+        }
+        errMsg = `Wrong amount check: ${first} !== ${second}`;
+      }
+      else {
+        eq = true;
+      }
+    }
+
+    return {
+      eq,
+      errMsg
+    }
   }
 }
