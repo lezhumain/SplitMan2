@@ -52,7 +52,7 @@ jobs:
       uses: github/issue-metrics@v2
       env:
         GH_TOKEN: ${{ github.token }}
-        SEARCH_QUERY: 'repo:lezhumain/SplitMan2 is:issue created:${{ env.last_month }} -reason:"not planned"'
+        SEARCH_QUERY: 'repo:lezhumain/SplitMan2 is:pr created:${{ env.last_month }} -reason:"not planned"'
 
     - name: Create issue
       uses: peter-evans/create-issue-from-file@v4
@@ -60,4 +60,4 @@ jobs:
         title: Monthly issue metrics report
         content-filepath: ./issue_metrics.md
         assignees: ""
-        token: "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"
+        token: ${{ github.token }}
