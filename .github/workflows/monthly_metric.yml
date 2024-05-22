@@ -1,11 +1,11 @@
 name: Monthly Pull Requests metrics
 
-#on:
-#  workflow_dispatch:
-#  schedule:
-#    - cron: '3 2 1 * *'
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '3 2 1 * *'
 
-on: [pull_request]
+# on: [pull_request]
 
 jobs:
   build:
