@@ -20,8 +20,11 @@ jobs:
         webhook_json="$INPUT_GHEVENT"
         # pr_comment=$(jq . <<< "$webhook_json")
         jq . <<< "$webhook_json"
+
+        echo "$TOK" | wc
       env:
         INPUT_GHEVENT: ${{ toJSON(github.event) }}
+        TOK: ${{ github.token }}
 
     - name: Get dates for last month
       shell: bash
@@ -48,6 +51,7 @@ jobs:
     - name: Run issue-metrics tool
       uses: github/issue-metrics@v2
       env:
+        GH_TOKEN: ${{ github.token }}
         SEARCH_QUERY: 'repo:lezhumain/SplitMan2 is:issue created:${{ env.last_month }} -reason:"not planned"'
 
     - name: Create issue
