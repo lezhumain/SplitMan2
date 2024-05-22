@@ -1,4 +1,4 @@
-name: Monthly issue metrics
+name: Monthly Pull Requests metrics
 
 #on:
 #  workflow_dispatch:
@@ -9,7 +9,7 @@ on: [pull_request]
 
 jobs:
   build:
-    name: issue metrics
+    name: pr metrics
     runs-on: ubuntu-latest
 
     steps:
