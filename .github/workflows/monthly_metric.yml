@@ -55,9 +55,11 @@ jobs:
         SEARCH_QUERY: 'repo:lezhumain/SplitMan2 is:pr created:${{ env.last_month }} -reason:"not planned"'
 
     - name: Create issue
-      uses: peter-evans/create-issue-from-file@v4
+      uses: peter-evans/create-issue-from-file@v5
       with:
         title: Monthly issue metrics report
         content-filepath: ./issue_metrics.md
         assignees: ""
+        labels: |
+            report
         token: ${{ github.token }}
