@@ -14,6 +14,15 @@ jobs:
 
     steps:
 
+    - name: Test even
+      shell: bash
+      run: |
+        webhook_json="$INPUT_GHEVENT"
+        # pr_comment=$(jq . <<< "$webhook_json")
+        jq . <<< "$webhook_json"
+      env:
+        INPUT_GHEVENT: ${{ toJSON(github.event) }}
+
     - name: Get dates for last month
       shell: bash
       run: |
