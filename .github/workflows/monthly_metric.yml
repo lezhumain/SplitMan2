@@ -60,6 +60,12 @@ jobs:
         sed -i "s|Issue Metrics|Pull Request Metrics|" ./issue_metrics.md
         # pr_comment=$(jq . <<< "$webhook_json")
 
+    - name: Check output file
+      shell: bash
+      run: |
+        ls -alh ./issue_metrics.md
+        du -sh ./issue_metrics.md
+
     - name: Create issue
       uses: peter-evans/create-issue-from-file@v5
       with:
