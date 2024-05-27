@@ -1,11 +1,11 @@
 name: Monthly Pull Requests metrics
 
-on:
-  workflow_dispatch:
-  schedule:
-    - cron: '3 2 1 * *'
+#on:
+#  workflow_dispatch:
+#  schedule:
+#    - cron: '3 2 1 * *'
 
-# on: [pull_request]
+on: [pull_request]
 
 jobs:
   build:
@@ -53,6 +53,18 @@ jobs:
       env:
         GH_TOKEN: ${{ github.token }}
         SEARCH_QUERY: 'repo:lezhumain/SplitMan2 is:pr created:${{ env.last_month }} -reason:"not planned"'
+
+    - name: Change title
+      shell: bash
+      run: |
+        sed -i "s|Issue Metrics|Pull Request Metrics|" ./issue_metrics.md
+        # pr_comment=$(jq . <<< "$webhook_json")
+
+    - name: Check output file
+      shell: bash
+      run: |
+        ls -alh ./issue_metrics.md
+        du -sh ./issue_metrics.md
 
     - name: Create issue
       uses: peter-evans/create-issue-from-file@v5
