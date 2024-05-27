@@ -15,7 +15,7 @@ jobs:
     steps:
 
     - name: Run zenhub-report-action tool
-      uses: lezhumain/zenhub_report_action@v1
+      uses: lezhumain/zenhub_report_action@v1.0.0
       env:
         GH_TOKEN: ${{ github.token }}
         API_KEY: ${{ secrets.ZH_TOKEN }}
