@@ -1,0 +1,38 @@
+name: Monthly Pull Requests metrics
+
+#on:
+#  workflow_dispatch:
+#  schedule:
+#    - cron: '3 2 1 * *'
+
+on: [pull_request]
+
+jobs:
+  build:
+    name: pr metrics
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Run zenhub-report-action tool
+      uses: lezhumain/zenhub_report_action@v1
+      env:
+        GH_TOKEN: ${{ github.token }}
+        API_KEY: ${{ secrets.ZH_TOKEN }}
+        WORKSPACE_ID: '5e3018c2d1715f5725d0b8c7'
+
+    - name: Check output file
+      shell: bash
+      run: |
+        ls -alh ./zenhub_report.md
+        du -sh ./zenhub_report.md
+
+    - name: Create issue
+      uses: peter-evans/create-issue-from-file@v5
+      with:
+        title: Monthly zenhub metrics report
+        content-filepath: ./zenhub_report.md
+        assignees: ""
+        labels: |
+            report
+        token: ${{ github.token }}
