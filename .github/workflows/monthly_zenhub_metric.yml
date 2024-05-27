@@ -1,4 +1,4 @@
-name: Monthly Pull Requests metrics
+name: Monthly Zenhub metrics
 
 #on:
 #  workflow_dispatch:
@@ -15,7 +15,7 @@ jobs:
     steps:
 
     - name: Run zenhub-report-action tool
-      uses: lezhumain/zenhub_report_action
+      uses: lezhumain/zenhub_report_action@v1
       env:
         GH_TOKEN: ${{ github.token }}
         API_KEY: ${{ secrets.ZH_TOKEN }}
