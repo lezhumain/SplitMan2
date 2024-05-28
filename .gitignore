@@ -149,3 +149,25 @@ SpliMan2-API*
 
 *.apk
 apks
+
+mydir
+*.jsonlist
+*.tar
+**/*.bk
+Dockerfile*
+all_tiles.html
+android_build
+*.tmp
+**/*.new
+*remove*
+*remove*.*
+azure-pipelines-mongo.yml
+buildLocal.sh
+*.txt
+*.sqlite
+id_rsa
+*.keystore
+e2e_report
+package_*.json
+.idea/dataSources
+.idea/dataSources.*
