@@ -32,7 +32,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
 
     - name: Run zenhub-report-action tool
-      uses: lezhumain/zenhub_report_action@test-1.0.2
+      uses: lezhumain/zenhub_report_action@v1.0.3
       env:
         GH_TOKEN: ${{ github.token }}
         API_KEY: ${{ secrets.ZH_TOKEN }}
