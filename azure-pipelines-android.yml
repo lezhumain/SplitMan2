@@ -31,7 +31,7 @@ stages:
           - checkout: self
 
           - script: |
-              npm ci -f
+              npm ci
               npm run build:prod
             displayName: 'build'
 
