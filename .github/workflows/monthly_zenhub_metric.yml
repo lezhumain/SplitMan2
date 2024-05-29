@@ -32,11 +32,17 @@ jobs:
         node-version: ${{ matrix.node-version }}
 
     - name: Run zenhub-report-action tool
-      uses: lezhumain/zenhub_report_action@v1.0.3
+      uses: lezhumain/zenhub_report_action@better_reports_and_args
+      with:
+        WORKSPACE_ID: '5e3018c2d1715f5725d0b8c7'
+        REPO_ID: '409231566'
+        FROM_PIPELINE: 'Backlog'
+        TO_PIPELINE: 'Awaiting TESS Review'
+        FROM_DATE: ''
+        TO_DATE: ''
       env:
         GH_TOKEN: ${{ github.token }}
         API_KEY: ${{ secrets.ZH_TOKEN }}
-        WORKSPACE_ID: '5e3018c2d1715f5725d0b8c7'
 
     - name: Check output file
       shell: bash
